@@ -23,6 +23,10 @@ import {
   SupportCategory,
   SupportPriority,
   SupportStatus,
+  ServerAdvertisement,
+  AdvertisementMediaType,
+  AdvertisementStatus,
+  AdvertisementPaymentStatus,
 } from "./types";
 import { MOCK_PRODUCTS, Product } from "@/lib/data/kenya-data";
 import { LIVE_ORDERS } from "@/lib/ai/tools/index";
@@ -39,6 +43,7 @@ export interface VendLexDatabaseSchema {
   disputes: ServerDispute[];
   kycs: ServerKYC[];
   supportTickets: ServerSupportTicket[];
+  advertisements: ServerAdvertisement[];
   marketingEvents: MarketingEvent[];
   attributionSessions: Record<string, AttributionData>;
   campaigns: MarketingCampaign[];
@@ -472,6 +477,7 @@ function getInitialSeedData(): VendLexDatabaseSchema {
       errors: [],
     },
     marketingConsents: {},
+    advertisements: [],
   };
 }
 
@@ -503,6 +509,7 @@ class ServerDatabaseManager {
   }
 
   private ensureMarketingSchema(): void {
+    if (!this.db.advertisements) this.db.advertisements = [];
     if (!this.db.marketingEvents) this.db.marketingEvents = [];
     if (!this.db.attributionSessions) this.db.attributionSessions = {};
     if (!this.db.campaigns || this.db.campaigns.length === 0) {
@@ -1512,6 +1519,265 @@ class ServerDatabaseManager {
     this.persist();
     return ticket;
   }
+
+  // ==========================================
+  // LIGHTWEIGHT ADVERTISING SYSTEM METHODS
+  // ==========================================
+
+  public getAdvertisements(filters?: {
+    category?: string;
+    county?: string;
+    town?: string;
+    status?: AdvertisementStatus;
+    advertiserId?: string;
+    limit?: number;
+    offset?: number;
+  }): { advertisements: ServerAdvertisement[]; total: number } {
+    if (!this.db.advertisements) this.db.advertisements = [];
+    const now = new Date();
+
+    // Auto-expire active ads that have passed expiryDate
+    let hasExpiredAny = false;
+    for (const ad of this.db.advertisements) {
+      if (ad.status === "ACTIVE" && ad.expiryDate && new Date(ad.expiryDate) < now) {
+        ad.status = "EXPIRED";
+        ad.updatedAt = now.toISOString();
+        hasExpiredAny = true;
+      }
+    }
+    if (hasExpiredAny) this.persist();
+
+    let list = [...this.db.advertisements];
+
+    if (filters?.advertiserId) {
+      list = list.filter((ad) => ad.advertiserId === filters.advertiserId);
+    }
+
+    if (filters?.status) {
+      list = list.filter((ad) => ad.status === filters.status);
+    } else if (!filters?.advertiserId) {
+      // Default to active for public queries
+      list = list.filter((ad) => ad.status === "ACTIVE" && (!ad.expiryDate || new Date(ad.expiryDate) >= now));
+    }
+
+    if (filters?.category && filters.category !== "All") {
+      list = list.filter(
+        (ad) => ad.category.toLowerCase() === filters.category!.toLowerCase()
+      );
+    }
+
+    if (filters?.county && filters.county !== "All") {
+      list = list.filter(
+        (ad) => ad.county.toLowerCase() === filters.county!.toLowerCase()
+      );
+    }
+
+    if (filters?.town && filters.town !== "All") {
+      list = list.filter(
+        (ad) => ad.town.toLowerCase() === filters.town!.toLowerCase()
+      );
+    }
+
+    // Sort newest / active priority first
+    list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const total = list.length;
+    const offset = filters?.offset || 0;
+    const limit = filters?.limit ? Math.min(filters.limit, 50) : 10;
+
+    const paginated = list.slice(offset, offset + limit);
+    return { advertisements: paginated, total };
+  }
+
+  public getAdvertisementById(id: string): ServerAdvertisement | null {
+    if (!this.db.advertisements) this.db.advertisements = [];
+    return this.db.advertisements.find((a) => a.id === id) || null;
+  }
+
+  public createAdvertisement(data: {
+    advertiserId: string;
+    advertiserName: string;
+    advertiserEmail: string;
+    advertiserPhone: string;
+    businessName: string;
+    title: string;
+    description: string;
+    category: string;
+    county: string;
+    town: string;
+    physicalAddress?: string;
+    contactPhone: string;
+    contactWhatsapp?: string;
+    websiteUrl?: string;
+    ctaLabel?: string;
+    ctaUrl?: string;
+    mediaType: AdvertisementMediaType;
+    mediaUrl: string;
+    posterUrl?: string;
+    mediaName?: string;
+    mediaSize?: number;
+    videoDurationSeconds?: number;
+    paymentStatus?: AdvertisementPaymentStatus;
+    mpesaReceipt?: string;
+    checkoutRequestId?: string;
+  }): ServerAdvertisement {
+    if (!this.db.advertisements) this.db.advertisements = [];
+    const now = new Date().toISOString();
+    const id = `adv-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+
+    const newAd: ServerAdvertisement = {
+      id,
+      advertiserId: data.advertiserId,
+      advertiserName: data.advertiserName,
+      advertiserEmail: data.advertiserEmail,
+      advertiserPhone: data.advertiserPhone,
+      businessName: data.businessName,
+      title: data.title,
+      description: data.description,
+      category: data.category,
+      county: data.county,
+      town: data.town,
+      physicalAddress: data.physicalAddress,
+      contactPhone: data.contactPhone,
+      contactWhatsapp: data.contactWhatsapp,
+      websiteUrl: data.websiteUrl,
+      ctaLabel: data.ctaLabel || "Visit Business",
+      ctaUrl: data.ctaUrl || `/businesses/${data.businessName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+      mediaType: data.mediaType,
+      mediaUrl: data.mediaUrl,
+      posterUrl: data.posterUrl,
+      mediaName: data.mediaName,
+      mediaSize: data.mediaSize,
+      videoDurationSeconds: data.videoDurationSeconds,
+      status: "PENDING_REVIEW",
+      paymentStatus: data.paymentStatus || "PENDING",
+      amount: 1020, // KES 1,020 server-side fixed
+      currency: "KES",
+      durationDays: 30, // 30 Days
+      mpesaReceipt: data.mpesaReceipt,
+      checkoutRequestId: data.checkoutRequestId,
+      viewsCount: 0,
+      clicksCount: 0,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    this.db.advertisements.push(newAd);
+    this.persist();
+
+    this.logAction({
+      userId: data.advertiserId,
+      userRole: "SELLER",
+      action: "ADVERTISEMENT_SUBMITTED",
+      resource: "ADVERTISEMENT",
+      resourceId: id,
+      details: `Submitted business ad "${data.title}" for ${data.businessName} (KES 1,020 / 30 Days)`,
+      status: "SUCCESS",
+    });
+
+    return newAd;
+  }
+
+  public updateAdvertisement(id: string, updates: Partial<ServerAdvertisement>): ServerAdvertisement | null {
+    const ad = this.getAdvertisementById(id);
+    if (!ad) return null;
+
+    Object.assign(ad, updates, { updatedAt: new Date().toISOString() });
+    this.persist();
+    return ad;
+  }
+
+  public approveAdvertisement(id: string, note?: string): ServerAdvertisement | null {
+    const ad = this.getAdvertisementById(id);
+    if (!ad) return null;
+
+    const now = new Date();
+    const expiry = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    ad.status = "ACTIVE";
+    ad.startDate = now.toISOString();
+    ad.expiryDate = expiry.toISOString();
+    ad.moderationNote = note || "Approved by Compliance";
+    ad.updatedAt = now.toISOString();
+
+    this.persist();
+
+    this.addNotification({
+      userId: ad.advertiserId,
+      title: `Advertisement Approved & Live! 🎉`,
+      message: `Your ad "${ad.title}" for ${ad.businessName} is now live across Kenya for 30 days.`,
+      type: "SYSTEM",
+      link: "/account/advertisements",
+    });
+
+    this.logAction({
+      userId: "admin",
+      userRole: "ADMIN",
+      action: "ADVERTISEMENT_APPROVED",
+      resource: "ADVERTISEMENT",
+      resourceId: id,
+      details: `Approved business ad "${ad.title}" for 30 days active placement`,
+      status: "SUCCESS",
+    });
+
+    return ad;
+  }
+
+  public rejectAdvertisement(id: string, reason: string): ServerAdvertisement | null {
+    const ad = this.getAdvertisementById(id);
+    if (!ad) return null;
+
+    ad.status = "REJECTED";
+    ad.moderationNote = reason;
+    ad.updatedAt = new Date().toISOString();
+    this.persist();
+
+    this.addNotification({
+      userId: ad.advertiserId,
+      title: `Advertisement Rejected`,
+      message: `Your ad "${ad.title}" could not be approved. Reason: ${reason}`,
+      type: "SYSTEM",
+      link: "/account/advertisements",
+    });
+
+    this.logAction({
+      userId: "admin",
+      userRole: "ADMIN",
+      action: "ADVERTISEMENT_REJECTED",
+      resource: "ADVERTISEMENT",
+      resourceId: id,
+      details: `Rejected business ad "${ad.title}". Reason: ${reason}`,
+      status: "SUCCESS",
+    });
+
+    return ad;
+  }
+
+  public suspendAdvertisement(id: string, note?: string): ServerAdvertisement | null {
+    const ad = this.getAdvertisementById(id);
+    if (!ad) return null;
+
+    ad.status = "SUSPENDED";
+    ad.moderationNote = note || "Suspended by Admin";
+    ad.updatedAt = new Date().toISOString();
+    this.persist();
+    return ad;
+  }
+
+  public recordAdvertisementEvent(id: string, eventType: "impression" | "view" | "click"): { success: boolean; viewsCount: number; clicksCount: number } {
+    const ad = this.getAdvertisementById(id);
+    if (!ad) return { success: false, viewsCount: 0, clicksCount: 0 };
+
+    if (eventType === "impression" || eventType === "view") {
+      ad.viewsCount = (ad.viewsCount || 0) + 1;
+    } else if (eventType === "click") {
+      ad.clicksCount = (ad.clicksCount || 0) + 1;
+    }
+
+    this.persist();
+    return { success: true, viewsCount: ad.viewsCount, clicksCount: ad.clicksCount };
+  }
 }
 
 export const serverDB = new ServerDatabaseManager();
+

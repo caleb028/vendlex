@@ -414,20 +414,57 @@ function OnboardingContent() {
           </div>
         </div>
 
-        {/* Card Body */}
-        <div className="bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-3xl p-6 sm:p-10 shadow-sm space-y-6">
-          {/* STEP 1: Offering Type & Owner Contact */}
-          {step === 1 && (
-            <div className="space-y-6 animate-fadeIn">
-              <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase tracking-wider text-foreground">
-                  Select What You Intend to Sell / Offer on VendLex *
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Option 1: Physical / Retail Goods */}
-                  <div
-                    onClick={() => handleTypeChange("PRODUCT")}
-                    className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
+        {/* If user is not logged in: Must create account or sign in first */}
+        {!user ? (
+          <div className="bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-3xl p-8 sm:p-12 shadow-sm text-center space-y-6 max-w-xl mx-auto">
+            <div className="w-16 h-16 rounded-3xl bg-brand-emerald-soft text-brand-emerald flex items-center justify-center mx-auto">
+              <Store className="w-8 h-8" />
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-xl sm:text-2xl font-black text-foreground">
+                Create Your Seller Account First
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                Before onboarding your store or service on VendLex, please create an account or sign in. You will use these credentials to log into your <strong>Merchant Dashboard</strong> to manage inventory, track orders, and receive direct payouts.
+              </p>
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href="/register?role=SELLER&redirect=/seller/onboarding"
+                className="inline-flex items-center justify-center gap-2 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-3.5 px-6 rounded-xl text-xs sm:text-sm shadow-md transition-all"
+              >
+                <span>Create Seller Account</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/login?redirect=/seller/onboarding"
+                className="inline-flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-foreground font-bold py-3.5 px-6 rounded-xl text-xs sm:text-sm transition-all"
+              >
+                <span>Sign In to Existing Account</span>
+              </Link>
+            </div>
+
+            <div className="border-t border-border pt-4 text-[11px] text-muted-foreground">
+              🛡️ Verified Merchant Escrow &bull; 🇰🇪 All 47 Counties Supported &bull; ⚡ Instant M-Pesa Sales
+            </div>
+          </div>
+        ) : (
+          /* Card Body for authenticated users */
+          <div className="bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-3xl p-6 sm:p-10 shadow-sm space-y-6">
+            {/* STEP 1: Offering Type & Owner Contact */}
+            {step === 1 && (
+              <div className="space-y-6 animate-fadeIn">
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-foreground">
+                    Select What You Intend to Sell / Offer on VendLex *
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Option 1: Physical / Retail Goods */}
+                    <div
+                      onClick={() => handleTypeChange("PRODUCT")}
+                      className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
                       offeringType === "PRODUCT"
                         ? "border-brand-emerald bg-brand-emerald-soft/30 dark:bg-brand-dark-bg ring-2 ring-brand-emerald/20 shadow-sm"
                         : "border-border hover:border-brand-emerald/40"
@@ -1153,6 +1190,7 @@ function OnboardingContent() {
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   );

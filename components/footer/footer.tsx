@@ -110,6 +110,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/advertise" className="hover:text-white transition-colors font-bold text-amber-300">
+                  Advertise Business (KES 1,020)
+                </Link>
+              </li>
+              <li>
                 <Link href="/pricing" className="hover:text-white transition-colors">
                   Pricing &amp; Plans
                 </Link>

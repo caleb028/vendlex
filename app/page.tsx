@@ -5,6 +5,7 @@ import { CategoryGrid } from "@/components/home/category-grid";
 import { DealsSection } from "@/components/home/deals-section";
 import { ServicesSection } from "@/components/home/services-section";
 import { CountyDiscoverySection } from "@/components/home/county-discovery-section";
+import { SponsoredBusinessesSection } from "@/components/home/sponsored-businesses-section";
 import { DiscoverPreview } from "@/components/home/discover-preview";
 import { WhyVendlex } from "@/components/home/why-vendlex";
 import { FinalCTA } from "@/components/home/final-cta";
@@ -41,7 +42,12 @@ export default function HomePage() {
         <CountyDiscoverySection />
       </ScrollReveal>
 
-      {/* 7. Discover What's Trending */}
+      {/* 7. Sponsored Local Businesses (KES 1,020 / 30 Days) */}
+      <ScrollReveal variant="fade-up" delay={80}>
+        <SponsoredBusinessesSection />
+      </ScrollReveal>
+
+      {/* 8. Discover What's Trending */}
       <ScrollReveal variant="slide-right" delay={100}>
         <DiscoverPreview />
       </ScrollReveal>

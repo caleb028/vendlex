@@ -25,6 +25,7 @@ import {
   LogOut,
   Lock,
   FileText,
+  Megaphone,
 } from "lucide-react";
 import { useCart } from "@/lib/store/cart-store";
 import { useWishlist } from "@/lib/store/wishlist-store";
@@ -131,6 +132,7 @@ export function Navbar() {
 
   // Secondary items moved to "More" dropdown per Section 9
   const moreLinks = [
+    { href: "/advertise", label: "Advertise Business", desc: "KES 1,020 / 30 Days physical business promotion", icon: Megaphone },
     { href: "/account/documents", label: "Verified Documents", desc: "Receipts, invoices & official certificates", icon: ShieldCheck },
     { href: "/discover", label: "Discover", desc: "Social commerce & trending posts", icon: Compass },
     { href: "/customer/dashboard", label: "Rewards", desc: "VendPoints loyalty vouchers", icon: Gift },
@@ -378,6 +380,15 @@ export function Navbar() {
                         >
                           <Store className="w-4 h-4 text-muted-foreground" />
                           <span>{role === "ADMIN" || role === "SUPER_ADMIN" ? "Admin Portal" : role === "SELLER" || role === "BUSINESS_OWNER" ? "Seller Dashboard" : "My Account & Orders"}</span>
+                        </Link>
+
+                        <Link
+                          href="/account/advertisements"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-foreground hover:bg-muted/50 hover:text-brand-emerald transition-colors"
+                        >
+                          <Megaphone className="w-4 h-4 text-muted-foreground" />
+                          <span>My Advertisements</span>
                         </Link>
 
                         <Link

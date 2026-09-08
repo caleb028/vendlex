@@ -325,6 +325,50 @@ async function runLaunchReadinessTests() {
   const hasFreeTier = PRICING_PLANS.some((p) => p.monthlyPrice === 0);
   assert(!hasFreeTier, "No tier is free; all tiers require paid M-Pesa STK push onboarding");
 
+  // 13. LIGHTWEIGHT BUSINESS ADVERTISING SYSTEM (KES 1,020 / 30 DAYS)
+  console.log("\n13. Lightweight Business Advertising System & Moderation Tests:");
+  const testAd = serverDB.createAdvertisement({
+    advertiserId: testUser.id,
+    advertiserName: testUser.name,
+    advertiserEmail: testUser.email,
+    advertiserPhone: testUser.phone,
+    businessName: "Kariokor Auto & Spares Specialists",
+    title: "Genuine Toyota, Nissan & Subaru Suspension & Engine Spares",
+    description: "Specialized in high grade original spare parts, shock absorbers, brake systems, and same-day fitting.",
+    category: "Automotive & Mechanics",
+    county: "Nairobi",
+    town: "Kariokor",
+    physicalAddress: "Kariokor Ring Rd, Stall 45",
+    contactPhone: "+254712345678",
+    contactWhatsapp: "+254712345678",
+    ctaLabel: "Call Business",
+    mediaType: "IMAGE",
+    mediaUrl: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?q=80&w=800",
+    mediaSize: 1024 * 500, // 500KB
+  });
+
+  assert(testAd.id.startsWith("adv-"), "Advertisement created with unique adv- ID");
+  assert(testAd.amount === 1020, "Server-enforced price is strictly KES 1,020");
+  assert(testAd.durationDays === 30, "Server-enforced duration is strictly 30 days");
+  assert(testAd.status === "PENDING_REVIEW", "Ad enters PENDING_REVIEW before appearing publicly");
+
+  // Record impression and click events
+  const impResult = serverDB.recordAdvertisementEvent(testAd.id, "impression");
+  assert(impResult.success && impResult.viewsCount === 1, "Impression event incremented viewsCount to 1");
+  const clickResult = serverDB.recordAdvertisementEvent(testAd.id, "click");
+  assert(clickResult.success && clickResult.clicksCount === 1, "Click event incremented clicksCount to 1");
+
+  // Admin approves ad -> sets 30-day active duration
+  const approvedAd = serverDB.approveAdvertisement(testAd.id, "Verified business license & genuine parts inventory.");
+  assert(approvedAd?.status === "ACTIVE", "Ad status updated to ACTIVE upon admin approval");
+  assert(approvedAd?.startDate !== undefined && approvedAd?.expiryDate !== undefined, "Active ad has startDate and 30-day expiryDate set");
+  const activeFeed = serverDB.getAdvertisements({ status: "ACTIVE", county: "Nairobi" });
+  assert(activeFeed.advertisements.some((a) => a.id === testAd.id), "Approved active ad appears in county-filtered public feed");
+
+  // Rejection test
+  const rejectedAd = serverDB.rejectAdvertisement(testAd.id, "Inappropriate image content.");
+  assert(rejectedAd?.status === "REJECTED" && rejectedAd?.moderationNote === "Inappropriate image content.", "Ad rejection stores reason and changes status to REJECTED");
+
   console.log("\n=======================================================");
   console.log(`LAUNCH READINESS RESULTS: ${passedCount} PASSED, ${failedCount} FAILED`);
   console.log("=======================================================\n");

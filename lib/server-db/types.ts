@@ -223,3 +223,48 @@ export interface ServerSupportTicket {
   messages: ServerSupportMessage[];
 }
 
+export type AdvertisementMediaType = "IMAGE" | "VIDEO";
+export type AdvertisementStatus = "PENDING_REVIEW" | "ACTIVE" | "REJECTED" | "SUSPENDED" | "EXPIRED";
+export type AdvertisementPaymentStatus = "UNPAID" | "PENDING" | "PAID" | "FAILED";
+
+export interface ServerAdvertisement {
+  id: string; // e.g. "adv-174145..."
+  advertiserId: string;
+  advertiserName: string;
+  advertiserEmail: string;
+  advertiserPhone: string;
+  businessName: string;
+  title: string;
+  description: string;
+  category: string;
+  county: string;
+  town: string;
+  physicalAddress?: string;
+  contactPhone: string;
+  contactWhatsapp?: string;
+  websiteUrl?: string;
+  ctaLabel: string;
+  ctaUrl: string;
+  mediaType: AdvertisementMediaType;
+  mediaUrl: string;
+  posterUrl?: string;
+  mediaName?: string;
+  mediaSize?: number;
+  videoDurationSeconds?: number;
+  status: AdvertisementStatus;
+  paymentStatus: AdvertisementPaymentStatus;
+  amount: number; // 1020 KES
+  currency: string; // "KES"
+  durationDays: number; // 30 Days
+  mpesaReceipt?: string;
+  checkoutRequestId?: string;
+  startDate?: string;
+  expiryDate?: string;
+  viewsCount: number;
+  clicksCount: number;
+  moderationNote?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+

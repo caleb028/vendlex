@@ -38,9 +38,10 @@ import {
   Check,
   HelpCircle,
   Hash,
+  Megaphone,
 } from "lucide-react";
 import { AICountyHeatmap } from "@/components/ai/ai-county-heatmap";
-import { ServerSupportTicket } from "@/lib/server-db/types";
+import { ServerSupportTicket, ServerAdvertisement } from "@/lib/server-db/types";
 import { VendLexDocument } from "@/lib/documents/types";
 import { usePlatform } from "@/lib/store/platform-store";
 
@@ -72,10 +73,16 @@ export default function AdminDashboardPage() {
 
   // Navigation Tab State
   const [activeTab, setActiveTab] = useState<
-    "overview" | "support" | "kyc" | "orders" | "disputes" | "daraja" | "documents" | "heatmap"
+    "overview" | "support" | "kyc" | "orders" | "disputes" | "daraja" | "documents" | "heatmap" | "advertisements"
   >("overview");
 
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
+  // Advertisements State
+  const [advertisements, setAdvertisements] = useState<ServerAdvertisement[]>([]);
+  const [loadingAds, setLoadingAds] = useState(false);
+  const [adFilterStatus, setAdFilterStatus] = useState<string>("ALL");
+  const [rejectReasonPrompt, setRejectReasonPrompt] = useState<{ id: string; reason: string } | null>(null);
 
   // SuperAdmin Security Passcode Gate
   const [passcode, setPasscode] = useState("");
@@ -179,11 +186,83 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const fetchAdvertisements = async () => {
+    setLoadingAds(true);
+    try {
+      const res = await fetch("/api/admin/advertisements");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.advertisements)) {
+        setAdvertisements(data.advertisements);
+      }
+    } catch (e) {
+      console.warn("Advertisements fetch warning:", e);
+    } finally {
+      setLoadingAds(false);
+    }
+  };
+
+  const handleApproveAd = async (id: string) => {
+    try {
+      const res = await fetch("/api/admin/advertisements", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action: "approve" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setActionSuccess(`Advertisement #${id} approved! Ad is now active across Kenya for 30 days.`);
+        setTimeout(() => setActionSuccess(null), 3500);
+        fetchAdvertisements();
+      }
+    } catch (e) {
+      console.error("Approve ad error:", e);
+    }
+  };
+
+  const handleRejectAd = async (id: string, reason: string) => {
+    if (!reason.trim()) return;
+    try {
+      const res = await fetch("/api/admin/advertisements", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action: "reject", reason }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setActionSuccess(`Advertisement #${id} rejected with reason communicated to advertiser.`);
+        setTimeout(() => setActionSuccess(null), 3500);
+        setRejectReasonPrompt(null);
+        fetchAdvertisements();
+      }
+    } catch (e) {
+      console.error("Reject ad error:", e);
+    }
+  };
+
+  const handleSuspendAd = async (id: string) => {
+    try {
+      const res = await fetch("/api/admin/advertisements", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action: "suspend" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setActionSuccess(`Advertisement #${id} suspended.`);
+        setTimeout(() => setActionSuccess(null), 3500);
+        fetchAdvertisements();
+      }
+    } catch (e) {
+      console.error("Suspend ad error:", e);
+    }
+  };
+
   useEffect(() => {
     fetchMetrics();
     fetchSupportTickets();
     fetchDocuments();
     fetchTransactions();
+    fetchAdvertisements();
   }, []);
 
   // Quick Admin Passcode Auth for direct administrator elevation
@@ -594,6 +673,20 @@ export default function AdminDashboardPage() {
           >
             <MapPin className="w-3.5 h-3.5" />
             <span>47-County Demand</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("advertisements")}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl whitespace-nowrap transition-all ${
+              activeTab === "advertisements"
+                ? "bg-brand-emerald text-white shadow-xs"
+                : "bg-muted/30 hover:bg-muted text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Megaphone className="w-3.5 h-3.5" />
+            <span>
+              Business Ads ({advertisements.filter((a) => a.status === "PENDING_REVIEW").length} Pending)
+            </span>
           </button>
         </div>
 
@@ -1375,6 +1468,215 @@ export default function AdminDashboardPage() {
         {/* TAB 8: AI 47-COUNTY DEMAND HEATMAP                                */}
         {/* ================================================================= */}
         {activeTab === "heatmap" && <AICountyHeatmap />}
+
+        {/* ================================================================= */}
+        {/* TAB 9: BUSINESS ADVERTISEMENTS MODERATION (KES 1,020 / 30 DAYS)   */}
+        {/* ================================================================= */}
+        {activeTab === "advertisements" && (
+          <div className="space-y-6">
+            {/* Ad Stats Header */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4 space-y-1">
+                <span className="text-xs font-bold text-muted-foreground">Total Ad Orders</span>
+                <div className="text-xl font-black text-foreground">{advertisements.length}</div>
+              </div>
+              <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4 space-y-1">
+                <span className="text-xs font-bold text-amber-600">Pending Review</span>
+                <div className="text-xl font-black text-amber-600">
+                  {advertisements.filter((a) => a.status === "PENDING_REVIEW").length}
+                </div>
+              </div>
+              <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4 space-y-1">
+                <span className="text-xs font-bold text-emerald-600">Active Live Ads</span>
+                <div className="text-xl font-black text-emerald-600">
+                  {advertisements.filter((a) => a.status === "ACTIVE").length}
+                </div>
+              </div>
+              <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4 space-y-1">
+                <span className="text-xs font-bold text-brand-emerald">Ad Revenue (KES)</span>
+                <div className="text-xl font-black text-brand-emerald">
+                  {formatKSh(advertisements.filter((a) => a.paymentStatus === "PAID").length * 1020)}
+                </div>
+              </div>
+            </div>
+
+            {/* Filter Tabs & Refresh */}
+            <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold">
+                {["ALL", "PENDING_REVIEW", "ACTIVE", "REJECTED", "SUSPENDED", "EXPIRED"].map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => setAdFilterStatus(status)}
+                    className={`px-3 py-1.5 rounded-xl transition-all ${
+                      adFilterStatus === status
+                        ? "bg-brand-emerald text-white"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {status.replace(/_/g, " ")}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={fetchAdvertisements}
+                disabled={loadingAds}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground bg-muted/60 px-3 py-1.5 rounded-xl self-start sm:self-auto"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loadingAds ? "animate-spin" : ""}`} />
+                <span>Refresh</span>
+              </button>
+            </div>
+
+            {/* Reject Reason Modal */}
+            {rejectReasonPrompt && (
+              <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-2xl p-4 space-y-3 animate-fadeIn">
+                <div className="text-xs font-bold text-red-700 dark:text-red-400">
+                  Specify reason for rejecting Advertisement #{rejectReasonPrompt.id}:
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. Media contains blurry text or unverified claims. Please re-upload clearer JPEG."
+                  value={rejectReasonPrompt.reason}
+                  onChange={(e) => setRejectReasonPrompt({ ...rejectReasonPrompt, reason: e.target.value })}
+                  className="w-full bg-white dark:bg-brand-dark-bg border border-red-300 dark:border-red-800 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-red-400"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleRejectAd(rejectReasonPrompt.id, rejectReasonPrompt.reason)}
+                    className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-1.5 px-4 rounded-xl"
+                  >
+                    Confirm Rejection
+                  </button>
+                  <button
+                    onClick={() => setRejectReasonPrompt(null)}
+                    className="bg-muted hover:bg-muted/80 text-foreground font-semibold text-xs py-1.5 px-3 rounded-xl"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Ads List */}
+            {advertisements.length === 0 ? (
+              <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-12 text-center text-muted-foreground space-y-2">
+                <Megaphone className="w-8 h-8 mx-auto opacity-40 text-brand-emerald" />
+                <p className="text-xs font-semibold">No advertisements submitted yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {advertisements
+                  .filter((a) => adFilterStatus === "ALL" || a.status === adFilterStatus)
+                  .map((ad) => (
+                    <div
+                      key={ad.id}
+                      className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-5 shadow-xs space-y-4 flex flex-col justify-between"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span
+                            className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
+                              ad.status === "ACTIVE"
+                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                                : ad.status === "PENDING_REVIEW"
+                                ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                                : ad.status === "REJECTED"
+                                ? "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {ad.status.replace(/_/g, " ")}
+                          </span>
+                          <span className="text-[11px] font-mono text-muted-foreground">
+                            {new Date(ad.createdAt).toLocaleDateString("en-KE")}
+                          </span>
+                        </div>
+
+                        {/* Media Thumbnail & Details */}
+                        <div className="flex gap-3">
+                          <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden shrink-0 border border-border">
+                            {ad.mediaType === "VIDEO" ? (
+                              <video
+                                src={ad.mediaUrl}
+                                className="w-full h-full object-cover"
+                                preload="none"
+                                muted
+                              />
+                            ) : (
+                              <img
+                                src={ad.mediaUrl}
+                                alt={ad.title}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1 space-y-1">
+                            <h3 className="text-xs font-bold text-foreground truncate">{ad.title}</h3>
+                            <div className="text-[11px] text-brand-emerald font-semibold truncate">{ad.businessName}</div>
+                            <div className="text-[11px] text-muted-foreground">
+                              {ad.town}, {ad.county} &bull; {ad.category}
+                            </div>
+                            <div className="text-[10px] font-mono text-muted-foreground">
+                              Contact: {ad.contactPhone} {ad.mpesaReceipt ? `• M-Pesa: ${ad.mpesaReceipt}` : ""}
+                            </div>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed bg-muted/20 p-2 rounded-xl">
+                          {ad.description}
+                        </p>
+
+                        {/* Metrics bar */}
+                        <div className="grid grid-cols-3 gap-2 bg-muted/30 p-2 rounded-xl text-center text-[11px]">
+                          <div>
+                            <span className="text-muted-foreground block text-[10px]">Views</span>
+                            <span className="font-bold text-foreground">{ad.viewsCount}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground block text-[10px]">Clicks</span>
+                            <span className="font-bold text-foreground">{ad.clicksCount}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground block text-[10px]">Price</span>
+                            <span className="font-bold text-brand-emerald">KES 1,020</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="pt-2 border-t border-border flex items-center justify-end gap-2">
+                        {ad.status === "PENDING_REVIEW" && (
+                          <>
+                            <button
+                              onClick={() => handleApproveAd(ad.id)}
+                              className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold text-xs py-1.5 px-3 rounded-xl shadow-xs"
+                            >
+                              Approve &amp; Activate (30d)
+                            </button>
+                            <button
+                              onClick={() => setRejectReasonPrompt({ id: ad.id, reason: "" })}
+                              className="bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs py-1.5 px-3 rounded-xl"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        {ad.status === "ACTIVE" && (
+                          <button
+                            onClick={() => handleSuspendAd(ad.id)}
+                            className="bg-muted hover:bg-red-50 text-red-600 font-semibold text-xs py-1.5 px-3 rounded-xl"
+                          >
+                            Suspend Ad
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
