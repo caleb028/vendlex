@@ -330,7 +330,7 @@ function HelpSupportContent() {
             </div>
             <h4 className="font-bold text-xs text-foreground">Official Email Desk</h4>
             <p className="text-[11px] text-muted-foreground">General inquiries &amp; merchant onboarding</p>
-            <a href="mailto:calebngiciri075@gmail.com" className="text-xs font-bold text-foreground hover:text-brand-emerald transition-colors block">calebngiciri075@gmail.com</a>
+            <a href="mailto:karibu@vendlex.co.ke" className="text-xs font-bold text-foreground hover:text-brand-emerald transition-colors block">karibu@vendlex.co.ke</a>
           </div>
 
           <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-5 shadow-xs space-y-2">
