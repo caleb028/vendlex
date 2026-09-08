@@ -58,12 +58,6 @@ export default function SellerSubscriptionPage() {
     e.preventDefault();
     if (!selectedPlanToUpgrade) return;
 
-    if (selectedPlanToUpgrade.monthlyPrice === 0) {
-      setCurrentTier("free");
-      setSelectedPlanToUpgrade(null);
-      return;
-    }
-
     clearAllTimers();
     setIsProcessing(true);
     setStkStatus("idle");

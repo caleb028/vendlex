@@ -2,6 +2,7 @@ import { serverDB, hashPassword, verifyPassword } from "../lib/server-db";
 import { DocumentService } from "../lib/documents/service";
 import { DocumentStore } from "../lib/documents/store";
 import { calculateCountyDeliveryFee } from "../lib/delivery";
+import { KENYAN_COUNTIES, KENYAN_TOWNS, PRICING_PLANS } from "../lib/data/kenya-data";
 
 let passedCount = 0;
 let failedCount = 0;
@@ -309,6 +310,20 @@ async function runLaunchReadinessTests() {
   assert(approvedKYC?.status === "APPROVED", "KYC status updated to APPROVED");
   const verifiedUser = serverDB.findUserById(testUser.id);
   assert(verifiedUser?.isVerified === true, "User account isVerified updated to true automatically upon KYC approval");
+
+  // 12. KENYAN 47 COUNTIES & KSH 199 LOWEST TIER ENFORCEMENT
+  console.log("\n12. All 47 Counties & Paid Listing Package Tests:");
+  assert(KENYAN_COUNTIES.length === 47, `All 47 Kenyan Counties present (actual: ${KENYAN_COUNTIES.length})`);
+  assert(KENYAN_COUNTIES.includes("Nairobi") && KENYAN_COUNTIES.includes("Mombasa") && KENYAN_COUNTIES.includes("West Pokot") && KENYAN_COUNTIES.includes("Marsabit"), "Verified presence of sample urban, coastal, northern, and rift valley counties");
+  
+  const allCountiesHaveTowns = KENYAN_COUNTIES.every((c) => Array.isArray(KENYAN_TOWNS[c]) && KENYAN_TOWNS[c].length > 0);
+  assert(allCountiesHaveTowns, "Every one of all 47 counties has populated town/base station entries");
+
+  const basicPlan = PRICING_PLANS.find((p) => p.id === "basic");
+  assert(basicPlan !== undefined && basicPlan.monthlyPrice === 199, "Lowest tier is Basic Listing charging KSh 199/month");
+  
+  const hasFreeTier = PRICING_PLANS.some((p) => p.monthlyPrice === 0);
+  assert(!hasFreeTier, "No tier is free; all tiers require paid M-Pesa STK push onboarding");
 
   console.log("\n=======================================================");
   console.log(`LAUNCH READINESS RESULTS: ${passedCount} PASSED, ${failedCount} FAILED`);

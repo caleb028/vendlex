@@ -3,6 +3,7 @@ import { serverDB, normalizeKenyanPhone } from "@/lib/server-db";
 import { getServerSession, SESSION_COOKIE_NAME } from "@/lib/auth/session";
 import { sanitizeInput } from "@/lib/security";
 import { DocumentService } from "@/lib/documents/service";
+import { formatKSh } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -121,7 +122,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 2. Submit KYC Record
+    // 2. Submit KYC Record with uploaded document details
+    const docName = sanitizeInput(body.docName || body.docUrl || "Business_Registration_Certificate.pdf", 150);
+    const docType = sanitizeInput(body.docType || "BUSINESS_REGISTRATION", 80);
+
     const kyc = serverDB.createKYC({
       userId: user.id,
       bizName,
@@ -130,11 +134,15 @@ export async function POST(req: NextRequest) {
       nationalId,
       county,
       town,
-      docUrl: "CR12_Certificate_Registration.pdf",
+      docUrl: docName,
       status: "PENDING",
     });
 
     // 3. Issue Official Merchant Accreditation Certificate
+    const planId = (body.selectedPlan || "basic").toLowerCase();
+    const planPrice = planId === "basic" ? 199 : planId === "starter" ? 299 : planId === "pro" ? 1499 : 799;
+    const planDisplayName = planId === "basic" ? "Basic Listing Plan" : planId === "starter" ? "Starter Plan" : planId === "pro" ? "Pro Enterprise Plan" : "Business Growth Plan";
+
     const certificate = DocumentService.issueMerchantCertificate({
       userId: user.id,
       bizName,
@@ -143,9 +151,9 @@ export async function POST(req: NextRequest) {
       ownerEmail: user.email,
       regNumber,
       county,
-      planName: body.selectedPlan ? `${String(body.selectedPlan).toUpperCase()} Merchant Plan` : "Professional Merchant Tier",
+      planName: `${planDisplayName} (${formatKSh(planPrice)}/mo)`,
       mpesaReceipt: body.receiptNumber || "MPESA-VERIFIED",
-      amountPaid: body.selectedPlan === "starter" ? 2500 : body.selectedPlan === "enterprise" ? 14999 : 4999,
+      amountPaid: planPrice,
     });
 
     // 4. Dispatch Activation Notification
@@ -170,11 +178,13 @@ export async function POST(req: NextRequest) {
         sellerId: user.id,
         sellerName: bizName,
         county,
-        value: body.selectedPlan === "starter" ? 2500 : body.selectedPlan === "enterprise" ? 14999 : 4999,
+        value: planPrice,
         metadata: {
-          planName: body.selectedPlan || "starter",
+          planName: planDisplayName,
           mpesaReceipt: body.receiptNumber || "MPESA-VERIFIED",
           regNumber,
+          docName,
+          docType,
         },
       });
     } catch (mktErr) {
