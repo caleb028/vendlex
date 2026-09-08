@@ -41,7 +41,7 @@ export function SponsoredBusinessesSection() {
   }
 
   return (
-    <section className="py-12 sm:py-16 bg-gradient-to-b from-amber-500/[0.03] via-transparent to-transparent border-b border-border/50">
+    <section className="py-10 sm:py-14 bg-gradient-to-b from-amber-500/[0.03] via-transparent to-transparent border-b border-border/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">

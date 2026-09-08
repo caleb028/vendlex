@@ -34,10 +34,10 @@ const ICON_MAP: Record<string, any> = {
 
 export function CategoryGrid() {
   return (
-    <section className="py-16 bg-brand-off-white dark:bg-brand-dark-bg">
+    <section className="py-10 sm:py-14 bg-brand-off-white dark:bg-brand-dark-bg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
             <span className="text-xs font-bold text-brand-emerald dark:text-brand-emerald-light uppercase tracking-wider">
               Browse by Department

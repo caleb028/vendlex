@@ -66,8 +66,8 @@ const POPULAR_SERVICES = [
 
 export function ServicesSection() {
   return (
-    <section className="py-16 sm:py-20 bg-brand-off-white dark:bg-brand-dark-bg border-t border-border/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <section className="py-10 sm:py-14 bg-brand-off-white dark:bg-brand-dark-bg border-t border-border/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-1">

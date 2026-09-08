@@ -9,7 +9,7 @@ export function CountyDiscoverySection() {
   const [selectedCounty, setSelectedCounty] = useState("Nairobi");
 
   return (
-    <section className="py-16 sm:py-20 bg-white dark:bg-brand-dark-card border-t border-border/50">
+    <section className="py-10 sm:py-14 bg-white dark:bg-brand-dark-card border-t border-border/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-gradient-to-br from-emerald-950 via-gray-900 to-brand-charcoal rounded-3xl p-8 sm:p-12 text-white shadow-lg border border-emerald-500/20 flex flex-col lg:flex-row items-center justify-between gap-8">
           {/* Left Text */}
