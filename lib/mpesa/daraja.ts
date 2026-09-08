@@ -47,7 +47,7 @@ export const DEFAULT_DARAJA_CONFIG: DarajaConfig = {
   consumerSecret: process.env.MPESA_CONSUMER_SECRET || "EoaAwAephsJMPNeEQ2ZrpoqowrXaYYR7COcjr1Y2ZTt6l2pXQTiGOzCVByXXBLow",
   passkey: process.env.MPESA_PASSKEY || "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919",
   shortcode: process.env.MPESA_SHORTCODE || "174379", // Safaricom Daraja sandbox test paybill
-  callbackUrl: process.env.MPESA_CALLBACK_URL || "https://vendlex.co.ke/api/mpesa/callback",
+  callbackUrl: process.env.MPESA_CALLBACK_URL || "https://vendlex.vercel.app/api/mpesa/callback",
   accountReference: "VENDLEX",
   transactionDesc: "VendLex Marketplace Payment",
 };

@@ -252,10 +252,10 @@ export default function ForgotPasswordPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => selectDemoAccount("admin@vendlex.co.ke")}
+                  onClick={() => selectDemoAccount("admin@vendlex.vercel.app")}
                   className="text-[11px] font-semibold px-2 py-1 rounded-lg bg-white dark:bg-brand-dark-card border border-border text-foreground hover:border-brand-emerald hover:text-brand-emerald transition-colors"
                 >
-                  Admin: admin@vendlex.co.ke
+                  Admin: admin@vendlex.vercel.app
                 </button>
               </div>
             </div>

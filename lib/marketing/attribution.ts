@@ -47,7 +47,7 @@ export class AttributionEngine {
         } else if (refUrl.hostname.includes("facebook") || refUrl.hostname.includes("instagram")) {
           source = "meta";
           medium = "social";
-        } else if (!refUrl.hostname.includes("vendlex.co.ke") && !refUrl.hostname.includes("localhost")) {
+        } else if (!refUrl.hostname.includes("vendlex.vercel.app") && !refUrl.hostname.includes("localhost")) {
           source = refUrl.hostname;
           medium = "referral";
         }
@@ -139,7 +139,7 @@ export function parseAttributionFromUrl(
   existingAttribution?: AttributionData
 ): AttributionData {
   try {
-    const url = new URL(urlStr, "https://vendlex.co.ke");
+    const url = new URL(urlStr, "https://vendlex.vercel.app");
     return AttributionEngine.parseAttribution(
       url.searchParams,
       referrer,

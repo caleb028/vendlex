@@ -1,6 +1,6 @@
 /**
  * VendLex Kenya — Universal Production API Client
- * Seamlessly routes API requests to Render Backend (https://api.vendlex.co.ke)
+ * Seamlessly routes API requests to Render Backend (https://api.vendlex.vercel.app)
  * or Vercel Next.js routes (/api) with credentials and error handling.
  */
 
@@ -23,7 +23,7 @@ export function getApiBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_APP_URL) {
     return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
   }
-  return process.env.NODE_ENV === "production" ? "https://vendlex.co.ke" : "http://localhost:3000";
+  return process.env.NODE_ENV === "production" ? "https://vendlex.vercel.app" : "http://localhost:3000";
 }
 
 export interface ApiFetchOptions extends RequestInit {

@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       } else {
         user = serverDB.createUser({
           name: ownerName,
-          email: ownerEmail || `merchant_${Date.now()}@vendlex.co.ke`,
+          email: ownerEmail || `merchant_${Date.now()}@vendlex.vercel.app`,
           phone: ownerPhone || "+254700000000",
           role: "SELLER",
           password: "password123", // default fallback password

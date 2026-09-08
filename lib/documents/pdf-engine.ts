@@ -18,7 +18,7 @@ export class VendLexPDFEngine {
    */
   static async renderDocumentPDF(
     doc: VendLexDocument,
-    baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://vendlex.co.ke"
+    baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://vendlex.vercel.app"
   ): Promise<PDFGenerationResult> {
     const isCertificate =
       doc.documentType === "SELLER_CERTIFICATE" ||
@@ -674,7 +674,7 @@ export class VendLexPDFEngine {
     });
 
     page.drawText(
-      `SHA-256 Digest: ${doc.fileHash.substring(0, 36)}... | Authenticity verifiable at vendlex.co.ke/verify`,
+      `SHA-256 Digest: ${doc.fileHash.substring(0, 36)}... | Authenticity verifiable at vendlex.vercel.app/verify`,
       {
         x: 40,
         y: 9,
@@ -1115,7 +1115,7 @@ export class VendLexPDFEngine {
 
     // Bottom Ledger SHA-256 Digest
     page.drawText(
-      `Official Cryptographic Ledger ID: ${doc.publicDocumentId}  |  SHA-256 Digest: ${doc.fileHash.substring(0, 36)}...  |  Verifiable at vendlex.co.ke/verify`,
+      `Official Cryptographic Ledger ID: ${doc.publicDocumentId}  |  SHA-256 Digest: ${doc.fileHash.substring(0, 36)}...  |  Verifiable at vendlex.vercel.app/verify`,
       {
         x: center - 230,
         y: 22,

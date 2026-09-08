@@ -40,7 +40,7 @@ async function runHelpSupportAdminTests() {
   const newTicket = serverDB.createSupportTicket({
     userId: "usr-cust-1",
     userName: "Automated Tester",
-    userEmail: "tester@vendlex.co.ke",
+    userEmail: "tester@vendlex.vercel.app",
     userPhone: "+254712345999",
     userRole: "CUSTOMER",
     category: "DELIVERY_COURIER",

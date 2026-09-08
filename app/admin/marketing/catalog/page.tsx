@@ -71,7 +71,7 @@ export default function AdminMarketingCatalogPage() {
     setTimeout(() => setCopiedKey(null), 2500);
   };
 
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://vendlex.co.ke";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://vendlex.vercel.app";
 
   return (
     <div className="min-h-screen bg-brand-off-white dark:bg-brand-dark-bg py-8">

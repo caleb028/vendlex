@@ -3,7 +3,7 @@
 **Platform Name:** VendLex Kenya  
 **Tagline:** `SHOP • GROW • PROSPER`  
 **Version:** 1.0.0 (Production Release)  
-**Domain:** `https://vendlex.co.ke`  
+**Domain:** `https://vendlex.vercel.app`  
 **Target Market:** All 47 Counties in Kenya (Nairobi HQ, Mombasa, Kisumu, Nakuru, Eldoret, etc.)
 
 ---

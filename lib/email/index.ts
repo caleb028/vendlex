@@ -91,7 +91,7 @@ export function getAppBaseUrl(): string {
   if (process.env.APP_URL) {
     return process.env.APP_URL.replace(/\/$/, "");
   }
-  return process.env.NODE_ENV === "production" ? "https://vendlex.co.ke" : "http://localhost:3000";
+  return process.env.NODE_ENV === "production" ? "https://vendlex.vercel.app" : "http://localhost:3000";
 }
 
 /**
@@ -207,7 +207,7 @@ export async function sendEmail({
   type?: SentEmailRecord["type"];
   token?: string;
 }): Promise<SendEmailResult> {
-  const from = process.env.EMAIL_FROM || '"VendLex Kenya" <karibu@vendlex.co.ke>';
+  const from = process.env.EMAIL_FROM || '"VendLex Kenya" <karibu@vendlex.vercel.app>';
   const replyTo = process.env.REPLY_TO_EMAIL || "calebngiciri075@gmail.com";
   const transport = createTransportInstance();
   const id = `mail-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;

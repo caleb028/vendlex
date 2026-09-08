@@ -127,7 +127,7 @@ export class MetaAdapter {
             event_name: metaEventName,
             event_time: Math.floor(new Date(event.timestamp).getTime() / 1000),
             event_id: event.eventId, // Shared deduplication key with browser pixel
-            event_source_url: event.attribution?.landingPage || "https://vendlex.co.ke",
+            event_source_url: event.attribution?.landingPage || "https://vendlex.vercel.app",
             action_source: "website",
             user_data: userData,
             custom_data: customData,
@@ -192,7 +192,7 @@ export class MetaAdapter {
    */
   static generateCatalogFeedCSV(
     items: ProductFeedItem[],
-    baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://vendlex.co.ke"
+    baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://vendlex.vercel.app"
   ): string {
     const headers = [
       "id",

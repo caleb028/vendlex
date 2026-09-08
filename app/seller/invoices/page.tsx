@@ -53,7 +53,7 @@ export default function SellerInvoicesPage() {
               invoiceNumber: `INV-${ord.orderNumber?.replace("ORD-", "") || ord.id.slice(-6)}`,
               customerName: ord.customerName || "Customer",
               customerPhone: ord.customerPhone || "+254700000000",
-              customerEmail: ord.customerEmail || "customer@vendlex.co.ke",
+              customerEmail: ord.customerEmail || "customer@vendlex.vercel.app",
               kraPin: "P051" + Math.floor(100000 + Math.random() * 900000) + "Z",
               items: (ord.items || []).map((it: any) => ({
                 description: it.title || it.productTitle || "Marketplace Product",

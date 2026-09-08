@@ -156,7 +156,7 @@ export default function CustomerDashboardPage() {
                   ✓ Verified Account
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">{displayPhone} • {user?.email || "customer@vendlex.co.ke"}</p>
+              <p className="text-xs text-muted-foreground">{displayPhone} • {user?.email || "customer@vendlex.vercel.app"}</p>
             </div>
           </div>
 
@@ -494,7 +494,7 @@ export default function CustomerDashboardPage() {
                 Open Dispute Ticket
               </Link>
               <a
-                href="mailto:support@vendlex.co.ke"
+                href="mailto:support@vendlex.vercel.app"
                 className="bg-brand-emerald text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm"
               >
                 Email Support Team

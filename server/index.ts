@@ -12,8 +12,8 @@ const HOST = "0.0.0.0";
 // 1. PRODUCTION CORS CONFIGURATION
 // ============================================================================
 const allowedOrigins = [
-  "https://vendlex.co.ke",
-  "https://www.vendlex.co.ke",
+  "https://vendlex.vercel.app",
+  "https://www.vendlex.vercel.app",
   "http://localhost:3000",
   "http://127.0.0.1:3000",
 ];
@@ -38,7 +38,7 @@ app.use(
       if (
         allowedOrigins.includes(origin) ||
         origin.endsWith(".vercel.app") ||
-        origin.includes("vendlex.co.ke")
+        origin.includes("vendlex.vercel.app")
       ) {
         return callback(null, true);
       }
@@ -118,7 +118,7 @@ app.get("/", (_req: Request, res: Response) => {
   res.json({
     service: "VendLex Kenya API",
     status: "online",
-    documentation: "https://vendlex.co.ke",
+    documentation: "https://vendlex.vercel.app",
     healthCheck: "/health",
     version: "2.0.0",
   });

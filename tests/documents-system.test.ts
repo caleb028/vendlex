@@ -150,7 +150,7 @@ async function runDocumentsTestSuite() {
     bizName: "Safari Agrovet Enterprises",
     ownerName: "Caleb Ngiciri",
     ownerPhone: "0712345678",
-    ownerEmail: "caleb@vendlex.co.ke",
+    ownerEmail: "caleb@vendlex.vercel.app",
     regNumber: "BN/2026/89410",
     county: "Nairobi",
     planName: "Verified Professional Tier",

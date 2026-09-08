@@ -77,7 +77,7 @@ export default function AdminMarketingIntegrationsPage() {
     setTimeout(() => setCopiedKey(null), 2500);
   };
 
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://vendlex.co.ke";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://vendlex.vercel.app";
 
   return (
     <div className="min-h-screen bg-brand-off-white dark:bg-brand-dark-bg py-8">
@@ -293,7 +293,7 @@ META_PIXEL_ID="123456789012345"
 META_TEST_EVENT_CODE="" # optional for test events
 
 # Safaricom Daraja M-Pesa (Auto-dispatches verified purchase conversions)
-MPESA_CALLBACK_URL="https://vendlex.co.ke/api/mpesa/callback"`}
+MPESA_CALLBACK_URL="https://vendlex.vercel.app/api/mpesa/callback"`}
           </pre>
         </div>
       </div>

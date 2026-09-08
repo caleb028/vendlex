@@ -8,7 +8,7 @@ import { WishlistProvider } from "@/lib/store/wishlist-store";
 import { NotificationProvider } from "@/lib/store/notification-store";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://vendlex.co.ke"),
+  metadataBase: new URL("https://vendlex.vercel.app"),
   title: "VendLex | Kenyan Marketplace | Buy. Sell. Grow.",
   description:
     "VendLex connects customers, businesses, sellers, and services across all 47 counties in Kenya in one digital ecosystem with direct Lipa na M-Pesa payments.",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_KE",
-    url: "https://vendlex.co.ke",
+    url: "https://vendlex.vercel.app",
     title: "VendLex | Kenyan Marketplace | Buy. Sell. Grow.",
     description:
       "Kenya's premier business marketplace & growth platform. Connecting customers, businesses, sellers and services in one digital ecosystem.",

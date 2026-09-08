@@ -1082,7 +1082,7 @@ function OnboardingContent() {
                 )}
 
                 <div className="p-3 bg-muted font-mono text-xs text-brand-emerald font-bold rounded-xl max-w-sm mx-auto">
-                  vendlex.co.ke/{isService ? "services" : "store"}/{storeSlug}
+                  vendlex.vercel.app/{isService ? "services" : "store"}/{storeSlug}
                 </div>
 
                 {/* Official Accreditation Certificate Download Card */}

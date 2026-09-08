@@ -11,7 +11,7 @@ export function AiAssistantPreview() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [output, setOutput] = useState<string>(
-    `🔥 HABARI NAIROBI! PAYDAY MEGA SHOE SALE IS LIVE! 🔥\n\nUnatafuta stylish, durable sneakers and official leather shoes? Savanna Kicks tumekuletea original quality kwa bei nafuu sana.\n\n💥 SPECIAL OFFER: Enjoy 15% OFF this weekend only!\n📍 Location: Nairobi CBD & Westlands\n⚡ Delivery: Same-day delivery across Nairobi (masaa 2 tu!) na 24-hr courier countrywide.\n💳 Payment: Lipa Salama na M-Pesa unapopokea kupitia VendLex!\n\n👇 Bofya link kwenye bio kuagiza sasa:\n👉 vendlex.co.ke/store/savanna-kicks\n\n#KenyaShopping #BiasharaKenya #NairobiDeals #MadeInKenya #VendLex #LipaNaMpesa`
+    `🔥 HABARI NAIROBI! PAYDAY MEGA SHOE SALE IS LIVE! 🔥\n\nUnatafuta stylish, durable sneakers and official leather shoes? Savanna Kicks tumekuletea original quality kwa bei nafuu sana.\n\n💥 SPECIAL OFFER: Enjoy 15% OFF this weekend only!\n📍 Location: Nairobi CBD & Westlands\n⚡ Delivery: Same-day delivery across Nairobi (masaa 2 tu!) na 24-hr courier countrywide.\n💳 Payment: Lipa Salama na M-Pesa unapopokea kupitia VendLex!\n\n👇 Bofya link kwenye bio kuagiza sasa:\n👉 vendlex.vercel.app/store/savanna-kicks\n\n#KenyaShopping #BiasharaKenya #NairobiDeals #MadeInKenya #VendLex #LipaNaMpesa`
   );
 
   const samplePrompts = [

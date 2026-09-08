@@ -64,7 +64,7 @@ export default function SellerAIPage() {
       icon: Share2,
       desc: "Instagram, TikTok & WhatsApp broadcast copy",
       defaultPrompt: "Flash deal on air fryers and kitchen blenders for Nairobi families",
-      defaultOutput: (p: string) => `🔥 END-MONTH KITCHEN SALE NA VENDLEX! 🔥\n\nPika chakula bila mafuta mengi! Jipatie NutriCook 8.5L Dual Air Fryer leo kwa KSh 16,499 pekee (Was KSh 19,999)!\n\n📍 Visit our Store: Nairobi Tech Hub, CBD\n🚚 Same-day delivery across Nairobi County\n💳 Lipa na M-Pesa ukipokea bidhaa yako!\n\n👉 Bonyeza link hapa kuagiza sasa:\nvendlex.co.ke/store/nairobi-tech-hub\n\n#VendLexKenya #NairobiDeals #KitchenwareKenya #LipaNaMpesa #ShopGrowProsper`,
+      defaultOutput: (p: string) => `🔥 END-MONTH KITCHEN SALE NA VENDLEX! 🔥\n\nPika chakula bila mafuta mengi! Jipatie NutriCook 8.5L Dual Air Fryer leo kwa KSh 16,499 pekee (Was KSh 19,999)!\n\n📍 Visit our Store: Nairobi Tech Hub, CBD\n🚚 Same-day delivery across Nairobi County\n💳 Lipa na M-Pesa ukipokea bidhaa yako!\n\n👉 Bonyeza link hapa kuagiza sasa:\nvendlex.vercel.app/store/nairobi-tech-hub\n\n#VendLexKenya #NairobiDeals #KitchenwareKenya #LipaNaMpesa #ShopGrowProsper`,
     },
     {
       id: "translate" as const,

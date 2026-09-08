@@ -8,7 +8,7 @@ const ROLE_ACCOUNTS: Record<string, string> = {
   CUSTOMER: "grace.wanjiku@gmail.com",
   SELLER: "kevin@nairobihub.co.ke",
   BUSINESS_OWNER: "amina@savannafashion.ke",
-  ADMIN: "admin@vendlex.co.ke",
+  ADMIN: "admin@vendlex.vercel.app",
 };
 
 export function RoleSwitcher() {

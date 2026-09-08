@@ -32,7 +32,7 @@ async function runMarketingEngineTestSuite() {
   // SUITE 1: MULTI-TOUCH ATTRIBUTION ENGINE
   console.log("1. Attribution & Channel Resolution Tests:");
   const googleAdsUrl =
-    "https://vendlex.co.ke/marketplace/prod-101?utm_source=google&utm_medium=cpc&utm_campaign=nairobi_tech_promo&gclid=Cj0KCQjwiM_test_gclid_123&county=Nairobi";
+    "https://vendlex.vercel.app/marketplace/prod-101?utm_source=google&utm_medium=cpc&utm_campaign=nairobi_tech_promo&gclid=Cj0KCQjwiM_test_gclid_123&county=Nairobi";
   const parsedGoogle = parseAttributionFromUrl(googleAdsUrl);
 
   assert(parsedGoogle.utmSource === "google", "Parses utmSource correctly");
@@ -45,7 +45,7 @@ async function runMarketingEngineTestSuite() {
   );
 
   const metaAdsUrl =
-    "https://vendlex.co.ke/marketplace/prod-102?utm_source=facebook&utm_medium=paid_social&utm_campaign=rift_solar_sale&fbclid=IwAR2_test_fbclid_456&county=Nakuru";
+    "https://vendlex.vercel.app/marketplace/prod-102?utm_source=facebook&utm_medium=paid_social&utm_campaign=rift_solar_sale&fbclid=IwAR2_test_fbclid_456&county=Nakuru";
   const parsedMeta = parseAttributionFromUrl(metaAdsUrl);
   assert(parsedMeta.fbclid === "IwAR2_test_fbclid_456", "Parses Meta Click ID (fbclid)");
   assert(
@@ -53,14 +53,14 @@ async function runMarketingEngineTestSuite() {
     "Resolves Meta Ads channel"
   );
 
-  const organicUrl = "https://vendlex.co.ke/marketplace";
+  const organicUrl = "https://vendlex.vercel.app/marketplace";
   const parsedOrganic = parseAttributionFromUrl(organicUrl, "https://www.google.com");
   assert(
     AttributionEngine.getPrimaryChannel(parsedOrganic) === "Google",
     "Resolves Organic Google search referral"
   );
 
-  const directUrl = "https://vendlex.co.ke/deals";
+  const directUrl = "https://vendlex.vercel.app/deals";
   const parsedDirect = parseAttributionFromUrl(directUrl);
   assert(
     AttributionEngine.getPrimaryChannel(parsedDirect) === "Direct",

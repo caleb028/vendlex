@@ -346,7 +346,7 @@ function getInitialSeedData(): VendLexDatabaseSchema {
             senderId: "usr-admin-1",
             senderName: "Compliance Admin",
             senderRole: "ADMIN",
-            message: "Hi Kevin! Anyone can scan the QR code on your PDF certificate or navigate to vendlex.co.ke/verify/VLX-CER-2026-000042 to view the authentic ledger record.",
+            message: "Hi Kevin! Anyone can scan the QR code on your PDF certificate or navigate to vendlex.vercel.app/verify/VLX-CER-2026-000042 to view the authentic ledger record.",
             timestamp: "2026-09-01T09:20:00Z",
           },
         ],

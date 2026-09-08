@@ -37,7 +37,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https://images.unsplash.com https://plus.unsplash.com https://assets.unsplash.com",
       "font-src 'self' https://fonts.gstatic.com data:",
-      "connect-src 'self' https://api.vendlex.co.ke https://*.onrender.com https://*.vercel.app https://sandbox.safaricom.co.ke https://api.safaricom.co.ke https://www.google-analytics.com https://analytics.google.com https://graph.facebook.com",
+      "connect-src 'self' https://api.vendlex.vercel.app https://*.onrender.com https://*.vercel.app https://sandbox.safaricom.co.ke https://api.safaricom.co.ke https://www.google-analytics.com https://analytics.google.com https://graph.facebook.com",
       "frame-ancestors 'none'",
       "object-src 'none'",
       "base-uri 'self'",

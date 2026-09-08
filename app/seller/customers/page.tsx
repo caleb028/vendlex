@@ -52,7 +52,7 @@ export default function SellerCustomersPage() {
                 id: ord.customerId || `cust-${Math.random().toString(36).substr(2, 6)}`,
                 name: ord.customerName || "Customer",
                 phone: ord.customerPhone || "+254 700 000 000",
-                email: ord.customerEmail || "customer@vendlex.co.ke",
+                email: ord.customerEmail || "customer@vendlex.vercel.app",
                 county: `${ord.county || "Nairobi"} (${ord.town || "CBD"})`,
                 totalOrders: 1,
                 totalSpent: ord.total || 0,

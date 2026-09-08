@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
         suggestedDemoAccounts: [
           { name: "Grace Wanjiku (Buyer)", email: "grace.wanjiku@gmail.com", phone: "0712 987 654" },
           { name: "Kevin Mwangi (Seller)", email: "kevin@nairobihub.co.ke", phone: "0712 345 678" },
-          { name: "Antony Otieno (Admin)", email: "admin@vendlex.co.ke", phone: "0700 000 001" },
+          { name: "Antony Otieno (Admin)", email: "admin@vendlex.vercel.app", phone: "0700 000 001" },
         ],
       },
     });

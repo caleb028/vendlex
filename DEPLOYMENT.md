@@ -10,7 +10,7 @@ This document provides the definitive step-by-step engineering guide for deployi
                                  INTERNET
                                     │
                                     ▼
-                          https://vendlex.co.ke
+                          https://vendlex.vercel.app
                                     │
                     ┌───────────────┴───────────────┐
                     │                               │
@@ -24,7 +24,7 @@ This document provides the definitive step-by-step engineering guide for deployi
                     └───────────────┬───────────────┘
                                     │ HTTPS (API)
                                     ▼
-                         https://api.vendlex.co.ke
+                         https://api.vendlex.vercel.app
                                     │
                                     ▼
                                 DATABASE
@@ -40,7 +40,7 @@ This document provides the definitive step-by-step engineering guide for deployi
 1. **GitHub Repository**: Push this repository to your GitHub account (e.g. `github.com/your-org/vendlex`).
 2. **Vercel Account**: [vercel.com](https://vercel.com) (Free / Pro).
 3. **Render Account**: [render.com](https://render.com) (Free / Individual / Team).
-4. **Domain Registrar**: Access to DNS management for `vendlex.co.ke`.
+4. **Domain Registrar**: Access to DNS management for `vendlex.vercel.app`.
 5. **Safaricom Daraja Portal**: [developer.safaricom.co.ke](https://developer.safaricom.co.ke) for production Lipa na M-Pesa Shortcode and Passkey.
 
 ---
@@ -91,7 +91,7 @@ If setting up services individually:
 | :--- | :--- | :--- |
 | `NODE_ENV` | `production` | Enables production optimizations & secure cookies |
 | `PORT` | `10000` | Render assigns this automatically |
-| `CORS_ORIGIN` | `https://vendlex.co.ke,https://www.vendlex.co.ke` | Allowed frontend origins |
+| `CORS_ORIGIN` | `https://vendlex.vercel.app,https://www.vendlex.vercel.app` | Allowed frontend origins |
 | `DATABASE_URL` | `postgresql://...` | Connection string from Render PostgreSQL |
 | `JWT_SECRET` | *(Generate 32-byte hex)* | Token cryptography secret |
 | `SESSION_SECRET` | *(Generate 32-byte hex)* | Session hash secret |
@@ -101,7 +101,7 @@ If setting up services individually:
 | `MPESA_CONSUMER_KEY` | `XXXXXX` | Daraja Production Consumer Key |
 | `MPESA_CONSUMER_SECRET`| `XXXXXX` | Daraja Production Consumer Secret |
 | `MPESA_PASSKEY` | `XXXXXX` | Daraja Live Passkey |
-| `MPESA_CALLBACK_URL` | `https://api.vendlex.co.ke/api/daraja/callback` | Live webhook endpoint |
+| `MPESA_CALLBACK_URL` | `https://api.vendlex.vercel.app/api/daraja/callback` | Live webhook endpoint |
 
 5. Click **Deploy Web Service**.
 6. Verify deployment by visiting: `https://vendlex-api.onrender.com/health` (should return HTTP 200 `{ status: "ok" }`).
@@ -122,8 +122,8 @@ If setting up services individually:
 
 | Variable Name | Production Value | Description |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_APP_URL` | `https://vendlex.co.ke` | Canonical Frontend Domain |
-| `NEXT_PUBLIC_API_URL` | `https://api.vendlex.co.ke` | Render Backend API Domain |
+| `NEXT_PUBLIC_APP_URL` | `https://vendlex.vercel.app` | Canonical Frontend Domain |
+| `NEXT_PUBLIC_API_URL` | `https://api.vendlex.vercel.app` | Render Backend API Domain |
 | `NODE_ENV` | `production` | Production environment flag |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | `G-XXXXXXXXXX` | Google Analytics 4 Measurement ID |
 | `NEXT_PUBLIC_META_PIXEL_ID` | `123456789012345` | Meta Ads Pixel ID |
@@ -136,9 +136,9 @@ If setting up services individually:
 
 ## 5. Custom Domain & DNS Configuration
 
-When you are ready to point your official domain (`vendlex.co.ke`):
+When you are ready to point your official domain (`vendlex.vercel.app`):
 
-### A. Frontend Domain Records (`vendlex.co.ke`)
+### A. Frontend Domain Records (`vendlex.vercel.app`)
 In your domain registrar DNS management (e.g. Kenya Web Experts, Safaricom Domains, Namecheap, Cloudflare):
 
 | Type | Host / Name | Value / Destination | TTL | Purpose |
@@ -148,12 +148,12 @@ In your domain registrar DNS management (e.g. Kenya Web Experts, Safaricom Domai
 
 In Vercel:
 - Navigate to **Project Settings** → **Domains**.
-- Add `vendlex.co.ke` and `www.vendlex.co.ke`.
+- Add `vendlex.vercel.app` and `www.vendlex.vercel.app`.
 - Vercel will provision free SSL certificates automatically (Let's Encrypt).
 
 ---
 
-### B. Backend API Domain Records (`api.vendlex.co.ke`)
+### B. Backend API Domain Records (`api.vendlex.vercel.app`)
 In your domain registrar DNS management:
 
 | Type | Host / Name | Value / Destination | TTL | Purpose |
@@ -162,7 +162,7 @@ In your domain registrar DNS management:
 
 In Render:
 - Navigate to **Web Service** (`vendlex-api`) → **Settings** → **Custom Domains**.
-- Add `api.vendlex.co.ke`.
+- Add `api.vendlex.vercel.app`.
 - Render will verify DNS and issue a free SSL certificate automatically.
 
 ---
@@ -173,13 +173,13 @@ Once your domain is active, provide these authoritative feed URLs to Google & Me
 
 - **Google Merchant Center RSS 2.0 XML**:
   ```text
-  https://api.vendlex.co.ke/api/feeds/google-merchant.xml
-  (or https://vendlex.co.ke/api/feeds/google-merchant.xml)
+  https://api.vendlex.vercel.app/api/feeds/google-merchant.xml
+  (or https://vendlex.vercel.app/api/feeds/google-merchant.xml)
   ```
 - **Meta Ads Facebook/Instagram Catalog CSV**:
   ```text
-  https://api.vendlex.co.ke/api/feeds/meta-catalog.csv
-  (or https://vendlex.co.ke/api/feeds/meta-catalog.csv)
+  https://api.vendlex.vercel.app/api/feeds/meta-catalog.csv
+  (or https://vendlex.vercel.app/api/feeds/meta-catalog.csv)
   ```
 
 ---
@@ -188,8 +188,8 @@ Once your domain is active, provide these authoritative feed URLs to Google & Me
 
 Execute this checklist once deployed:
 
-- [ ] **API Health**: `curl https://api.vendlex.co.ke/health` returns `{"status":"ok"}`.
-- [ ] **Frontend Home**: Visit `https://vendlex.co.ke` — Navbar, categories, and hero banner render cleanly.
+- [ ] **API Health**: `curl https://api.vendlex.vercel.app/health` returns `{"status":"ok"}`.
+- [ ] **Frontend Home**: Visit `https://vendlex.vercel.app` — Navbar, categories, and hero banner render cleanly.
 - [ ] **User Registration & Login**: Test signing up with a Kenyan phone number (+254...) and signing in.
 - [ ] **Marketplace Browsing**: Filter products by Nairobi, Kiambu, Mombasa, and category.
 - [ ] **Cart & Checkout**: Add product to cart, select county delivery zone, and initiate checkout.
@@ -198,7 +198,7 @@ Execute this checklist once deployed:
 - [ ] **Help & Support**: Submit a support ticket (`TKT-2026-XXXXX`) and verify message reply thread.
 - [ ] **Admin Command Center**: Access `/admin`, enter security passcode, and review live KPI dashboard.
 - [ ] **PWA Installation**: Test "Add to Home Screen" on Android / iOS Chrome / Safari.
-- [ ] **Robots & Sitemap**: Verify `https://vendlex.co.ke/robots.txt` and `https://vendlex.co.ke/sitemap.xml`.
+- [ ] **Robots & Sitemap**: Verify `https://vendlex.vercel.app/robots.txt` and `https://vendlex.vercel.app/sitemap.xml`.
 
 ---
 

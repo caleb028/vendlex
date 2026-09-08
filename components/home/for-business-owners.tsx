@@ -42,7 +42,7 @@ export function ForBusinessOwners() {
                 <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
-                <span>Free custom digital storefront URL (vendlex.co.ke/store/your-name)</span>
+                <span>Free custom digital storefront URL (vendlex.vercel.app/store/your-name)</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
@@ -93,7 +93,7 @@ export function ForBusinessOwners() {
                   <div className="w-3 h-3 rounded-full bg-amber-500/80" />
                   <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
                   <span className="text-xs text-gray-400 font-mono ml-2">
-                    vendlex.co.ke/seller/nairobi-tech-hub
+                    vendlex.vercel.app/seller/nairobi-tech-hub
                   </span>
                 </div>
                 <span className="text-[11px] bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold px-2.5 py-0.5 rounded-full">

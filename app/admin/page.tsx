@@ -134,7 +134,7 @@ export default function AdminDashboardPage() {
   const [consumerKey, setConsumerKey] = useState("k0kU8oM4Y8w6p6PZ2eZ7sR8Q1A1b2c3d");
   const [consumerSecret, setConsumerSecret] = useState("••••••••••••••••••••••••••••••••");
   const [passkey, setPasskey] = useState("bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919");
-  const callbackUrl = typeof window !== "undefined" ? `${window.location.origin}/api/mpesa/callback` : "https://vendlex.co.ke/api/mpesa/callback";
+  const callbackUrl = typeof window !== "undefined" ? `${window.location.origin}/api/mpesa/callback` : "https://vendlex.vercel.app/api/mpesa/callback";
 
   // STK Test Simulator State
   const [testPhone, setTestPhone] = useState("0712345678");
@@ -282,7 +282,7 @@ export default function AdminDashboardPage() {
     setAuthError(null);
 
     if (passcode.trim() === "admin123" || passcode.trim() === "vendlex2026") {
-      await login("admin@vendlex.co.ke", "password123", true);
+      await login("admin@vendlex.vercel.app", "password123", true);
       setIsAuthenticating(false);
       setActionSuccess("SuperAdmin Privileges Verified. Full platform access granted.");
       setTimeout(() => setActionSuccess(null), 3000);

@@ -151,7 +151,7 @@ export class GoogleAdapter {
    */
   static generateMerchantFeedXML(
     items: ProductFeedItem[],
-    baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://vendlex.co.ke"
+    baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://vendlex.vercel.app"
   ): string {
     const escapeXml = (unsafe: string) =>
       (unsafe || "")

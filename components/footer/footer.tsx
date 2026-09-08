@@ -58,7 +58,7 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
-                <a href="mailto:karibu@vendlex.co.ke" className="hover:text-white transition-colors">karibu@vendlex.co.ke</a>
+                <a href="mailto:karibu@vendlex.vercel.app" className="hover:text-white transition-colors">karibu@vendlex.vercel.app</a>
               </div>
             </div>
           </div>
@@ -193,7 +193,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:careers@vendlex.co.ke" className="hover:text-white transition-colors">
+                <a href="mailto:careers@vendlex.vercel.app" className="hover:text-white transition-colors">
                   Careers
                 </a>
               </li>

@@ -63,7 +63,7 @@ Looking for premium **${inputPrompt}**? We've got you covered with certified qua
 🔥 **Special Promo:** Use code **KARIBU10** at checkout for 10% OFF your first order!
 
 Tap the link to shop directly on our VendLex verified storefront:
-👉 vendlex.co.ke/store/${businessName.toLowerCase().replace(/\s+/g, "-")}
+👉 vendlex.vercel.app/store/${businessName.toLowerCase().replace(/\s+/g, "-")}
 
 #NairobiCommerce #KenyaTech #OnlineShoppingKenya #VendLex #KenyanBrands #BusinessGrowth`;
       }
