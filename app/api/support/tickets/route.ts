@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
       userId: "usr-admin-1",
       title: `🚨 New Support Ticket: ${ticket.ticketNumber}`,
       message: `From ${userName} (${userPhone} / ${userEmail}): "${ticket.subject}"`,
-      type: "ALERT",
+      type: "SECURITY",
       link: `/admin`,
     });
 
