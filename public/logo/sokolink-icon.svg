@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="100%" height="100%" fill="none">
+  <defs>
+    <clipPath id="bagIconShape">
+      <path d="M 40 45 C 40 42, 43 40, 47 40 L 133 40 C 137 40, 140 42, 140 45 L 152 165 C 153 169, 149 172, 145 172 L 35 172 C 31 172, 27 169, 28 165 Z" />
+    </clipPath>
+  </defs>
+
+  <!-- BAG HANDLES -->
+  <g stroke="#056B38" stroke-width="8" stroke-linecap="round" fill="none">
+    <path d="M 68 45 L 68 22 C 68 12, 112 12, 112 22 L 112 45" />
+  </g>
+
+  <!-- SHOPPING BAG BODY -->
+  <g clip-path="url(#bagIconShape)">
+    <rect x="0" y="0" width="180" height="110" fill="#056B38" />
+    <rect x="0" y="110" width="180" height="75" fill="#C40D18" />
+    <path d="M 180 62 L 72 62 C 60 62, 52 70, 52 82 C 52 94, 62 102, 74 102 L 180 102 Z" fill="#C40D18" />
+
+    <path d="M 0 112 L 68 112" stroke="#FFFFFF" stroke-width="12" stroke-linecap="square" />
+    <path d="M 180 62 L 80 62 C 64 62, 54 74, 54 88 C 54 102, 66 112, 82 112 L 102 112 C 118 112, 126 122, 126 136 C 126 150, 114 160, 96 160 C 80 160, 70 150, 70 138" 
+          stroke="#FFFFFF" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <ellipse cx="94" cy="138" rx="8" ry="10" fill="#C40D18" />
+  </g>
+</svg>

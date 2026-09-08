@@ -1,0 +1,28 @@
+# ==============================================================================
+# VendLex Kenya — Production Search Engine Directive (robots.txt)
+# https://vendlex.co.ke
+# ==============================================================================
+
+User-agent: *
+Allow: /
+Allow: /marketplace
+Allow: /businesses
+Allow: /services
+Allow: /deals
+Allow: /discover
+Allow: /b2b
+Allow: /counties
+Allow: /help
+
+# Disallow private user/admin dashboards and sensitive API routes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /seller/
+Disallow: /customer/
+Disallow: /account/
+Disallow: /api/
+Disallow: /reset-password
+Disallow: /verify-email
+
+# Canonical XML Sitemap
+Sitemap: https://vendlex.co.ke/sitemap.xml

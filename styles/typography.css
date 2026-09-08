@@ -1,0 +1,187 @@
+/* ============================================================================
+   VendLex Kenya — High-Visibility Typography System
+   Specialized for ultra-clear readability, sharp contrast & fluid responsive scaling.
+   Meets Apple, Stripe & Shopify typography accessibility and visual hierarchy standards.
+============================================================================ */
+
+:root {
+  /* 1. Fluid Font Scales (using clamp for seamless desktop & mobile responsiveness) */
+  --font-size-hero: clamp(2rem, 4.5vw + 1rem, 3.75rem);       /* 32px - 60px */
+  --font-size-h1: clamp(1.625rem, 3vw + 0.5rem, 2.5rem);      /* 26px - 40px */
+  --font-size-h2: clamp(1.375rem, 2.2vw + 0.4rem, 2rem);      /* 22px - 32px */
+  --font-size-h3: clamp(1.25rem, 1.5vw + 0.3rem, 1.625rem);   /* 20px - 26px */
+  --font-size-h4: clamp(1.125rem, 1vw + 0.3rem, 1.375rem);    /* 18px - 22px */
+  
+  --font-size-body-lg: clamp(1.0625rem, 0.4vw + 0.95rem, 1.1875rem); /* 17px - 19px */
+  --font-size-body: clamp(1rem, 0.3vw + 0.92rem, 1.125rem);          /* 16px - 18px */
+  --font-size-body-sm: clamp(0.875rem, 0.2vw + 0.82rem, 0.9375rem);  /* 14px - 15px */
+  --font-size-caption: clamp(0.75rem, 0.15vw + 0.72rem, 0.8125rem);  /* 12px - 13px */
+  
+  --font-size-button: clamp(0.9375rem, 0.3vw + 0.85rem, 1.0625rem);  /* 15px - 17px */
+  --font-size-label: clamp(0.875rem, 0.2vw + 0.82rem, 0.9375rem);    /* 14px - 15px */
+
+  /* 2. Line Heights */
+  --leading-tight: 1.2;
+  --leading-heading: 1.25;
+  --leading-snug: 1.35;
+  --leading-body: 1.6;
+  --leading-relaxed: 1.7;
+
+  /* 3. Letter Spacing (Tracking) */
+  --tracking-tight: -0.025em;  /* -0.5px */
+  --tracking-normal: 0em;      /* 0px */
+  --tracking-wide: 0.015em;    /* +0.2px */
+  --tracking-wider: 0.05em;
+
+  /* 4. High-Contrast Text Colors (Light Mode) */
+  --text-primary: #111827;     /* Deep rich charcoal black - WCAG AAA */
+  --text-secondary: #1F2937;   /* Secondary strong dark */
+  --text-muted: #374151;       /* High-visibility muted text (replaces low contrast gray) */
+  --text-subtle: #4B5563;
+  --text-inverse: #FFFFFF;
+}
+
+.dark {
+  /* High-Contrast Text Colors (Dark Mode) */
+  --text-primary: #F9FAFB;     /* Ultra-bright off-white */
+  --text-secondary: #F3F4F6;   /* Secondary bright light */
+  --text-muted: #D1D5DB;       /* Clear readable light slate */
+  --text-subtle: #9CA3AF;
+  --text-inverse: #111827;
+}
+
+/* ============================================================================
+   GLOBAL TYPOGRAPHY DEFAULTS & BASE OVERRIDES
+============================================================================ */
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans, "Inter", "Poppins", system-ui, -apple-system, sans-serif);
+  font-size: var(--font-size-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-primary);
+}
+
+/* Headings */
+h1, .h1, .heading-1 {
+  font-size: var(--font-size-h1);
+  font-weight: 800;
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+h2, .h2, .heading-2 {
+  font-size: var(--font-size-h2);
+  font-weight: 700;
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+h3, .h3, .heading-3 {
+  font-size: var(--font-size-h3);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-normal);
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+h4, .h4, .heading-4 {
+  font-size: var(--font-size-h4);
+  font-weight: 600;
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-normal);
+  color: var(--text-primary);
+}
+
+/* Paragraphs */
+p {
+  font-size: var(--font-size-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-secondary);
+}
+
+p.lead, .text-lead {
+  font-size: var(--font-size-body-lg);
+  line-height: var(--leading-relaxed);
+  font-weight: 450;
+  color: var(--text-primary);
+}
+
+/* Labels & Form Elements */
+label, .label-text {
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: var(--tracking-normal);
+  color: var(--text-primary);
+  display: inline-block;
+}
+
+input, textarea, select {
+  font-size: var(--font-size-body);
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+/* Buttons */
+button, .btn, [type="button"], [type="submit"] {
+  font-size: var(--font-size-button);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: var(--tracking-wide);
+  text-decoration: none;
+}
+
+/* High Visibility Utility Classes */
+.text-contrast-primary {
+  color: var(--text-primary) !important;
+}
+
+.text-contrast-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.text-contrast-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Card & Surface Sharp Typography */
+.card-title {
+  font-size: var(--font-size-h3);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
+}
+
+.card-subtitle {
+  font-size: var(--font-size-body-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.card-body {
+  font-size: var(--font-size-body);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+
+/* Pricing / Currency Numbers */
+.price-display {
+  font-feature-settings: "tnum" 1, "cv05" 1;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+}

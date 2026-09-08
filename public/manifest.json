@@ -1,0 +1,22 @@
+{
+  "name": "VendLex - Kenyan Marketplace | Buy. Sell. Grow.",
+  "short_name": "VendLex",
+  "description": "Kenya's digital marketplace and SaaS business management ecosystem.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#071A13",
+  "theme_color": "#087443",
+  "icons": [
+    {
+      "src": "/logo/vendlex-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo/vendlex-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

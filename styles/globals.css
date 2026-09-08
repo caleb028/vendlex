@@ -1,0 +1,700 @@
+@import "./typography.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* VendLex Official Brand Tokens — Prestige Standard */
+    --vlx-emerald-500: #059669;
+    --vlx-emerald-600: #047857;
+    --vlx-emerald-700: #065F46;
+    --vlx-emerald-400: #10B981;
+    --vlx-emerald-hover: #10B981;
+    --vlx-emerald-light: #ECFDF5;
+    --vlx-emerald-soft: #D1FAE5;
+
+    --vlx-navy-900: #0F172A;
+    --vlx-navy-950: #070E1B;
+    --vlx-navy-800: #1E293B;
+    --vlx-navy-elevated: #1E293B;
+
+    --vlx-gold-500: #F59E0B;
+    --vlx-gold-400: #FBBF24;
+    --vlx-gold-600: #D97706;
+    --vlx-gold-light: #FEF3C7;
+
+    --vlx-growth-500: #2563EB;
+    --vlx-growth-400: #3B82F6;
+    --vlx-growth-600: #1D4ED8;
+    --vlx-growth-light: #EFF6FF;
+
+    /* Surfaces & text — Light Mode */
+    --vlx-bg: #F8FAFC;
+    --vlx-surface: #FFFFFF;
+    --vlx-surface-secondary: #F1F5F9;
+    --vlx-surface-elevated: #FFFFFF;
+    --vlx-border: #E2E8F0;
+    --vlx-border-strong: #CBD5E1;
+
+    --vlx-text-primary: #0F172A;
+    --vlx-text-secondary: #475569;
+    --vlx-text-muted: #64748B;
+
+    /* Semantic status */
+    --vlx-success: #059669;
+    --vlx-success-bg: rgba(5, 150, 105, 0.10);
+    --vlx-warning: #D97706;
+    --vlx-warning-bg: rgba(217, 119, 6, 0.10);
+    --vlx-error: #DC2626;
+    --vlx-error-bg: rgba(220, 38, 38, 0.10);
+    --vlx-info: #2563EB;
+    --vlx-info-bg: rgba(37, 99, 235, 0.10);
+
+    /* Standard Tailwind theme variables */
+    --background: #F8FAFC;
+    --foreground: #0F172A;
+    --card: #FFFFFF;
+    --card-foreground: #0F172A;
+    --primary: #059669;
+    --primary-foreground: #FFFFFF;
+    --primary-dark: #047857;
+    --primary-light: #10B981;
+    --secondary: #0F172A;
+    --secondary-foreground: #FFFFFF;
+    --accent: #F59E0B;
+    --accent-light: #FBBF24;
+    --accent-dark: #D97706;
+    --accent-foreground: #0F172A;
+    --muted: #F1F5F9;
+    --muted-foreground: #64748B;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+    --radius: 0.75rem;
+
+    --color-primary: #059669;
+    --color-primary-dark: #047857;
+    --color-primary-light: #10B981;
+    --color-navy: #0F172A;
+    --color-navy-dark: #070E1B;
+    --color-gold: #F59E0B;
+    --color-gold-light: #FBBF24;
+    --color-success: #059669;
+    --color-warning: #D97706;
+    --color-error: #DC2626;
+    --color-info: #2563EB;
+  }
+
+  .dark {
+    /* VendLex Official Dark Tokens — Prestige Sapphire Obsidian */
+    --vlx-bg: #070E1B;
+    --vlx-surface: #0F172A;
+    --vlx-surface-secondary: #152238;
+    --vlx-surface-elevated: #1E293B;
+    --vlx-surface-higher: #24354F;
+    --vlx-border: #1E293B;
+    --vlx-border-strong: #334155;
+
+    --vlx-text-primary: #F8FAFC;
+    --vlx-text-secondary: #CBD5E1;
+    --vlx-text-muted: #94A3B8;
+
+    --vlx-emerald-500: #10B981;
+    --vlx-emerald-hover: #34D399;
+    --vlx-gold-500: #FBBF24;
+    --vlx-growth-500: #3B82F6;
+
+    --vlx-success: #10B981;
+    --vlx-success-bg: rgba(16, 185, 129, 0.15);
+    --vlx-warning: #F59E0B;
+    --vlx-warning-bg: rgba(245, 158, 11, 0.15);
+    --vlx-error: #EF4444;
+    --vlx-error-bg: rgba(239, 68, 68, 0.15);
+    --vlx-info: #3B82F6;
+    --vlx-info-bg: rgba(59, 130, 246, 0.15);
+
+    /* Standard Tailwind theme variables */
+    --background: #070E1B;
+    --foreground: #F8FAFC;
+    --card: #0F172A;
+    --card-foreground: #F8FAFC;
+    --primary: #10B981;
+    --primary-foreground: #070E1B;
+    --primary-dark: #059669;
+    --primary-light: #34D399;
+    --secondary: #1E293B;
+    --secondary-foreground: #F8FAFC;
+    --accent: #FBBF24;
+    --accent-light: #FDE68A;
+    --accent-dark: #F59E0B;
+    --accent-foreground: #070E1B;
+    --muted: #152238;
+    --muted-foreground: #94A3B8;
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-muted: #94A3B8;
+    --border: #1E293B;
+
+    --color-primary: #10B981;
+    --color-primary-dark: #059669;
+    --color-primary-light: #34D399;
+    --color-navy: #0F172A;
+    --color-navy-dark: #070E1B;
+    --color-gold: #FBBF24;
+    --color-gold-light: #FDE68A;
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-error: #EF4444;
+    --color-info: #3B82F6;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    overflow-x: hidden;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #1E3A50;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Gradient accents — Prestige Palette */
+.emerald-gradient {
+  background: linear-gradient(135deg, #059669 0%, #047857 50%, #0F172A 100%);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #D97706 0%, #F59E0B 50%, #FBBF24 100%);
+}
+
+.luxury-foil-gradient {
+  background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 25%, #FEF3C7 50%, #FBBF24 75%, #D97706 100%);
+}
+
+.sapphire-gradient {
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #059669 100%);
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(90deg, #0c261d 25%, #163e30 50%, #0c261d 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Route & Loading Indeterminate Bar */
+@keyframes indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+.animate-indeterminate {
+  animation: indeterminate 1.4s ease-in-out infinite;
+}
+
+/* Page Transition Glow */
+.page-transition-glow {
+  box-shadow: 0 0 20px rgba(8, 116, 67, 0.25);
+}
+
+/* ============================================================================
+   Elegant Micro-Interactions & Styling Utilities
+============================================================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(8, 116, 67, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(8, 116, 67, 0.45);
+  }
+}
+
+@keyframes shimmerSlide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.3); }
+  65% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+@keyframes badgeBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 1. Page Load Animation Keyframes */
+@keyframes pageLoadFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.996);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-page-load {
+  animation: pageLoadFadeIn 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-page-stagger-1 {
+  animation: pageLoadFadeIn 500ms cubic-bezier(0.16, 1, 0.3, 1) 75ms both;
+}
+
+.animate-page-stagger-2 {
+  animation: pageLoadFadeIn 550ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both;
+}
+
+.animate-page-stagger-3 {
+  animation: pageLoadFadeIn 600ms cubic-bezier(0.16, 1, 0.3, 1) 225ms both;
+}
+
+/* 2. Pop Up Animation Keyframes (Modals, Dialogs, Floating Drawers, Toasts) */
+@keyframes popUpSpring {
+  0% {
+    opacity: 0;
+    transform: scale(0.90) translateY(12px);
+  }
+  65% {
+    transform: scale(1.018) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-pop-up {
+  animation: popUpSpring 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes popUpBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-pop-up-bounce {
+  animation: popUpBounce 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* 3. Zoom Out Animation Keyframes */
+@keyframes kenBurnsZoomOut {
+  0% {
+    transform: scale(1.09);
+  }
+  100% {
+    transform: scale(1.0);
+  }
+}
+
+.animate-ken-burns-zoom-out {
+  animation: kenBurnsZoomOut 7.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes stampZoomOut {
+  0% {
+    opacity: 0;
+    transform: scale(1.28);
+    filter: blur(2px);
+  }
+  65% {
+    transform: scale(0.97);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-stamp-zoom-out {
+  animation: stampZoomOut 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes zoomOutSettle {
+  0% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-zoom-out-settle {
+  animation: zoomOutSettle 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 4. Scroll Animation Classes */
+.scroll-hidden {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-hidden.scroll-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-hidden-zoom {
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-hidden-zoom.scroll-revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.scroll-hidden-left {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-hidden-left.scroll-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-hidden-right {
+  opacity: 0;
+  transform: translateX(32px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-hidden-right.scroll-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scaleUp {
+  animation: scaleUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-float-slow {
+  animation: floatSlow 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.animate-heart-pop {
+  animation: heartPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.animate-badge-bounce {
+  animation: badgeBounce 2s ease-in-out infinite;
+}
+
+/* Elevated Card with Smooth Lift */
+.card-elevated {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.card-elevated:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.08), 0 10px 15px -5px rgba(8, 116, 67, 0.06);
+}
+
+/* Glass Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.dark .glass-card {
+  background: rgba(12, 38, 29, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(27, 77, 60, 0.6);
+}
+
+/* Button Glows */
+.btn-glow-emerald {
+  box-shadow: 0 4px 14px rgba(8, 116, 67, 0.25);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-glow-emerald:hover {
+  box-shadow: 0 6px 20px rgba(8, 116, 67, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-glow-gold {
+  box-shadow: 0 4px 14px rgba(217, 164, 65, 0.3);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-glow-gold:hover {
+  box-shadow: 0 6px 22px rgba(217, 164, 65, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Subtle Shimmer Sweep Overlay */
+.shine-overlay {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-overlay::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.18),
+    transparent
+  );
+  transform: skewX(-20deg) translateX(-150%);
+  transition: transform 0.75s ease;
+}
+
+.shine-overlay:hover::after {
+  transform: skewX(-20deg) translateX(300%);
+}
+
+/* ------------------------------------------------------------- */
+/* 3D LETTER ROTATION & CINEMATIC DEPTH ENTRANCE                 */
+/* ------------------------------------------------------------- */
+@keyframes letter3DCinematicEntrance {
+  0% {
+    opacity: 0;
+    transform: perspective(1200px) translateY(30px) rotateX(65deg) rotateY(-10deg) translateZ(-35px) scale(0.94);
+  }
+  40% {
+    opacity: 0.95;
+    transform: perspective(1200px) translateY(-3px) rotateX(-8deg) rotateY(3deg) translateZ(12px) scale(1.02);
+  }
+  68% {
+    opacity: 1;
+    transform: perspective(1200px) translateY(1px) rotateX(2deg) rotateY(-1deg) translateZ(3px) scale(1.005);
+  }
+  88% {
+    opacity: 1;
+    transform: perspective(1200px) translateY(-0.5px) rotateX(-0.5deg) rotateY(0deg) translateZ(0.5px) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(1200px) translateY(0) rotateX(0deg) rotateY(0deg) translateZ(0) scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  @keyframes letter3DCinematicEntrance {
+    0% {
+      opacity: 0;
+      transform: translateY(18px) rotateX(25deg) scale(0.96);
+    }
+    45% {
+      opacity: 1;
+      transform: translateY(-2px) rotateX(-4deg) scale(1.01);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) rotateX(0deg) scale(1);
+    }
+  }
+}
+
+@keyframes headlineSubtleFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.letter-3d-animated {
+  position: relative;
+  display: inline-block;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transform-origin: center center;
+  animation-name: letter3DCinematicEntrance;
+  animation-duration: 850ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+.headline-idle-float {
+  animation: headlineSubtleFloat 7.5s ease-in-out infinite;
+}
+
+/* Marketplace Product Cards Staggered Entry */
+@keyframes cardStaggerFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.marketplace-card-animated {
+  animation: cardStaggerFadeInUp 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Respect Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .letter-3d-animated,
+  .marketplace-card-animated,
+  .headline-idle-float {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+
