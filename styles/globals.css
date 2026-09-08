@@ -155,11 +155,13 @@
     border-color: var(--border);
   }
 
+  html,
   body {
     background-color: var(--background);
     color: var(--foreground);
     overflow-x: hidden;
     font-feature-settings: "rlig" 1, "calt" 1;
+    touch-action: manipulation;
   }
 }
 

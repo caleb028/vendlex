@@ -55,7 +55,8 @@ export const viewport: Viewport = {
   themeColor: "#087443",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 import { Suspense } from "react";
