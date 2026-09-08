@@ -1,78 +1,22 @@
 {
-  "id": "https://vendlex.vercel.app/",
-  "name": "VendLex - Kenyan Marketplace & Business Hub",
+  "name": "VendLex - Kenyan Marketplace | Buy. Sell. Grow.",
   "short_name": "VendLex",
-  "description": "Kenya's premier business marketplace & digital commerce platform. Buy verified products, hire local services, and manage orders with Lipa na M-Pesa across all 47 counties.",
-  "start_url": "/?source=pwa",
-  "scope": "/",
+  "description": "Kenya's digital marketplace and SaaS business management ecosystem.",
+  "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#071A13",
   "theme_color": "#087443",
-  "lang": "en-KE",
-  "dir": "ltr",
-  "categories": [
-    "shopping",
-    "business",
-    "finance",
-    "productivity"
-  ],
   "icons": [
     {
       "src": "/logo/vendlex-icon.png",
-      "sizes": "192x192",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
       "src": "/logo/vendlex-icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/logo/vendlex-logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
+      "sizes": "192x192",
+      "type": "image/png"
     }
-  ],
-  "shortcuts": [
-    {
-      "name": "Marketplace",
-      "short_name": "Shop",
-      "description": "Browse Kenyan goods and deals",
-      "url": "/marketplace",
-      "icons": [{ "src": "/logo/vendlex-icon.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Local Services",
-      "short_name": "Services",
-      "description": "Find verified plumbers, electricians, technicians",
-      "url": "/services",
-      "icons": [{ "src": "/logo/vendlex-icon.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Seller Portal",
-      "short_name": "Sell",
-      "description": "Manage your store inventory and orders",
-      "url": "/seller/dashboard",
-      "icons": [{ "src": "/logo/vendlex-icon.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Advertise Business",
-      "short_name": "Advertise",
-      "description": "Promote your physical or local business",
-      "url": "/advertise",
-      "icons": [{ "src": "/logo/vendlex-icon.png", "sizes": "192x192" }]
-    }
-  ],
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=ke.co.vendlex.app",
-      "id": "ke.co.vendlex.app"
-    }
-  ],
-  "prefer_related_applications": false
+  ]
 }
