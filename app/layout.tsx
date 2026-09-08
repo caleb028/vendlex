@@ -69,6 +69,7 @@ import { PlatformProvider } from "@/lib/store/platform-store";
 import { MarketingTracker } from "@/components/marketing/tracker";
 import { MarketingPixelScripts } from "@/components/marketing/pixel-scripts";
 import { MarketingConsentBanner } from "@/components/marketing/consent-banner";
+import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 
 export default function RootLayout({
   children,
@@ -91,6 +92,7 @@ export default function RootLayout({
           <MarketingTracker />
         </Suspense>
         <MarketingPixelScripts />
+        <ServiceWorkerRegister />
         <AuthProvider>
           <PlatformProvider>
             <CartProvider>
