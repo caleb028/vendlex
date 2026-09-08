@@ -176,15 +176,16 @@ export function AIChatbot() {
 
   return (
     <>
-      {/* Floating Pill Trigger (Section 21 & 33) */}
-      <div className="fixed bottom-18 lg:bottom-6 right-4 lg:right-6 z-40">
+      {/* Floating Pill Trigger */}
+      <div className="fixed bottom-20 lg:bottom-6 right-3 sm:right-4 lg:right-6 z-40">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-black text-xs sm:text-sm py-2.5 px-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 border border-emerald-400/40 hover:scale-103 active:scale-98"
+          className="bg-gradient-to-r from-brand-emerald-dark to-brand-emerald hover:from-brand-emerald hover:to-brand-emerald-dark text-white font-black text-xs sm:text-sm py-2 px-3 sm:py-2.5 sm:px-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center gap-1.5 sm:gap-2 border border-emerald-400/50 hover:scale-105 active:scale-95 btn-glow-emerald"
           title="Open VendLex AI Copilot"
+          aria-label="Open VendLex AI Copilot"
         >
-          <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-          <span>VendLex AI</span>
+          <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300 animate-pulse shrink-0" />
+          <span className="text-xs sm:text-sm tracking-wide">VendLex AI</span>
         </button>
       </div>
 

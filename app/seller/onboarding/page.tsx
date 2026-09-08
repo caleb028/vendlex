@@ -27,16 +27,41 @@ import {
   Award,
   FileText,
   Download,
+  Wrench,
+  Briefcase,
+  Layers,
+  MapPin,
 } from "lucide-react";
+
+const SERVICE_CATEGORIES = [
+  "Electrician & Power Systems",
+  "Plumbing & Drainage",
+  "Solar Installation & Maintenance",
+  "Phone & Tablet Repair",
+  "Computer & Laptop Repair",
+  "Auto Mechanic & Diagnostics",
+  "Painting & Interior Decor",
+  "Masonry & Construction",
+  "Refrigeration & HVAC",
+  "Appliance Repair",
+  "Cleaning & Fumigation",
+  "Photography & Videography",
+  "Catering & Event Planning",
+  "Beauty & Hair Styling",
+  "Tailoring & Fashion Design",
+  "Legal, Tax & Business Consulting",
+];
 
 function OnboardingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialPlan = searchParams.get("plan") || "business";
+  const initialType = searchParams.get("type") === "service" ? "SERVICE" : "PRODUCT";
   const { refreshSession } = useAuth();
   const { submitKYC } = usePlatform();
 
   const [step, setStep] = useState<number>(1);
+  const [offeringType, setOfferingType] = useState<"PRODUCT" | "SERVICE">(initialType);
 
   const [certificateInfo, setCertificateInfo] = useState<{
     id: string;
@@ -47,27 +72,42 @@ function OnboardingContent() {
 
   // Form State
   const [ownerName, setOwnerName] = useState("Kevin Mwangi");
-  const [ownerPhone, setOwnerPhone] = useState("0712345678");
+  const [ownerPhone, setOwnerPhone] = useState("0798159503");
   const [ownerEmail, setOwnerEmail] = useState("kevin@nairobihub.co.ke");
 
-  const [bizName, setBizName] = useState("Nairobi Tech Hub");
-  const [bizCategory, setBizCategory] = useState("Computers & Tech");
+  const [bizName, setBizName] = useState(
+    offeringType === "SERVICE" ? "Rift Solar & Power Solutions" : "Nairobi Tech Hub"
+  );
+  const [bizCategory, setBizCategory] = useState(
+    offeringType === "SERVICE" ? "Solar Installation & Maintenance" : "Computers & Tech"
+  );
   const [county, setCounty] = useState("Nairobi");
   const [town, setTown] = useState("CBD");
   const [physicalLocation, setPhysicalLocation] = useState("Bazaar Plaza, 4th Floor, Suite 412");
-  const [bizDesc, setBizDesc] = useState("Premier retailer of high performance laptops, smartphones, and genuine accessories in Nairobi.");
+  const [bizDesc, setBizDesc] = useState(
+    offeringType === "SERVICE"
+      ? "Certified electrical & solar energy installations with same-day emergency dispatch across Nairobi and surrounding counties."
+      : "Premier retailer of high performance laptops, smartphones, and genuine accessories in Nairobi."
+  );
 
   const [regNumber, setRegNumber] = useState("BN/2024/984210");
   const [nationalId, setNationalId] = useState("32984124");
 
-  const [productTitle, setProductTitle] = useState("HP Envy x360 Convertible 14-inch (Core i7, 16GB RAM, 512GB SSD)");
-  const [productPrice, setProductPrice] = useState("114999");
-  const [productStock, setProductStock] = useState("10");
+  // Product / Service Item State
+  const [itemTitle, setItemTitle] = useState(
+    offeringType === "SERVICE"
+      ? "Residential Solar Installation & Inverter Setup"
+      : "HP Envy x360 Convertible 14-inch (Core i7, 16GB RAM, 512GB SSD)"
+  );
+  const [itemPrice, setItemPrice] = useState(offeringType === "SERVICE" ? "3500" : "114999");
+  const [itemStock, setItemStock] = useState("10");
+  const [pricingModel, setPricingModel] = useState("Starting From");
+  const [turnaroundTime, setTurnaroundTime] = useState("Within 24 Hours");
 
   const [selectedPlan, setSelectedPlan] = useState(initialPlan);
 
   // M-Pesa STK Push Payment State
-  const [paymentPhone, setPaymentPhone] = useState("0712345678");
+  const [paymentPhone, setPaymentPhone] = useState("0798159503");
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "sending" | "sent" | "success" | "error">("idle");
   const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
   const [receiptNumber, setReceiptNumber] = useState<string | null>(null);
@@ -77,9 +117,27 @@ function OnboardingContent() {
   const activePlanObj = PRICING_PLANS.find((p) => p.id === selectedPlan) || PRICING_PLANS[2];
   const pollIntervalRef = React.useRef<NodeJS.Timeout | null>(null);
 
+  // Update default category when offeringType switches
+  const handleTypeChange = (type: "PRODUCT" | "SERVICE") => {
+    setOfferingType(type);
+    if (type === "SERVICE") {
+      setBizCategory("Solar Installation & Maintenance");
+      setItemTitle("Residential Solar Installation & Inverter Setup");
+      setItemPrice("3500");
+      setBizName("Rift Solar & Power Solutions");
+      setBizDesc("Certified electrical & solar energy installations with same-day emergency dispatch across Nairobi and surrounding counties.");
+    } else {
+      setBizCategory("Computers & Tech");
+      setItemTitle("HP Envy x360 Convertible 14-inch (Core i7, 16GB RAM, 512GB SSD)");
+      setItemPrice("114999");
+      setBizName("Nairobi Tech Hub");
+      setBizDesc("Premier retailer of high performance laptops, smartphones, and genuine accessories in Nairobi.");
+    }
+  };
+
   // Keep paymentPhone synced with ownerPhone if user edits step 1
   useEffect(() => {
-    if (ownerPhone && paymentPhone === "0712345678") {
+    if (ownerPhone && paymentPhone === "0798159503") {
       setPaymentPhone(ownerPhone.replace(/\s+/g, ""));
     }
   }, [ownerPhone]);
@@ -122,7 +180,7 @@ function OnboardingContent() {
                   Item: [
                     { Name: "Amount", Value: activePlanObj.monthlyPrice },
                     { Name: "MpesaReceiptNumber", Value: simReceipt },
-                    { Name: "TransactionDate", Value: "20260906074500" },
+                    { Name: "TransactionDate", Value: "20260908120000" },
                     { Name: "PhoneNumber", Value: paymentPhone },
                   ],
                 },
@@ -131,7 +189,7 @@ function OnboardingContent() {
           }),
         });
       } catch (e) {
-        console.warn("Callback simulation error:", e);
+        console.warn("Callback simulation warning:", e);
       }
     }
     if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
@@ -139,40 +197,39 @@ function OnboardingContent() {
     setPaymentStatus("success");
     setTimeout(() => {
       handleLaunch(simReceipt);
-    }, 1000);
+    }, 1200);
   };
 
-  const handleSimulateFailure = (reason = "Payment failed: Transaction was cancelled on user phone (M-Pesa Code 1032).") => {
+  const handleSimulateFailure = (reason: string) => {
     if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
     setPaymentStatus("error");
     setErrorMessage(reason);
   };
 
-  // Initiate Daraja STK Push to Seller Phone
   const handleInitiateSTK = async () => {
-    if (activePlanObj.monthlyPrice === 0) {
-      // Free plan requires no payment
-      setPaymentStatus("success");
-      handleLaunch("FREE_TIER_ACTIVATED");
-      return;
-    }
-
-    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
     setPaymentStatus("sending");
     setErrorMessage("");
     setCountdown(45);
+
+    if (activePlanObj.monthlyPrice === 0) {
+      setPaymentStatus("success");
+      setReceiptNumber("FREE-TIER-ACTIVE");
+      setTimeout(() => {
+        handleLaunch("FREE-TIER-ACTIVE");
+      }, 1000);
+      return;
+    }
 
     try {
       const res = await fetch("/api/mpesa/stkpush", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          phoneNumber: paymentPhone,
+          phone: paymentPhone,
           amount: activePlanObj.monthlyPrice,
-          accountReference: `VENDLEX-${selectedPlan.toUpperCase()}`,
-          transactionDesc: `${activePlanObj.name} Merchant Plan`,
-          sellerName: bizName || "New Merchant",
-          purpose: "SUBSCRIPTION",
+          orderId: `VLX-PLAN-${selectedPlan.toUpperCase()}-${Date.now().toString().slice(-4)}`,
+          accountReference: `VENDLEX-${bizName.replace(/\s+/g, "").slice(0, 10).toUpperCase()}`,
+          description: `VendLex ${activePlanObj.name} Store Activation`,
         }),
       });
 
@@ -219,7 +276,6 @@ function OnboardingContent() {
   };
 
   const handleLaunch = async (receipt?: string) => {
-    // Strict Guard: Paid plans MUST have verified payment status and receipt
     const finalReceipt = receipt || receiptNumber;
     if (activePlanObj.monthlyPrice > 0 && (!finalReceipt || paymentStatus !== "success")) {
       setPaymentStatus("error");
@@ -244,9 +300,10 @@ function OnboardingContent() {
           ownerPhone,
           regNumber,
           nationalId,
-          productTitle,
-          productPrice,
-          productStock,
+          productTitle: itemTitle,
+          productPrice: itemPrice,
+          productStock: offeringType === "SERVICE" ? 999 : itemStock,
+          offeringType,
           selectedPlan,
           receiptNumber: finalReceipt,
           paymentPhone,
@@ -262,7 +319,7 @@ function OnboardingContent() {
 
     await refreshSession();
     submitKYC({
-      bizName: bizName || "Nairobi Tech Hub",
+      bizName: bizName || "VendLex Merchant",
       ownerName: ownerName || "Kevin Mwangi",
       regNumber: regNumber || `BN/2026/${Math.floor(100000 + Math.random() * 900000)}`,
       nationalId: nationalId || "32984124",
@@ -280,21 +337,25 @@ function OnboardingContent() {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
+  const isService = offeringType === "SERVICE";
+
   return (
-    <div className="min-h-screen bg-brand-off-white dark:bg-brand-dark-bg py-10">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Progress Tracker */}
-        <div className="mb-8 text-center space-y-2">
-          <span className="text-xs font-bold text-brand-emerald uppercase tracking-wider">
-            Step {step} of 6
-          </span>
+    <div className="min-h-screen bg-brand-off-white dark:bg-brand-dark-bg py-8 sm:py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        {/* Header & Progress Tracker */}
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center gap-2 bg-brand-emerald/10 text-brand-emerald border border-brand-emerald/20 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+            <span>{isService ? "🛠️ Service Provider Onboarding" : "📦 Retail Merchant Onboarding"}</span>
+            <span>•</span>
+            <span>Step {step} of 6</span>
+          </div>
           <h1 className="text-2xl sm:text-3xl font-black text-foreground">
-            {step === 1 && "Create Merchant Account"}
-            {step === 2 && "Business Information"}
+            {step === 1 && "Start Selling on VendLex Kenya"}
+            {step === 2 && (isService ? "Service Business Profile" : "Storefront Information")}
             {step === 3 && "Business KYC & Verification"}
-            {step === 4 && "Add Your First Product or Service"}
-            {step === 5 && "Choose Plan & M-Pesa Activation"}
-            {step === 6 && "Store Live on VendLex! 🎉"}
+            {step === 4 && (isService ? "Add Your First Service Offering" : "Add Your First Product Listing")}
+            {step === 5 && "Choose Growth Tier & M-Pesa Activation"}
+            {step === 6 && (isService ? "Service Profile Live on VendLex! 🎉" : "Store Live on VendLex! 🎉")}
           </h1>
 
           {/* Stepper Dots */}
@@ -315,29 +376,85 @@ function OnboardingContent() {
         </div>
 
         {/* Wizard Card Container */}
-        <div className="bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-3xl p-6 sm:p-10 shadow-xl space-y-6">
-          {/* STEP 1: Account */}
+        <div className="bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-3xl p-5 sm:p-10 shadow-xl space-y-6">
+          {/* STEP 1: Account & Offering Model Selection */}
           {step === 1 && (
-            <div className="space-y-4 animate-fadeIn">
+            <div className="space-y-5 animate-fadeIn">
               <div className="space-y-1">
-                <h3 className="font-bold text-base text-foreground">Personal & Account Information</h3>
-                <p className="text-xs text-muted-foreground">The primary owner and legal signatory for this store.</p>
+                <h3 className="font-bold text-base text-foreground">1. What would you like to offer on VendLex?</h3>
+                <p className="text-xs text-muted-foreground">Select your business model to tailor your dashboard and listings.</p>
               </div>
 
-              <div className="space-y-3">
+              {/* 2-Option Cards: Product vs Service */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div
+                  onClick={() => handleTypeChange("PRODUCT")}
+                  className={`p-4 sm:p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-3 ${
+                    offeringType === "PRODUCT"
+                      ? "border-brand-emerald bg-brand-emerald-soft/30 dark:bg-brand-dark-bg ring-2 ring-brand-emerald/40 shadow-sm"
+                      : "border-border hover:border-brand-emerald/40 bg-muted/20"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-brand-emerald flex items-center justify-center">
+                      <Package className="w-5 h-5" />
+                    </div>
+                    {offeringType === "PRODUCT" && (
+                      <span className="text-[10px] font-black uppercase tracking-wider bg-brand-emerald text-white px-2 py-0.5 rounded-full">
+                        Selected
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="font-black text-sm text-foreground">Retail Products &amp; Goods</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                      Physical items (electronics, fashion, hardware, farm produce, artisan crafts) shipped with live parcel tracking.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => handleTypeChange("SERVICE")}
+                  className={`p-4 sm:p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-3 ${
+                    offeringType === "SERVICE"
+                      ? "border-brand-gold bg-brand-gold/10 dark:bg-brand-dark-bg ring-2 ring-brand-gold/40 shadow-sm"
+                      : "border-border hover:border-brand-gold/40 bg-muted/20"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/70 text-amber-600 flex items-center justify-center">
+                      <Wrench className="w-5 h-5" />
+                    </div>
+                    {offeringType === "SERVICE" && (
+                      <span className="text-[10px] font-black uppercase tracking-wider bg-brand-gold text-brand-charcoal px-2 py-0.5 rounded-full">
+                        Selected
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="font-black text-sm text-foreground">Skilled Services &amp; Trades</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                      Labor, repairs &amp; technical services (electricians, plumbers, mechanics, tech repairs, cleaners, consultations).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-border space-y-3">
+                <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Owner &amp; Legal Signatory Information</h4>
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">Your Full Name *</label>
+                  <label className="block text-xs font-bold text-foreground mb-1">Your Full Legal Name *</label>
                   <input
                     type="text"
                     value={ownerName}
                     onChange={(e) => setOwnerName(e.target.value)}
-                    className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-foreground mb-1">Kenyan Phone (M-Pesa STK & Payouts) *</label>
+                    <label className="block text-xs font-bold text-foreground mb-1">Kenyan Phone (M-Pesa STK &amp; Payouts) *</label>
                     <input
                       type="tel"
                       value={ownerPhone}
@@ -345,8 +462,8 @@ function OnboardingContent() {
                         setOwnerPhone(e.target.value);
                         setPaymentPhone(e.target.value);
                       }}
-                      placeholder="0712345678"
-                      className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground font-mono font-bold focus:outline-none focus:border-brand-emerald"
+                      placeholder="07XX XXX XXX"
+                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground font-mono font-bold focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
 
@@ -356,7 +473,7 @@ function OnboardingContent() {
                       type="email"
                       value={ownerEmail}
                       onChange={(e) => setOwnerEmail(e.target.value)}
-                      className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
                 </div>
@@ -368,43 +485,59 @@ function OnboardingContent() {
           {step === 2 && (
             <div className="space-y-4 animate-fadeIn">
               <div className="space-y-1">
-                <h3 className="font-bold text-base text-foreground">Business Storefront Details</h3>
-                <p className="text-xs text-muted-foreground">This info will appear on your public VendLex storefront.</p>
+                <h3 className="font-bold text-base text-foreground">
+                  {isService ? "Service Business Profile & Coverage Area" : "Business Storefront Details"}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {isService
+                    ? "This profile will appear in the VendLex 47 Counties Service Directory."
+                    : "This info will appear on your public VendLex verified marketplace storefront."}
+                </p>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">Registered Business Name *</label>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    {isService ? "Service Business / Professional Name *" : "Registered Business Name *"}
+                  </label>
                   <input
                     type="text"
                     value={bizName}
                     onChange={(e) => setBizName(e.target.value)}
-                    className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-foreground mb-1">Category *</label>
+                    <label className="block text-xs font-bold text-foreground mb-1">
+                      {isService ? "Service Specialization *" : "Product Category *"}
+                    </label>
                     <select
                       value={bizCategory}
                       onChange={(e) => setBizCategory(e.target.value)}
-                      className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
                     >
-                      {CATEGORIES.map((c) => (
-                        <option key={c.id} value={c.name}>
-                          {c.name}
-                        </option>
-                      ))}
+                      {isService
+                        ? SERVICE_CATEGORIES.map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))
+                        : CATEGORIES.map((c) => (
+                            <option key={c.id} value={c.name}>
+                              {c.name}
+                            </option>
+                          ))}
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-foreground mb-1">County *</label>
+                    <label className="block text-xs font-bold text-foreground mb-1">Primary County *</label>
                     <select
                       value={county}
                       onChange={(e) => setCounty(e.target.value)}
-                      className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
                     >
                       {KENYAN_COUNTIES.map((c) => (
                         <option key={c} value={c}>
@@ -415,56 +548,63 @@ function OnboardingContent() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-foreground mb-1">Town / Area *</label>
+                    <label className="block text-xs font-bold text-foreground mb-1">Town / Base Station *</label>
                     <input
                       type="text"
                       value={town}
                       onChange={(e) => setTown(e.target.value)}
-                      className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">Physical Store / Office Location</label>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    {isService ? "Workshop / Office Location (Optional)" : "Physical Store / Office Location"}
+                  </label>
                   <input
                     type="text"
                     value={physicalLocation}
                     onChange={(e) => setPhysicalLocation(e.target.value)}
-                    className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                    placeholder="e.g. Westlands Commercial Center, Nairobi"
+                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">Short Store Description</label>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    {isService ? "Professional Bio & Service Highlights" : "Short Store Description"}
+                  </label>
                   <textarea
                     rows={2}
                     value={bizDesc}
                     onChange={(e) => setBizDesc(e.target.value)}
-                    className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground resize-none"
+                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground resize-none"
                   />
                 </div>
               </div>
             </div>
           )}
 
-          {/* STEP 3: KYC Verification */}
+          {/* STEP 3: KYC & Verification */}
           {step === 3 && (
             <div className="space-y-4 animate-fadeIn">
               <div className="space-y-1">
-                <h3 className="font-bold text-base text-foreground">Verified Merchant KYC</h3>
-                <p className="text-xs text-muted-foreground">Required to activate the blue Verified badge and receive M-Pesa payouts.</p>
+                <h3 className="font-bold text-base text-foreground">Business KYC &amp; Verification Documents</h3>
+                <p className="text-xs text-muted-foreground">Required to issue your stamped Accreditation Certificate and escrow payout privileges.</p>
               </div>
 
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-foreground mb-1">Business Reg. No. / CR12 *</label>
+                    <label className="block text-xs font-bold text-foreground mb-1">
+                      {isService ? "Business Reg / Practicing Cert # *" : "Business Registration (BN/PVT) *"}
+                    </label>
                     <input
                       type="text"
                       value={regNumber}
                       onChange={(e) => setRegNumber(e.target.value)}
-                      className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground font-mono focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground font-mono focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
 
@@ -474,48 +614,59 @@ function OnboardingContent() {
                       type="text"
                       value={nationalId}
                       onChange={(e) => setNationalId(e.target.value)}
-                      className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground font-mono focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground font-mono focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
                 </div>
 
                 {/* Upload Zone */}
-                <div className="border-2 border-dashed border-border rounded-2xl p-6 text-center space-y-2 bg-muted/20">
+                <div className="border-2 border-dashed border-border rounded-2xl p-6 text-center space-y-2 bg-muted/10">
                   <Upload className="w-8 h-8 text-brand-emerald mx-auto" />
                   <div className="text-xs font-bold text-foreground">
-                    Upload Business Certificate or National ID (PDF, JPG, PNG)
+                    Upload Business Certificate, ID, or Trade License (PDF, JPG, PNG)
                   </div>
                   <p className="text-[11px] text-muted-foreground">
-                    Certificate_Of_Incorporation.pdf (Verified Sample Attached)
+                    Verified Sample Attached (CR12_Certificate_Registration.pdf)
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* STEP 4: First Product */}
+          {/* STEP 4: First Listing (Product OR Service) */}
           {step === 4 && (
             <div className="space-y-4 animate-fadeIn">
               <div className="space-y-1">
-                <h3 className="font-bold text-base text-foreground">Add Your First Product Listing &amp; Upload Photo</h3>
-                <p className="text-xs text-muted-foreground">Select a photo from your computer or phone to showcase your product.</p>
+                <h3 className="font-bold text-base text-foreground">
+                  {isService ? "Add Your Primary Service & Set Rates" : "Add Your First Product Listing"}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {isService
+                    ? "Set your service pricing model, starting fee, and dispatch turnaround time."
+                    : "Enter your product details and attach a photo from your device."}
+                </p>
               </div>
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">Product Title *</label>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    {isService ? "Service Title / Offering *" : "Product Title *"}
+                  </label>
                   <input
                     type="text"
-                    value={productTitle}
-                    onChange={(e) => setProductTitle(e.target.value)}
-                    className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                    value={itemTitle}
+                    onChange={(e) => setItemTitle(e.target.value)}
+                    placeholder={isService ? "e.g. Emergency Home Electrical Wiring & Solar Repair" : "e.g. Samsung Galaxy A54 5G (128GB)"}
+                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
                   />
                 </div>
 
                 {/* Device Photo Upload Zone */}
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">Product Photo (From Device File Manager)</label>
-                  <div className="border-2 border-dashed border-border hover:border-brand-emerald bg-muted/20 p-4 rounded-2xl text-center space-y-1">
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    {isService ? "Service / Portfolio Photo" : "Product Photo (From Device File Manager)"}
+                  </label>
+                  <div className="border-2 border-dashed border-border hover:border-brand-emerald bg-muted/10 p-4 rounded-2xl text-center space-y-1">
                     <Upload className="w-6 h-6 text-brand-emerald mx-auto" />
                     <label htmlFor="onboarding-img" className="text-xs font-bold text-brand-emerald cursor-pointer hover:underline block">
                       Choose Photo File from Device
@@ -538,23 +689,41 @@ function OnboardingContent() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-foreground mb-1">Selling Price (KSh) *</label>
+                    <label className="block text-xs font-bold text-foreground mb-1">
+                      {isService ? "Starting Price / Inspection Fee (KSh) *" : "Selling Price (KSh) *"}
+                    </label>
                     <input
                       type="number"
-                      value={productPrice}
-                      onChange={(e) => setProductPrice(e.target.value)}
-                      className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground font-bold focus:outline-none focus:border-brand-emerald"
+                      value={itemPrice}
+                      onChange={(e) => setItemPrice(e.target.value)}
+                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground font-bold focus:outline-none focus:border-brand-emerald"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-foreground mb-1">Initial Stock Count *</label>
-                    <input
-                      type="number"
-                      value={productStock}
-                      onChange={(e) => setProductStock(e.target.value)}
-                      className="w-full bg-muted/30 border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
-                    />
+                    <label className="block text-xs font-bold text-foreground mb-1">
+                      {isService ? "Pricing Model *" : "Initial Stock Count *"}
+                    </label>
+                    {isService ? (
+                      <select
+                        value={pricingModel}
+                        onChange={(e) => setPricingModel(e.target.value)}
+                        className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                      >
+                        <option value="Starting From">Starting From (Base Rate)</option>
+                        <option value="Fixed Price">Fixed Price Per Job</option>
+                        <option value="Hourly Rate">Hourly Rate</option>
+                        <option value="Custom Quote">Custom Quote Upon Inspection</option>
+                      </select>
+                    ) : (
+                      <input
+                        type="number"
+                        value={itemStock}
+                        onChange={(e) => setItemStock(e.target.value)}
+                        className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                      >
+                      </input>
+                    )}
                   </div>
                 </div>
               </div>
@@ -617,13 +786,12 @@ function OnboardingContent() {
                         type="tel"
                         value={paymentPhone}
                         onChange={(e) => setPaymentPhone(e.target.value)}
-                        placeholder="e.g. 0712345678"
+                        placeholder="e.g. 0798159503"
                         disabled={paymentStatus === "sending" || paymentStatus === "sent"}
                         className="w-full bg-white dark:bg-brand-dark-card border border-border rounded-xl p-3 text-xs font-mono font-bold text-foreground focus:outline-none focus:border-brand-emerald"
                       />
                     </div>
 
-                    {/* Status Feedback / PIN Prompt Alert */}
                     {paymentStatus === "sending" && (
                       <div className="flex items-center gap-2 p-3.5 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-xl text-blue-700 dark:text-blue-300 text-xs font-semibold">
                         <Loader2 className="w-4 h-4 animate-spin shrink-0" />
@@ -646,7 +814,6 @@ function OnboardingContent() {
                           Please check your phone screen, enter your <strong>M-Pesa PIN</strong> to authorize {formatKSh(activePlanObj.monthlyPrice)}, and press OK.
                         </p>
 
-                        {/* Interactive Testing Controls */}
                         <div className="pt-2.5 border-t border-emerald-200 dark:border-emerald-800 flex flex-wrap items-center justify-between gap-2">
                           <span className="text-[10px] text-emerald-800 dark:text-emerald-300 font-semibold">
                             Daraja Simulation Controls:
@@ -674,7 +841,7 @@ function OnboardingContent() {
                     {paymentStatus === "success" && (
                       <div className="flex items-center gap-2 p-3.5 bg-emerald-100 dark:bg-emerald-950 border border-emerald-400 rounded-xl text-emerald-800 dark:text-emerald-200 text-xs font-bold animate-fadeIn">
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span>M-Pesa Payment Confirmed! Receipt: {receiptNumber}. Activating Store...</span>
+                        <span>M-Pesa Payment Confirmed! Receipt: {receiptNumber}. Activating Workspace...</span>
                       </div>
                     )}
 
@@ -719,21 +886,21 @@ function OnboardingContent() {
             </div>
           )}
 
-          {/* STEP 6: Store Live Celebration OR Payment Failed */}
+          {/* STEP 6: Celebration & Stamped Certificate */}
           {step === 6 && (
             <>
               {(paymentStatus === "success" && !!receiptNumber) || activePlanObj.monthlyPrice === 0 ? (
-                <div className="text-center py-8 space-y-6 animate-scaleUp">
+                <div className="text-center py-6 sm:py-8 space-y-6 animate-scaleUp">
                   <div className="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-brand-emerald flex items-center justify-center mx-auto shadow-sm animate-pop-up-bounce">
                     <Sparkles className="w-10 h-10" />
                   </div>
 
                   <div className="space-y-2">
                     <h2 className="text-2xl sm:text-3xl font-black text-foreground">
-                      Congratulations, {ownerName || "Merchant"}!
+                      Hongera, {ownerName || "Merchant"}! 🎉
                     </h2>
                     <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
-                      <strong className="text-foreground">{bizName}</strong> is now officially live on VendLex Kenya.
+                      <strong className="text-foreground">{bizName}</strong> is now officially active and verified on VendLex Kenya.
                     </p>
 
                     {receiptNumber && (
@@ -744,23 +911,23 @@ function OnboardingContent() {
                     )}
 
                     <div className="p-3 bg-muted font-mono text-xs text-brand-emerald font-bold rounded-xl max-w-sm mx-auto">
-                      vendlex.co.ke/store/{storeSlug}
+                      vendlex.co.ke/{isService ? "services" : "store"}/{storeSlug}
                     </div>
 
-                    {/* Official Merchant Accreditation Certificate Download Card */}
+                    {/* Official Accreditation Certificate Download Card */}
                     <div className="p-5 bg-gradient-to-r from-amber-500/10 via-brand-gold/15 to-amber-500/10 border-2 border-brand-gold/40 rounded-3xl max-w-md mx-auto space-y-3 shadow-sm text-center">
                       <div className="flex items-center justify-center gap-2 text-brand-gold">
                         <Award className="w-5 h-5 text-amber-500" />
                         <span className="text-xs font-black uppercase tracking-wider text-amber-900 dark:text-amber-200">
-                          Official Merchant Accreditation Certificate
+                          {isService ? "Official Service Accreditation Certificate" : "Official Merchant Accreditation Certificate"}
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        Your stamped Certificate of Accreditation ({certificateInfo?.publicDocumentId || "VLX-CERT-2026"}) has been auto-generated with an official security seal and QR code verification.
+                        Your official stamped Certificate ({certificateInfo?.publicDocumentId || "VLX-CER-2026"}) has been generated with cryptographic seal and QR code verification.
                       </p>
                       <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
                         <a
-                          href={certificateInfo?.downloadUrl || `/api/documents/${certificateInfo?.publicDocumentId || "VLX-CERT-2026-000182"}/download`}
+                          href={certificateInfo?.downloadUrl || `/api/documents/${certificateInfo?.publicDocumentId || "VLX-CER-2026-000042"}/download`}
                           target="_blank"
                           rel="noreferrer"
                           className="bg-brand-gold hover:bg-amber-400 text-brand-charcoal font-black py-2.5 px-5 rounded-xl text-xs flex items-center gap-2 shadow-md transition-all"
@@ -792,15 +959,14 @@ function OnboardingContent() {
                     </Link>
 
                     <Link
-                      href={`/businesses/${storeSlug}`}
+                      href={isService ? "/services" : `/businesses/${storeSlug}`}
                       className="bg-muted hover:bg-muted/80 text-foreground font-bold px-6 py-3 rounded-xl text-xs sm:text-sm transition-all"
                     >
-                      View Public Storefront &rarr;
+                      {isService ? "View in Services Directory &rarr;" : "View Public Storefront &rarr;"}
                     </Link>
                   </div>
                 </div>
               ) : (
-                /* PAYMENT FAILED FALLBACK */
                 <div className="text-center py-8 space-y-6 animate-pop-up">
                   <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-950/60 text-brand-red flex items-center justify-center mx-auto shadow-sm">
                     <AlertCircle className="w-10 h-10" />

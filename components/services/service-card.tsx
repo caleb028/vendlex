@@ -145,6 +145,7 @@ export function ServiceCard({ service }: { service: Service }) {
       <ServiceRequestModal
         service={service}
         isOpen={modalOpen}
+        initialMode={activeAction}
         onClose={() => setModalOpen(false)}
       />
     </>

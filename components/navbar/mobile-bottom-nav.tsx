@@ -27,7 +27,7 @@ export function MobileBottomNav() {
       {itemCount > 0 && (
         <button
           onClick={() => setIsCartOpen(true)}
-          className="lg:hidden fixed bottom-18 right-4 z-40 bg-brand-emerald text-white font-bold py-2.5 px-4 rounded-full shadow-2xl flex items-center gap-2 border border-emerald-400/40 animate-bounce-subtle"
+          className="lg:hidden fixed bottom-20 left-4 z-40 bg-brand-charcoal dark:bg-brand-dark-card text-white font-bold py-2.5 px-4 rounded-full shadow-2xl flex items-center gap-2 border border-brand-gold/40 animate-bounce-subtle"
           aria-label="Open Cart Drawer"
         >
           <div className="relative">
