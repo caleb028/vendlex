@@ -10,7 +10,8 @@
     "build:server": "tsc --project tsconfig.server.json",
     "start:server": "node dist/server/index.js",
     "server:dev": "npx tsx server/index.ts",
-    "db:migrate": "npx tsx scripts/migrate-db.ts"
+    "db:migrate": "npx tsx scripts/migrate-db.ts",
+    "test": "npx tsx tests/platform-launch-readiness.test.ts"
   },
   "dependencies": {
     "@types/cors": "^2.8.19",

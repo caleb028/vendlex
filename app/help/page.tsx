@@ -319,9 +319,9 @@ function HelpSupportContent() {
             <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-brand-emerald flex items-center justify-center">
               <Phone className="w-4 h-4" />
             </div>
-            <h4 className="font-bold text-xs text-foreground">Phone &amp; Hotline</h4>
+            <h4 className="font-bold text-xs text-foreground">Phone &amp; Hotline / WhatsApp</h4>
             <p className="text-[11px] text-muted-foreground">Monday – Saturday (8:00 AM – 8:00 PM)</p>
-            <div className="font-mono text-xs font-black text-brand-emerald">+254 700 000 000</div>
+            <a href="tel:+254798159503" className="font-mono text-xs font-black text-brand-emerald hover:underline block">+254 798 159 503</a>
           </div>
 
           <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-5 shadow-xs space-y-2">
@@ -330,7 +330,7 @@ function HelpSupportContent() {
             </div>
             <h4 className="font-bold text-xs text-foreground">Official Email Desk</h4>
             <p className="text-[11px] text-muted-foreground">General inquiries &amp; merchant onboarding</p>
-            <div className="text-xs font-bold text-foreground">support@vendlex.co.ke</div>
+            <a href="mailto:calebngiciri075@gmail.com" className="text-xs font-bold text-foreground hover:text-brand-emerald transition-colors block">calebngiciri075@gmail.com</a>
           </div>
 
           <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-5 shadow-xs space-y-2">

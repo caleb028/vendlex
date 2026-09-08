@@ -88,6 +88,15 @@ export async function POST(req: NextRequest) {
       link: `/services`,
     });
 
+    // Notify platform admin (Caleb)
+    serverDB.addNotification({
+      userId: "usr-admin-1",
+      title: `🛠️ Service Request: ${serviceTitle}`,
+      message: `${customerName} (${customerPhone}) submitted ${requestType} for ${serviceTitle}. Provider: ${providerName}.`,
+      type: "SYSTEM",
+      link: `/admin`,
+    });
+
     serverDB.logAction({
       userId: user?.id,
       userRole: user?.role,

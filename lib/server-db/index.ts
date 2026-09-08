@@ -151,9 +151,9 @@ function getInitialSeedData(): VendLexDatabaseSchema {
     },
     {
       id: "usr-admin-1",
-      name: "Antony Otieno",
-      email: "admin@vendlex.co.ke",
-      phone: "+254700000001",
+      name: "Caleb Ngiciri",
+      email: "calebngiciri075@gmail.com",
+      phone: "+254798159503",
       role: "ADMIN",
       status: "ACTIVE",
       passwordHash: defaultPass.hash,

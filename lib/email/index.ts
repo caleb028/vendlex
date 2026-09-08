@@ -207,7 +207,7 @@ export async function sendEmail({
   type?: SentEmailRecord["type"];
   token?: string;
 }): Promise<SendEmailResult> {
-  const from = process.env.EMAIL_FROM || '"VendLex Security" <no-reply@vendlex.co.ke>';
+  const from = process.env.EMAIL_FROM || '"VendLex Kenya" <calebngiciri075@gmail.com>';
   const transport = createTransportInstance();
   const id = `mail-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 

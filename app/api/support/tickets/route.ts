@@ -103,6 +103,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Always notify administrator (Caleb)
+    serverDB.addNotification({
+      userId: "usr-admin-1",
+      title: `🚨 New Support Ticket: ${ticket.ticketNumber}`,
+      message: `From ${userName} (${userPhone} / ${userEmail}): "${ticket.subject}"`,
+      type: "ALERT",
+      link: `/admin`,
+    });
+
     return NextResponse.json({
       success: true,
       message: `Support ticket ${ticket.ticketNumber} submitted successfully. Our team will get back to you shortly.`,

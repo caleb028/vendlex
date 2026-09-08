@@ -54,11 +54,11 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-brand-gold-light shrink-0" />
-                <span>+254 700 000 000</span>
+                <a href="tel:+254798159503" className="hover:text-white transition-colors">+254 798 159 503</a>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>karibu@vendlex.co.ke</span>
+                <a href="mailto:calebngiciri075@gmail.com" className="hover:text-white transition-colors">calebngiciri075@gmail.com</a>
               </div>
             </div>
           </div>

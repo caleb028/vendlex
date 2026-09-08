@@ -231,7 +231,7 @@ export class VendLexPDFEngine {
       font: fontBold,
       color: textDark,
     });
-    page.drawText(doc.ownerPhone || doc.ownerEmail || "+254 700 000 000", {
+    page.drawText(doc.ownerPhone || doc.ownerEmail || "+254 798 159 503", {
       x: 55,
       y: currentY - 26,
       size: 9,
