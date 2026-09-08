@@ -162,50 +162,6 @@ function OnboardingContent() {
     return () => clearTimeout(timer);
   }, [paymentStatus, countdown]);
 
-  const handleSimulateSuccess = async () => {
-    const simReceipt = `QGH${Math.floor(100000 + Math.random() * 900000)}K`;
-    if (checkoutRequestId) {
-      try {
-        await fetch("/api/mpesa/callback", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            Body: {
-              stkCallback: {
-                MerchantRequestID: `MR-${Date.now()}`,
-                CheckoutRequestID: checkoutRequestId,
-                ResultCode: 0,
-                ResultDesc: "The service request is processed successfully.",
-                CallbackMetadata: {
-                  Item: [
-                    { Name: "Amount", Value: activePlanObj.monthlyPrice },
-                    { Name: "MpesaReceiptNumber", Value: simReceipt },
-                    { Name: "TransactionDate", Value: "20260908120000" },
-                    { Name: "PhoneNumber", Value: paymentPhone },
-                  ],
-                },
-              },
-            },
-          }),
-        });
-      } catch (e) {
-        console.warn("Callback simulation warning:", e);
-      }
-    }
-    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-    setReceiptNumber(simReceipt);
-    setPaymentStatus("success");
-    setTimeout(() => {
-      handleLaunch(simReceipt);
-    }, 1200);
-  };
-
-  const handleSimulateFailure = (reason: string) => {
-    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-    setPaymentStatus("error");
-    setErrorMessage(reason);
-  };
-
   const handleInitiateSTK = async () => {
     setPaymentStatus("sending");
     setErrorMessage("");
@@ -813,28 +769,6 @@ function OnboardingContent() {
                         <p className="text-[11px] leading-relaxed text-emerald-900/80 dark:text-emerald-200/90">
                           Please check your phone screen, enter your <strong>M-Pesa PIN</strong> to authorize {formatKSh(activePlanObj.monthlyPrice)}, and press OK.
                         </p>
-
-                        <div className="pt-2.5 border-t border-emerald-200 dark:border-emerald-800 flex flex-wrap items-center justify-between gap-2">
-                          <span className="text-[10px] text-emerald-800 dark:text-emerald-300 font-semibold">
-                            Daraja Simulation Controls:
-                          </span>
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={handleSimulateSuccess}
-                              className="px-2.5 py-1 bg-brand-emerald text-white rounded-lg text-[10px] font-bold hover:bg-brand-emerald-dark transition-colors shadow-xs"
-                            >
-                              ✓ Simulate Successful PIN Entry
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleSimulateFailure("Payment failed: Transaction was cancelled by user on phone (M-Pesa Code 1032).")}
-                              className="px-2.5 py-1 bg-red-100 text-brand-red dark:bg-red-950/60 rounded-lg text-[10px] font-bold hover:bg-red-200 transition-colors border border-red-200"
-                            >
-                              ✗ Simulate Cancel / Failure
-                            </button>
-                          </div>
-                        </div>
                       </div>
                     )}
 

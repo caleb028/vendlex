@@ -47,12 +47,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const { user } = getServerSession(req);
+    const { user, isAuthenticated } = getServerSession(req);
+    if (!isAuthenticated || !user) {
+      return NextResponse.json(
+        { success: false, error: "Please sign in or create an account to place your order." },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
 
-    const customerName = sanitizeInput(body.customerName || user?.name || "Customer", 80);
-    const customerPhone = sanitizeInput(body.customerPhone || user?.phone || "", 20);
-    const customerEmail = sanitizeInput(body.customerEmail || user?.email || "", 100);
+    const customerName = sanitizeInput(body.customerName || user.name || "Customer", 80);
+    const customerPhone = sanitizeInput(body.customerPhone || user.phone || "", 20);
+    const customerEmail = sanitizeInput(body.customerEmail || user.email || "", 100);
     const county = sanitizeInput(body.county || "Nairobi", 50);
     const town = sanitizeInput(body.town || "Central", 50);
     const estate = sanitizeInput(body.estate || "Estate", 100);

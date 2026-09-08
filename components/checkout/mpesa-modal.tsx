@@ -149,38 +149,6 @@ export function MpesaModal({
     }
   };
 
-  // Helper for testing environments without live Safaricom SIM card
-  const handleSimulateSandboxCallback = async () => {
-    if (!checkoutId) return;
-    try {
-      const receipt = `QKH${Math.floor(100000 + Math.random() * 900000)}A`;
-      await fetch("/api/mpesa/callback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          Body: {
-            stkCallback: {
-              MerchantRequestID: `MR-${Date.now()}`,
-              CheckoutRequestID: checkoutId,
-              ResultCode: 0,
-              ResultDesc: "The service request is processed successfully.",
-              CallbackMetadata: {
-                Item: [
-                  { Name: "Amount", Value: amount },
-                  { Name: "MpesaReceiptNumber", Value: receipt },
-                  { Name: "TransactionDate", Value: "20260904120000" },
-                  { Name: "PhoneNumber", Value: inputPhone },
-                ],
-              },
-            },
-          },
-        }),
-      });
-    } catch (e) {
-      console.warn("Callback simulation error:", e);
-    }
-  };
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="md">
       <div className="space-y-6 text-center">
@@ -282,16 +250,7 @@ export function MpesaModal({
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={handleSimulateSandboxCallback}
-                className="text-xs bg-emerald-50 dark:bg-emerald-950/50 border border-brand-emerald text-brand-emerald font-bold py-1.5 px-3 rounded-lg hover:bg-brand-emerald hover:text-white transition-colors"
-                title="Simulate Safaricom callback on sandbox"
-              >
-                ⚡ Approve Sandbox PIN (Dev/Test)
-              </button>
-
+            <div className="flex items-center justify-center pt-2">
               <button
                 type="button"
                 onClick={() => setStep("TIMED_OUT")}

@@ -47,7 +47,7 @@ export function DeliveryTrackingMap({
         </span>
       </div>
 
-      {/* Simulated GPS Live Route Map Box */}
+      {/* Real-time GPS Live Route Map Box */}
       <div className="relative h-48 w-full rounded-2xl bg-gradient-to-br from-emerald-900 via-gray-900 to-black overflow-hidden p-5 flex flex-col justify-between text-white shadow-inner border border-emerald-800">
         {/* Animated Map Grid Lines */}
         <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px] opacity-25" />

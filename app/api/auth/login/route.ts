@@ -113,6 +113,15 @@ export async function POST(req: NextRequest) {
       status: "SUCCESS",
     });
 
+    // Add authentic sign-in notification
+    serverDB.addNotification({
+      userId: user.id,
+      title: "Account Sign-In Detected",
+      message: `Signed in successfully on ${new Date().toLocaleDateString("en-KE", { dateStyle: "medium", timeStyle: "short" })}.`,
+      type: "SYSTEM",
+      link: user.role === "SELLER" || user.role === "BUSINESS_OWNER" ? "/seller/dashboard" : "/customer/dashboard",
+    });
+
     const response = NextResponse.json({
       success: true,
       message: "Sign in successful.",

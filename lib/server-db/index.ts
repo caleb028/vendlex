@@ -226,17 +226,7 @@ function getInitialSeedData(): VendLexDatabaseSchema {
     orders: initialOrders,
     reviews: initialReviews,
     serviceRequests: [],
-    notifications: [
-      {
-        id: "notif-1",
-        userId: "usr-cust-1",
-        title: "Welcome to VendLex Kenya",
-        message: "Your buyer account is active. Shop verified electronics, fashion, and home goods with instant M-Pesa protection.",
-        type: "SYSTEM",
-        isRead: false,
-        createdAt: "2026-08-31T12:00:00Z",
-      },
-    ],
+    notifications: [],
     auditLogs: [
       {
         id: "aud-init",

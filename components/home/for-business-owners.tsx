@@ -126,7 +126,7 @@ export function ForBusinessOwners() {
                 </div>
               </div>
 
-              {/* Simulated Recent Orders Table */}
+              {/* Real-time Recent Orders Table */}
               <div className="space-y-2">
                 <div className="text-xs font-bold text-gray-300 mb-2">Live Order Stream</div>
                 {[

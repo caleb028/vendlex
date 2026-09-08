@@ -95,6 +95,15 @@ export async function POST(req: NextRequest) {
       status: "SUCCESS",
     });
 
+    // Add authentic welcome notification for the newly registered user
+    serverDB.addNotification({
+      userId: newUser.id,
+      title: "Karibu VendLex Kenya!",
+      message: `Welcome ${newUser.name}! Your account is active. Start exploring verified products, sellers, and trusted services across Kenya.`,
+      type: "SYSTEM",
+      link: newUser.role === "SELLER" || newUser.role === "BUSINESS_OWNER" ? "/seller/dashboard" : "/marketplace",
+    });
+
     const response = NextResponse.json({
       success: true,
       message: "Account registered successfully.",

@@ -131,51 +131,6 @@ export default function SellerSubscriptionPage() {
     }
   };
 
-  const handleSimulateSandboxCallback = async () => {
-    const simReceipt = `QGH${Math.floor(100000 + Math.random() * 900000)}K`;
-    if (checkoutId) {
-      try {
-        await fetch("/api/mpesa/callback", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            Body: {
-              stkCallback: {
-                MerchantRequestID: `MR-${Date.now()}`,
-                CheckoutRequestID: checkoutId,
-                ResultCode: 0,
-                ResultDesc: "The service request is processed successfully.",
-                CallbackMetadata: {
-                  Item: [
-                    { Name: "Amount", Value: selectedPlanToUpgrade?.monthlyPrice || 799 },
-                    { Name: "MpesaReceiptNumber", Value: simReceipt },
-                    { Name: "TransactionDate", Value: "20260906074500" },
-                    { Name: "PhoneNumber", Value: phone },
-                  ],
-                },
-              },
-            },
-          }),
-        });
-      } catch (e) {
-        console.warn("Callback simulation error:", e);
-      }
-    }
-    clearAllTimers();
-    setReceiptNo(simReceipt);
-    if (selectedPlanToUpgrade) setCurrentTier(selectedPlanToUpgrade.id);
-    setStkStatus("success");
-    try {
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-    } catch (e) {}
-  };
-
-  const handleSimulateFailure = (reason = "Payment failed: Transaction was cancelled on user phone (M-Pesa Code 1032).") => {
-    clearAllTimers();
-    setStkStatus("error");
-    setErrorMessage(reason);
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -332,29 +287,6 @@ export default function SellerSubscriptionPage() {
                   <span>
                     Do not share your M-Pesa PIN with anyone. VendLex will automatically detect confirmation.
                   </span>
-                </div>
-
-                {/* Developer / Sandbox Simulation Controls */}
-                <div className="pt-2 border-t border-border flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-[10px] text-muted-foreground font-semibold">
-                    Daraja Simulation:
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={handleSimulateSandboxCallback}
-                      className="px-2.5 py-1 bg-brand-emerald text-white rounded-lg text-[10px] font-bold hover:bg-brand-emerald-dark transition-colors shadow-xs"
-                    >
-                      ✓ Approve Sandbox PIN
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleSimulateFailure("Payment failed: Transaction was cancelled on phone (M-Pesa Code 1032).")}
-                      className="px-2.5 py-1 bg-red-100 text-brand-red dark:bg-red-950/60 rounded-lg text-[10px] font-bold hover:bg-red-200 transition-colors border border-red-200"
-                    >
-                      ✗ Decline / Cancel
-                    </button>
-                  </div>
                 </div>
               </div>
             )}
