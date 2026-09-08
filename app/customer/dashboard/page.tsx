@@ -25,7 +25,10 @@ import {
   FileText,
   Download,
   Loader2,
+  LogOut,
+  Lock,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/store/auth-store";
 
 interface CustomerOrder {
@@ -42,10 +45,18 @@ interface CustomerOrder {
 }
 
 export default function CustomerDashboardPage() {
-  const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "orders" | "documents" | "wishlist" | "stores" | "addresses" | "notifications" | "rewards" | "reviews" | "support" | "settings"
   >("orders");
+
+  const handleSignOut = async () => {
+    setIsLoggingOut(true);
+    await logout();
+    router.push("/login");
+  };
 
   // Rewards State
   const [vendPoints, setVendPoints] = useState(1450);
@@ -149,17 +160,30 @@ export default function CustomerDashboardPage() {
             </div>
           </div>
 
-          {/* VendPoints Loyalty Pill */}
-          <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 p-3 sm:p-4 rounded-2xl flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-400 text-brand-charcoal font-black">
-              <Award className="w-5 h-5" />
+          <div className="flex flex-wrap items-center gap-3">
+            {/* VendPoints Loyalty Pill */}
+            <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 p-3 sm:p-4 rounded-2xl flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-400 text-brand-charcoal font-black">
+                <Award className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 dark:text-amber-200">
+                  VendPoints Balance
+                </span>
+                <div className="text-xl font-black text-foreground">{vendPoints} Pts</div>
+              </div>
             </div>
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 dark:text-amber-200">
-                VendPoints Balance
-              </span>
-              <div className="text-xl font-black text-foreground">{vendPoints} Pts</div>
-            </div>
+
+            {/* Sign Out Button */}
+            <button
+              onClick={handleSignOut}
+              disabled={isLoggingOut}
+              className="flex items-center gap-1.5 px-4 py-3 rounded-2xl text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-950/70 border border-red-200 dark:border-red-900/50 transition-colors shadow-2xs"
+              title="Sign Out of VendLex"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
+            </button>
           </div>
         </div>
 
@@ -481,8 +505,11 @@ export default function CustomerDashboardPage() {
 
         {/* TAB 9: SETTINGS */}
         {activeTab === "settings" && (
-          <div className="bg-white dark:bg-brand-dark-card border border-border rounded-3xl p-6 shadow-sm space-y-4 text-xs">
-            <h3 className="text-base font-black text-foreground">Security &amp; Preferences</h3>
+          <div className="bg-white dark:bg-brand-dark-card border border-border rounded-3xl p-6 shadow-sm space-y-6 text-xs">
+            <div>
+              <h3 className="text-base font-black text-foreground">Security &amp; Preferences</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Manage your customer profile and account credentials.</p>
+            </div>
             <div className="space-y-3 max-w-md">
               <div>
                 <label className="font-bold text-foreground block mb-1">Full Name</label>
@@ -500,6 +527,25 @@ export default function CustomerDashboardPage() {
                   className="w-full p-2.5 rounded-xl border border-border bg-muted/30 text-xs"
                 />
               </div>
+            </div>
+
+            <div className="pt-4 border-t border-border flex flex-wrap items-center justify-between gap-4 max-w-md">
+              <Link
+                href="/account/security"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-emerald hover:underline"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>Security &amp; Active Sessions &rarr;</span>
+              </Link>
+
+              <button
+                onClick={handleSignOut}
+                disabled={isLoggingOut}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
+              </button>
             </div>
           </div>
         )}

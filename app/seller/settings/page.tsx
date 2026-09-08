@@ -1,13 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/store/auth-store";
 import { KENYAN_COUNTIES } from "@/lib/data/kenya-data";
-import { Settings, Save, CheckCircle2, ShieldCheck, Smartphone, Clock, Store } from "lucide-react";
+import { Settings, Save, CheckCircle2, ShieldCheck, Smartphone, Clock, Store, LogOut, Lock } from "lucide-react";
 
 export default function SellerSettingsPage() {
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, logout } = useAuth();
   const [savedToast, setSavedToast] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsLoggingOut(true);
+    await logout();
+    router.push("/login");
+  };
 
   // Form states
   const [storeName, setStoreName] = useState(user?.businessName || "Nairobi Tech Hub");
@@ -171,6 +181,35 @@ export default function SellerSettingsPage() {
                 className="w-full bg-muted/30 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Account Security & Sign Out */}
+        <div className="bg-white dark:bg-brand-dark-card border border-border rounded-3xl p-6 shadow-sm space-y-4">
+          <h3 className="font-extrabold text-sm text-foreground flex items-center gap-2">
+            <Lock className="w-4 h-4 text-brand-emerald" />
+            <span>Account Security &amp; Authentication</span>
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Manage your active login sessions, password, and merchant authentication access.
+          </p>
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-border/80">
+            <Link
+              href="/account/security"
+              className="inline-flex items-center gap-2 text-xs font-bold text-brand-emerald hover:underline"
+            >
+              <span>Manage Sessions &amp; Security &rarr;</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={handleSignOut}
+              disabled={isLoggingOut}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-950/70 border border-red-200 dark:border-red-900/50 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>{isLoggingOut ? "Signing Out..." : "Sign Out of Store"}</span>
+            </button>
           </div>
         </div>
 

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/store/auth-store";
 import { formatKSh } from "@/lib/utils";
 import {
@@ -39,6 +40,7 @@ import {
   HelpCircle,
   Hash,
   Megaphone,
+  LogOut,
 } from "lucide-react";
 import { AICountyHeatmap } from "@/components/ai/ai-county-heatmap";
 import { ServerSupportTicket, ServerAdvertisement } from "@/lib/server-db/types";
@@ -61,7 +63,15 @@ interface MpesaTxn {
 }
 
 export default function AdminDashboardPage() {
-  const { user, role, login } = useAuth();
+  const router = useRouter();
+  const { user, role, login, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsLoggingOut(true);
+    await logout();
+    router.push("/login");
+  };
   const {
     orders: orderReqs,
     serviceRequests: serviceReqs,
@@ -528,6 +538,16 @@ export default function AdminDashboardPage() {
               <Mail className="w-3.5 h-3.5 text-brand-emerald" />
               <span>Email Spool</span>
             </Link>
+
+            <button
+              onClick={handleSignOut}
+              disabled={isLoggingOut}
+              className="px-3 py-2 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 font-bold text-xs rounded-xl border border-red-200 dark:border-red-900/50 transition-colors flex items-center gap-1.5"
+              title="Sign Out of Admin Console"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
+            </button>
           </div>
         </div>
 

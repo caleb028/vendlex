@@ -99,9 +99,17 @@ export function MobileBottomNav() {
 
         {/* 5. Account */}
         <Link
-          href={user ? "/customer/dashboard" : "/login"}
+          href={
+            !user
+              ? "/login"
+              : role === "ADMIN" || role === "SUPER_ADMIN"
+              ? "/admin"
+              : role === "SELLER" || role === "BUSINESS_OWNER"
+              ? "/seller/dashboard"
+              : "/customer/dashboard"
+          }
           className={`flex flex-col items-center justify-center py-1.5 px-2.5 rounded-xl transition-colors ${
-            pathname.startsWith("/customer") || pathname.startsWith("/login")
+            pathname.startsWith("/customer") || pathname.startsWith("/seller") || pathname.startsWith("/admin") || pathname.startsWith("/login")
               ? "text-brand-emerald dark:text-brand-emerald-light font-black"
               : "text-muted-foreground hover:text-foreground"
           }`}

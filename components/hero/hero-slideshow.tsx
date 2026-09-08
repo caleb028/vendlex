@@ -58,10 +58,18 @@ export function HeroSlideshow() {
       {/* Hero Content Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
         <div className="max-w-3xl space-y-6 animate-fadeIn">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-emerald/30 border border-brand-emerald/50 backdrop-blur-md text-emerald-300 text-xs sm:text-sm font-semibold tracking-wide shadow-glow-green">
-            <span>🇰🇪 BUILT FOR KENYAN BUSINESSES</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+          {/* HIGH-VISIBILITY 47 COUNTIES BADGE & CATEGORY PILL */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-400/60 backdrop-blur-md text-emerald-200 text-xs sm:text-sm font-extrabold tracking-wide shadow-glow-green">
+              <span>🇰🇪 CONNECTING ALL 47 COUNTIES IN KENYA</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            </div>
+            {slide?.badge && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 border border-white/25 backdrop-blur-md text-amber-300 text-xs font-bold uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>{slide.badge}</span>
+              </div>
+            )}
           </div>
 
           {/* Heading */}
