@@ -114,13 +114,17 @@ export async function POST(req: NextRequest) {
     });
 
     // Add authentic sign-in notification
-    serverDB.addNotification({
-      userId: user.id,
-      title: "Account Sign-In Detected",
-      message: `Signed in successfully on ${new Date().toLocaleDateString("en-KE", { dateStyle: "medium", timeStyle: "short" })}.`,
-      type: "SYSTEM",
-      link: user.role === "SELLER" || user.role === "BUSINESS_OWNER" ? "/seller/dashboard" : "/customer/dashboard",
-    });
+    try {
+      serverDB.addNotification({
+        userId: user.id,
+        title: "Account Sign-In Detected",
+        message: `Signed in successfully on ${new Date().toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" })}.`,
+        type: "SYSTEM",
+        link: user.role === "SELLER" || user.role === "BUSINESS_OWNER" ? "/seller/dashboard" : "/customer/dashboard",
+      });
+    } catch (e) {
+      console.warn("Sign-in notification warning:", e);
+    }
 
     const response = NextResponse.json({
       success: true,
