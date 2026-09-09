@@ -126,3 +126,45 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: "Failed to open dispute ticket." }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const { user, isAuthenticated } = getServerSession(req);
+    if (!isAuthenticated || !user || (user.role !== "ADMIN" && user.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ success: false, error: "Forbidden: Admin access required." }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const id = body.id;
+    const status = body.status; // "RESOLVED" | "REJECTED" | "INVESTIGATING"
+    const resolutionNotes = body.resolutionNotes ? sanitizeInput(body.resolutionNotes, 500) : undefined;
+
+    if (!id || !status) {
+      return NextResponse.json({ success: false, error: "Dispute ID and status are required." }, { status: 400 });
+    }
+
+    const updated = serverDB.updateDisputeStatus(id, status, resolutionNotes);
+    if (!updated) {
+      return NextResponse.json({ success: false, error: "Dispute ticket not found." }, { status: 404 });
+    }
+
+    serverDB.logAction({
+      userId: user.id,
+      userRole: user.role,
+      action: "DISPUTE_RESOLVED",
+      resource: "DISPUTE",
+      resourceId: id,
+      details: `Dispute ${id} marked as ${status}. Notes: ${resolutionNotes || "None"}`,
+      status: "SUCCESS",
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `Dispute #${id} updated to ${status}.`,
+      dispute: updated,
+    });
+  } catch (err: any) {
+    console.error("[Disputes PATCH Error]:", err);
+    return NextResponse.json({ success: false, error: "Failed to update dispute." }, { status: 500 });
+  }
+}

@@ -17,35 +17,30 @@ import {
   Key,
   RefreshCw,
   Send,
-  Wrench,
   Truck,
   MessageSquare,
-  UserCheck,
-  Package,
   MapPin,
   ExternalLink,
-  Clock,
-  Filter,
-  Mail,
-  Lock,
   Search,
-  Eye,
   AlertTriangle,
-  Award,
   ChevronRight,
   TrendingUp,
   Store,
-  Users,
-  Check,
   HelpCircle,
-  Hash,
   Megaphone,
   LogOut,
+  Package,
+  Mail,
 } from "lucide-react";
 import { AICountyHeatmap } from "@/components/ai/ai-county-heatmap";
-import { ServerSupportTicket, ServerAdvertisement } from "@/lib/server-db/types";
+import {
+  ServerSupportTicket,
+  ServerAdvertisement,
+  ServerOrder,
+  ServerKYC,
+  ServerDispute,
+} from "@/lib/server-db/types";
 import { VendLexDocument } from "@/lib/documents/types";
-import { usePlatform } from "@/lib/store/platform-store";
 
 interface MpesaTxn {
   id: string;
@@ -64,7 +59,7 @@ interface MpesaTxn {
 
 export default function AdminDashboardPage() {
   const router = useRouter();
-  const { user, role, login, logout } = useAuth();
+  const { user, role, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleSignOut = async () => {
@@ -72,14 +67,6 @@ export default function AdminDashboardPage() {
     await logout();
     router.push("/login");
   };
-  const {
-    orders: orderReqs,
-    serviceRequests: serviceReqs,
-    businessKYCs: kycs,
-    updateOrderStatus,
-    updateServiceStatus,
-    updateKYCStatus,
-  } = usePlatform();
 
   // Navigation Tab State
   const [activeTab, setActiveTab] = useState<
@@ -88,28 +75,33 @@ export default function AdminDashboardPage() {
 
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
-  // Advertisements State
-  const [advertisements, setAdvertisements] = useState<ServerAdvertisement[]>([]);
-  const [loadingAds, setLoadingAds] = useState(false);
-  const [adFilterStatus, setAdFilterStatus] = useState<string>("ALL");
-  const [rejectReasonPrompt, setRejectReasonPrompt] = useState<{ id: string; reason: string } | null>(null);
-
-
-
-  // Live Metric Counts
+  // Real-World Platform Metrics (Zero initialized, strictly computed from real database)
   const [metrics, setMetrics] = useState({
-    totalGMV: 48500000,
-    escrowInVault: 12840000,
-    activeSellers: 1240,
-    verifiedMerchants: 1156,
-    totalOrders: 18420,
-    pendingKYCsCount: 2,
-    openDisputesCount: 1,
-    openTicketsCount: 3,
+    totalUsers: 0,
+    totalOrders: 0,
+    totalGMV: 0,
+    escrowInVault: 0,
+    activeSellers: 0,
+    verifiedMerchants: 0,
+    pendingKYCsCount: 0,
+    openDisputesCount: 0,
+    openTicketsCount: 0,
+    totalProducts: 0,
+    totalDocuments: 0,
+    validDocuments: 0,
     systemHealth: "100% OPERATIONAL",
   });
 
-  // Support Tickets State
+  // Live Server Database Collections
+  const [orders, setOrders] = useState<ServerOrder[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
+  const [kycs, setKycs] = useState<ServerKYC[]>([]);
+  const [loadingKycs, setLoadingKycs] = useState(false);
+
+  const [disputes, setDisputes] = useState<ServerDispute[]>([]);
+  const [loadingDisputes, setLoadingDisputes] = useState(false);
+
   const [supportTickets, setSupportTickets] = useState<ServerSupportTicket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(false);
   const [ticketFilterStatus, setTicketFilterStatus] = useState<string>("ALL");
@@ -117,28 +109,35 @@ export default function AdminDashboardPage() {
   const [adminReplyText, setAdminReplyText] = useState("");
   const [isSendingReply, setIsSendingReply] = useState(false);
 
-  // Verified Documents State
+  const [advertisements, setAdvertisements] = useState<ServerAdvertisement[]>([]);
+  const [loadingAds, setLoadingAds] = useState(false);
+  const [adFilterStatus, setAdFilterStatus] = useState<string>("ALL");
+
   const [documents, setDocuments] = useState<VendLexDocument[]>([]);
   const [docSearchQuery, setDocSearchQuery] = useState("");
 
-  // Live M-Pesa Transactions State
   const [transactions, setTransactions] = useState<MpesaTxn[]>([]);
   const [loadingTxns, setLoadingTxns] = useState(false);
 
-  // Daraja Config State
-  const [envMode, setEnvMode] = useState<"sandbox" | "production">("production");
+  // Daraja Gateway Configuration
   const [shortcode, setShortcode] = useState("174379");
   const [consumerKey, setConsumerKey] = useState("k0kU8oM4Y8w6p6PZ2eZ7sR8Q1A1b2c3d");
-  const [consumerSecret, setConsumerSecret] = useState("••••••••••••••••••••••••••••••••");
   const [passkey, setPasskey] = useState("bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919");
   const callbackUrl = typeof window !== "undefined" ? `${window.location.origin}/api/mpesa/callback` : "https://vendlex.vercel.app/api/mpesa/callback";
 
-  // STK Test Simulator State
+  // STK Test Trigger State
   const [testPhone, setTestPhone] = useState("0712345678");
   const [testAmount, setTestAmount] = useState("10");
   const [isTriggeringSTK, setIsTriggeringSTK] = useState(false);
   const [stkFeedback, setStkFeedback] = useState<string | null>(null);
 
+  // Dispute Action Modal State
+  const [resolvingDispute, setResolvingDispute] = useState<{ id: string; action: "RESOLVE" | "REJECT" } | null>(null);
+  const [disputeNotes, setDisputeNotes] = useState("");
+
+  // =========================================================================
+  // REAL-WORLD DATA FETCHERS (Live from persistent server database)
+  // =========================================================================
   const fetchMetrics = async () => {
     try {
       const res = await fetch("/api/admin/metrics");
@@ -148,6 +147,51 @@ export default function AdminDashboardPage() {
       }
     } catch (e) {
       console.warn("Metrics fetch warning:", e);
+    }
+  };
+
+  const fetchOrders = async () => {
+    setLoadingOrders(true);
+    try {
+      const res = await fetch("/api/orders");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.orders)) {
+        setOrders(data.orders);
+      }
+    } catch (e) {
+      console.warn("Orders fetch warning:", e);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  const fetchKycs = async () => {
+    setLoadingKycs(true);
+    try {
+      const res = await fetch("/api/admin/kyc");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.kycs)) {
+        setKycs(data.kycs);
+      }
+    } catch (e) {
+      console.warn("KYC fetch warning:", e);
+    } finally {
+      setLoadingKycs(false);
+    }
+  };
+
+  const fetchDisputes = async () => {
+    setLoadingDisputes(true);
+    try {
+      const res = await fetch("/api/disputes");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.disputes)) {
+        setDisputes(data.disputes);
+      }
+    } catch (e) {
+      console.warn("Disputes fetch warning:", e);
+    } finally {
+      setLoadingDisputes(false);
     }
   };
 
@@ -208,6 +252,83 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const refreshAllData = () => {
+    fetchMetrics();
+    fetchOrders();
+    fetchKycs();
+    fetchDisputes();
+    fetchSupportTickets();
+    fetchDocuments();
+    fetchTransactions();
+    fetchAdvertisements();
+  };
+
+  useEffect(() => {
+    refreshAllData();
+  }, []);
+
+  // =========================================================================
+  // REAL-WORLD ACTION HANDLERS (Mutates live database)
+  // =========================================================================
+  const handleOrderStatusAction = async (id: string, newStatus: ServerOrder["status"]) => {
+    try {
+      const res = await fetch(`/api/orders/${id}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setActionSuccess(`Order #${id} status updated to ${newStatus.replace("_", " ")}.`);
+        setTimeout(() => setActionSuccess(null), 3500);
+        fetchOrders();
+        fetchMetrics();
+      }
+    } catch (e) {
+      console.error("Order status update error:", e);
+    }
+  };
+
+  const handleKycAction = async (id: string, newStatus: "APPROVED" | "REJECTED") => {
+    try {
+      const res = await fetch("/api/admin/kyc", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setActionSuccess(`KYC submission #${id} marked as ${newStatus}. Verified credentials issued.`);
+        setTimeout(() => setActionSuccess(null), 3500);
+        fetchKycs();
+        fetchMetrics();
+      }
+    } catch (e) {
+      console.error("KYC action error:", e);
+    }
+  };
+
+  const handleResolveDispute = async (id: string, status: "RESOLVED" | "REJECTED", notes?: string) => {
+    try {
+      const res = await fetch("/api/disputes", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status, resolutionNotes: notes || "Resolved by Platform Admin" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setActionSuccess(`Dispute #${id} has been marked as ${status}.`);
+        setTimeout(() => setActionSuccess(null), 3500);
+        setResolvingDispute(null);
+        setDisputeNotes("");
+        fetchDisputes();
+        fetchMetrics();
+      }
+    } catch (e) {
+      console.error("Dispute resolve error:", e);
+    }
+  };
+
   const handleApproveAd = async (id: string) => {
     try {
       const res = await fetch("/api/admin/advertisements", {
@@ -238,61 +359,11 @@ export default function AdminDashboardPage() {
       if (data.success) {
         setActionSuccess(`Advertisement #${id} rejected with reason communicated to advertiser.`);
         setTimeout(() => setActionSuccess(null), 3500);
-        setRejectReasonPrompt(null);
         fetchAdvertisements();
       }
     } catch (e) {
       console.error("Reject ad error:", e);
     }
-  };
-
-  const handleSuspendAd = async (id: string) => {
-    try {
-      const res = await fetch("/api/admin/advertisements", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, action: "suspend" }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setActionSuccess(`Advertisement #${id} suspended.`);
-        setTimeout(() => setActionSuccess(null), 3500);
-        fetchAdvertisements();
-      }
-    } catch (e) {
-      console.error("Suspend ad error:", e);
-    }
-  };
-
-  useEffect(() => {
-    fetchMetrics();
-    fetchSupportTickets();
-    fetchDocuments();
-    fetchTransactions();
-    fetchAdvertisements();
-  }, []);
-
-
-
-  const handleKycAction = async (id: string, newStatus: "APPROVED" | "REJECTED") => {
-    updateKYCStatus(id, newStatus);
-    try {
-      await fetch("/api/admin/kyc", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: newStatus }),
-      });
-    } catch (e) {
-      console.warn("KYC server update warning:", e);
-    }
-    setActionSuccess(`KYC Request #${id} has been ${newStatus.toLowerCase()} successfully and merchant credentials updated.`);
-    setTimeout(() => setActionSuccess(null), 3500);
-  };
-
-  const handleOrderStatusAction = (id: string, newStatus: any) => {
-    updateOrderStatus(id, newStatus);
-    setActionSuccess(`Order #${id} updated to ${newStatus.replace("_", " ")}.`);
-    setTimeout(() => setActionSuccess(null), 3500);
   };
 
   const handleTicketStatusChange = async (ticketId: string, newStatus: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED") => {
@@ -397,9 +468,15 @@ export default function AdminDashboardPage() {
     );
   }, [documents, docSearchQuery]);
 
+  const filteredAds = useMemo(() => {
+    return advertisements.filter((a) => {
+      if (adFilterStatus !== "ALL" && a.status !== adFilterStatus) return false;
+      return true;
+    });
+  }, [advertisements, adFilterStatus]);
+
   // =========================================================================
-  // AUTHENTICATED SUPERADMIN COMMAND CENTER
-  // (Guarded by app/admin/layout.tsx zero-trust security gate)
+  // AUTHENTICATED SUPERADMIN COMMAND CENTER (Zero-Trust Guarded)
   // =========================================================================
   return (
     <div className="min-h-screen bg-brand-off-white dark:bg-brand-dark-bg py-6 sm:py-8">
@@ -420,11 +497,20 @@ export default function AdminDashboardPage() {
               VendLex Platform Operations Command Center
             </h1>
             <p className="text-xs text-muted-foreground">
-              Comprehensive oversight: M-Pesa escrow vault, merchant KYC approvals, order logistics, customer support desk &amp; fraud defense.
+              Live marketplace oversight: Real M-Pesa transactions, active merchant stores, verified KYC accreditations &amp; dispute mediation.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <button
+              onClick={refreshAllData}
+              className="px-3 py-2 bg-muted/60 hover:bg-muted text-foreground font-bold text-xs rounded-xl border border-border transition-colors flex items-center gap-1.5"
+              title="Refresh all live database collections"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-brand-emerald" />
+              <span>Refresh Live Data</span>
+            </button>
+
             <Link
               href="/admin/marketing"
               className="px-3 py-2 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-brand-emerald font-bold text-xs rounded-xl border border-emerald-200 dark:border-emerald-800 transition-colors flex items-center gap-1.5"
@@ -468,7 +554,7 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* 8 Executive KPI Metric Cards */}
+        {/* 4 Real-World KPI Metric Cards (Strictly live calculations) */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
           <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4.5 space-y-1 shadow-2xs">
             <div className="flex items-center justify-between text-muted-foreground">
@@ -476,7 +562,7 @@ export default function AdminDashboardPage() {
               <TrendingUp className="w-4 h-4 text-brand-emerald" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-brand-emerald">{formatKSh(metrics.totalGMV)}</div>
-            <span className="text-[10px] text-muted-foreground">+41% YTD across 47 counties</span>
+            <span className="text-[10px] text-muted-foreground">{metrics.totalOrders} total completed orders</span>
           </div>
 
           <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4.5 space-y-1 shadow-2xs">
@@ -485,7 +571,7 @@ export default function AdminDashboardPage() {
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-foreground">{formatKSh(metrics.escrowInVault)}</div>
-            <span className="text-[10px] text-brand-emerald font-semibold">100% Protected Funds</span>
+            <span className="text-[10px] text-brand-emerald font-semibold">Active protected orders</span>
           </div>
 
           <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4.5 space-y-1 shadow-2xs">
@@ -503,7 +589,7 @@ export default function AdminDashboardPage() {
               <HelpCircle className="w-4 h-4 text-purple-500" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-purple-600">{metrics.openTicketsCount} Open</div>
-            <span className="text-[10px] text-muted-foreground">Avg resolution: 14 mins</span>
+            <span className="text-[10px] text-muted-foreground">{supportTickets.length} total inquiries logged</span>
           </div>
         </div>
 
@@ -554,7 +640,7 @@ export default function AdminDashboardPage() {
             }`}
           >
             <Truck className="w-3.5 h-3.5" />
-            <span>Orders &amp; Escrow ({orderReqs.length})</span>
+            <span>Orders &amp; Escrow ({orders.length})</span>
           </button>
 
           <button
@@ -566,7 +652,7 @@ export default function AdminDashboardPage() {
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5 text-brand-red" />
-            <span>Disputes &amp; Fraud (3 Flags)</span>
+            <span>Disputes &amp; Fraud ({disputes.filter((d) => d.status === "PENDING_REVIEW").length})</span>
           </button>
 
           <button
@@ -632,15 +718,12 @@ export default function AdminDashboardPage() {
                   <div>
                     <h3 className="font-extrabold text-base text-foreground flex items-center gap-2">
                       <TrendingUp className="w-4 h-4 text-brand-emerald" />
-                      <span>Live Platform Activity Stream</span>
+                      <span>Live Platform Operations Feed</span>
                     </h3>
-                    <p className="text-xs text-muted-foreground">Real-time settlements, verifications &amp; logistics updates.</p>
+                    <p className="text-xs text-muted-foreground">Real-time settlements, merchant verifications &amp; logistics monitoring.</p>
                   </div>
                   <button
-                    onClick={() => {
-                      fetchMetrics();
-                      fetchSupportTickets();
-                    }}
+                    onClick={refreshAllData}
                     className="p-2 rounded-xl border border-border hover:bg-muted text-muted-foreground hover:text-foreground"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
@@ -653,7 +736,7 @@ export default function AdminDashboardPage() {
                       <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
                       <div>
                         <div className="font-bold text-foreground">Safaricom Daraja 2.0 Webhook Active</div>
-                        <div className="text-[11px] text-muted-foreground">Listening at /api/mpesa/callback • 0 dropped payloads</div>
+                        <div className="text-[11px] text-muted-foreground">Listening at /api/mpesa/callback • Real-time STK settlement</div>
                       </div>
                     </div>
                     <span className="text-[10px] font-black uppercase text-brand-emerald bg-emerald-100 dark:bg-emerald-900 px-2 py-0.5 rounded">
@@ -665,8 +748,8 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center gap-3">
                       <ShieldCheck className="w-4 h-4 text-blue-500 shrink-0" />
                       <div>
-                        <div className="font-bold text-foreground">Verified Merchant Accreditation Engine</div>
-                        <div className="text-[11px] text-muted-foreground">Auto-generates official stamped PDF certificates with QR verification</div>
+                        <div className="font-bold text-foreground">Merchant Accreditation &amp; Certificate Generator</div>
+                        <div className="text-[11px] text-muted-foreground">Generates verifiable PDF receipts, invoices &amp; certificates</div>
                       </div>
                     </div>
                     <span className="text-[10px] font-black uppercase text-blue-700 bg-blue-100 dark:bg-blue-900 px-2 py-0.5 rounded">
@@ -678,8 +761,8 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center gap-3">
                       <Zap className="w-4 h-4 text-amber-500 shrink-0" />
                       <div>
-                        <div className="font-bold text-foreground">Google Ads &amp; Meta Product Catalog Syndication</div>
-                        <div className="text-[11px] text-muted-foreground">Live XML &amp; CSV feeds syncing inventory across 47 counties</div>
+                        <div className="font-bold text-foreground">Marketing &amp; Growth Engine Active</div>
+                        <div className="text-[11px] text-muted-foreground">Syndicates active product catalog across all 47 counties</div>
                       </div>
                     </div>
                     <span className="text-[10px] font-black uppercase text-amber-700 bg-amber-100 dark:bg-amber-900 px-2 py-0.5 rounded">
@@ -690,21 +773,21 @@ export default function AdminDashboardPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                   <div className="p-4 rounded-2xl bg-muted/30 border border-border space-y-1">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Nairobi Delivery Hub</span>
-                    <div className="font-black text-foreground text-sm">Fargo Courier Express</div>
-                    <span className="text-[10px] text-brand-emerald font-semibold">Same-Day Active</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Orders in Vault</span>
+                    <div className="font-black text-foreground text-sm">{orders.filter((o) => o.status === "PAID" || o.status === "DISPATCHED").length} Active</div>
+                    <span className="text-[10px] text-brand-emerald font-semibold">Protected Escrow</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-muted/30 border border-border space-y-1">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">County Dispatch</span>
-                    <div className="font-black text-foreground text-sm">G4S &amp; Wells Fargo</div>
-                    <span className="text-[10px] text-brand-emerald font-semibold">24-48 hr Tracked</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">KYC Submissions</span>
+                    <div className="font-black text-foreground text-sm">{kycs.length} Total</div>
+                    <span className="text-[10px] text-blue-600 font-semibold">{kycs.filter((k) => k.status === "APPROVED").length} Verified</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-muted/30 border border-border space-y-1">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Fraud Shield</span>
-                    <div className="font-black text-foreground text-sm">Heuristic AI Guard</div>
-                    <span className="text-[10px] text-brand-emerald font-semibold">99.2% Clean</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Open Disputes</span>
+                    <div className="font-black text-foreground text-sm">{disputes.filter((d) => d.status === "PENDING_REVIEW").length} Pending</div>
+                    <span className="text-[10px] text-brand-emerald font-semibold">Live Heuristic Guard</span>
                   </div>
                 </div>
               </div>
@@ -716,7 +799,7 @@ export default function AdminDashboardPage() {
                     <Zap className="w-4 h-4 text-brand-gold" />
                     <span>Quick Admin Operations</span>
                   </h3>
-                  <p className="text-[11px] text-muted-foreground">1-click platform overrides &amp; tools.</p>
+                  <p className="text-[11px] text-muted-foreground">Direct management shortcuts.</p>
                 </div>
 
                 <div className="space-y-2 text-xs">
@@ -724,7 +807,7 @@ export default function AdminDashboardPage() {
                     onClick={() => setActiveTab("support")}
                     className="w-full text-left p-3 rounded-xl bg-muted/30 hover:bg-muted border border-border font-bold text-foreground flex items-center justify-between transition-colors"
                   >
-                    <span>Manage Support Tickets</span>
+                    <span>Manage Support Desk ({supportTickets.filter((t) => t.status === "OPEN").length})</span>
                     <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </button>
 
@@ -732,7 +815,15 @@ export default function AdminDashboardPage() {
                     onClick={() => setActiveTab("kyc")}
                     className="w-full text-left p-3 rounded-xl bg-muted/30 hover:bg-muted border border-border font-bold text-foreground flex items-center justify-between transition-colors"
                   >
-                    <span>Review Pending KYC Queue</span>
+                    <span>Review Pending KYC Queue ({kycs.filter((k) => k.status === "PENDING").length})</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab("orders")}
+                    className="w-full text-left p-3 rounded-xl bg-muted/30 hover:bg-muted border border-border font-bold text-foreground flex items-center justify-between transition-colors"
+                  >
+                    <span>Manage Orders &amp; Escrow ({orders.length})</span>
                     <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </button>
 
@@ -756,7 +847,7 @@ export default function AdminDashboardPage() {
                     href="/admin/documents"
                     className="w-full block p-3 rounded-xl bg-muted/30 hover:bg-muted border border-border font-bold text-foreground flex items-center justify-between transition-colors"
                   >
-                    <span>Inspect Platform Document Ledger</span>
+                    <span>Inspect Document Vault ({documents.length})</span>
                     <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
                   </Link>
                 </div>
@@ -962,55 +1053,65 @@ export default function AdminDashboardPage() {
               </span>
             </div>
 
-            <div className="space-y-4">
-              {kycs.map((kyc) => (
-                <div
-                  key={kyc.id}
-                  className="p-5 rounded-2xl border border-border bg-muted/20 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-brand-emerald/40 transition-colors"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-sm text-foreground">{kyc.bizName}</h4>
-                      <span className="text-[10px] bg-muted px-2 py-0.5 rounded font-mono">{kyc.regNumber}</span>
+            {loadingKycs ? (
+              <div className="p-8 text-center text-xs text-muted-foreground">Loading KYC queue...</div>
+            ) : kycs.length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted-foreground border border-dashed border-border rounded-2xl">
+                No KYC applications submitted yet.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {kycs.map((kyc) => (
+                  <div
+                    key={kyc.id}
+                    className="p-5 rounded-2xl border border-border bg-muted/20 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-brand-emerald/40 transition-colors"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-sm text-foreground">{kyc.bizName}</h4>
+                        <span className="text-[10px] bg-muted px-2 py-0.5 rounded font-mono">{kyc.regNumber}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Signatory: <strong className="text-foreground">{kyc.ownerName}</strong> (ID: {kyc.nationalId}) • {kyc.county}
+                      </p>
+                      {kyc.docUrl && (
+                        <div className="text-[11px] text-brand-emerald font-semibold flex items-center gap-1 mt-1">
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Attached Document: {kyc.docUrl}</span>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Signatory: <strong className="text-foreground">{kyc.ownerName}</strong> (ID: {kyc.nationalId}) • {kyc.county}
-                    </p>
-                    <div className="text-[11px] text-brand-emerald font-semibold flex items-center gap-1 mt-1">
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Attached Permit: {kyc.docUrl}</span>
-                    </div>
-                  </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    {kyc.status === "PENDING" ? (
-                      <>
-                        <button
-                          onClick={() => handleKycAction(kyc.id, "APPROVED")}
-                          className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center gap-1 shadow-sm transition-colors"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Approve Merchant</span>
-                        </button>
-                        <button
-                          onClick={() => handleKycAction(kyc.id, "REJECTED")}
-                          className="bg-brand-red hover:bg-brand-red-dark text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center gap-1 shadow-sm transition-colors"
-                        >
-                          <XCircle className="w-3.5 h-3.5" />
-                          <span>Reject</span>
-                        </button>
-                      </>
-                    ) : (
-                      <span className={`px-3 py-1 rounded-xl text-xs font-bold ${
-                        kyc.status === "APPROVED" ? "bg-emerald-100 text-brand-emerald" : "bg-red-100 text-brand-red"
-                      }`}>
-                        {kyc.status}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2 shrink-0">
+                      {kyc.status === "PENDING" ? (
+                        <>
+                          <button
+                            onClick={() => handleKycAction(kyc.id, "APPROVED")}
+                            className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center gap-1 shadow-sm transition-colors"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Approve Merchant</span>
+                          </button>
+                          <button
+                            onClick={() => handleKycAction(kyc.id, "REJECTED")}
+                            className="bg-brand-red hover:bg-brand-red-dark text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center gap-1 shadow-sm transition-colors"
+                          >
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>Reject</span>
+                          </button>
+                        </>
+                      ) : (
+                        <span className={`px-3 py-1 rounded-xl text-xs font-bold ${
+                          kyc.status === "APPROVED" ? "bg-emerald-100 text-brand-emerald" : "bg-red-100 text-brand-red"
+                        }`}>
+                          {kyc.status}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -1025,81 +1126,100 @@ export default function AdminDashboardPage() {
                   <Truck className="w-5 h-5 text-brand-emerald" />
                   <span>Orders Logistics &amp; Lipa na M-Pesa Escrow Releases</span>
                 </h3>
-                <p className="text-xs text-muted-foreground">Oversee dispatch tracking (Fargo / G4S / Wells) and authorize verified merchant payouts.</p>
+                <p className="text-xs text-muted-foreground">Manage order states, assign courier tracking, and release escrow funds to merchants.</p>
               </div>
+              <button
+                onClick={fetchOrders}
+                className="px-3 py-1.5 rounded-xl border border-border hover:bg-muted text-xs font-bold text-foreground flex items-center gap-1 self-start sm:self-auto"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loadingOrders ? "animate-spin" : ""}`} />
+                <span>Refresh Orders</span>
+              </button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-border text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
-                    <th className="pb-3">Order Ref</th>
-                    <th className="pb-3">Customer</th>
-                    <th className="pb-3">Product &amp; Store</th>
-                    <th className="pb-3">Amount</th>
-                    <th className="pb-3">M-Pesa Receipt</th>
-                    <th className="pb-3">Tracking Waybill</th>
-                    <th className="pb-3">Escrow State</th>
-                    <th className="pb-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  {orderReqs.map((ord) => (
-                    <tr key={ord.id} className="hover:bg-muted/20 transition-colors">
-                      <td className="py-3.5 font-mono font-bold text-foreground">{ord.orderNumber}</td>
-                      <td className="py-3.5">
-                        <div className="font-bold text-foreground">{ord.customerName}</div>
-                        <div className="text-[10px] text-muted-foreground">{ord.county} • {ord.customerPhone}</div>
-                      </td>
-                      <td className="py-3.5">
-                        <div className="font-bold text-foreground line-clamp-1 max-w-xs">{ord.productTitle}</div>
-                        <div className="text-[10px] text-brand-emerald font-semibold">{ord.storeName}</div>
-                      </td>
-                      <td className="py-3.5 font-black text-brand-emerald">{formatKSh(ord.amount)}</td>
-                      <td className="py-3.5 font-mono font-bold text-foreground">{ord.mpesaReceipt}</td>
-                      <td className="py-3.5 font-mono text-muted-foreground">{ord.courierTracking || "Pending Dispatch"}</td>
-                      <td className="py-3.5">
-                        <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
-                          ord.status === "ESCROW_RELEASED"
-                            ? "bg-emerald-100 text-brand-emerald"
-                            : ord.status === "DISPATCHED"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-amber-100 text-amber-800"
-                        }`}>
-                          {ord.status.replace("_", " ")}
-                        </span>
-                      </td>
-                      <td className="py-3.5 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {ord.status === "PAID_ESCROW" && (
-                            <button
-                              onClick={() => handleOrderStatusAction(ord.id, "DISPATCHED")}
-                              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2.5 rounded-lg text-[11px] shadow-sm"
-                            >
-                              Mark Dispatched
-                            </button>
-                          )}
-
-                          {ord.status === "DISPATCHED" && (
-                            <button
-                              onClick={() => handleOrderStatusAction(ord.id, "ESCROW_RELEASED")}
-                              className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-1 px-2.5 rounded-lg text-[11px] shadow-sm"
-                            >
-                              Release Payout
-                            </button>
-                          )}
-                        </div>
-                      </td>
+            {loadingOrders ? (
+              <div className="p-8 text-center text-xs text-muted-foreground">Loading orders...</div>
+            ) : orders.length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted-foreground border border-dashed border-border rounded-2xl">
+                No orders placed on the platform yet.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-border text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
+                      <th className="pb-3">Order Ref</th>
+                      <th className="pb-3">Customer</th>
+                      <th className="pb-3">Items &amp; Store</th>
+                      <th className="pb-3">Amount</th>
+                      <th className="pb-3">M-Pesa Receipt</th>
+                      <th className="pb-3">Tracking Waybill</th>
+                      <th className="pb-3">Escrow Status</th>
+                      <th className="pb-3 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {orders.map((ord) => (
+                      <tr key={ord.id} className="hover:bg-muted/20 transition-colors">
+                        <td className="py-3.5 font-mono font-bold text-foreground">{ord.orderNumber}</td>
+                        <td className="py-3.5">
+                          <div className="font-bold text-foreground">{ord.customerName}</div>
+                          <div className="text-[10px] text-muted-foreground">{ord.county} • {ord.customerPhone}</div>
+                        </td>
+                        <td className="py-3.5">
+                          <div className="font-bold text-foreground line-clamp-1 max-w-xs">
+                            {ord.items?.map((i) => `${i.productTitle} (${i.quantity}x)`).join(", ") || "Product items"}
+                          </div>
+                          <div className="text-[10px] text-brand-emerald font-semibold">{ord.sellerName}</div>
+                        </td>
+                        <td className="py-3.5 font-black text-brand-emerald">{formatKSh(ord.totalAmount)}</td>
+                        <td className="py-3.5 font-mono font-bold text-foreground">{ord.mpesaReceipt || "—"}</td>
+                        <td className="py-3.5 font-mono text-muted-foreground">{ord.courierTracking || "Pending Dispatch"}</td>
+                        <td className="py-3.5">
+                          <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
+                            ord.status === "DELIVERED"
+                              ? "bg-emerald-100 text-brand-emerald"
+                              : ord.status === "DISPATCHED"
+                              ? "bg-blue-100 text-blue-800"
+                              : ord.status === "PAID"
+                              ? "bg-purple-100 text-purple-800"
+                              : "bg-amber-100 text-amber-800"
+                          }`}>
+                            {ord.status.replace("_", " ")}
+                          </span>
+                        </td>
+                        <td className="py-3.5 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1.5">
+                            {ord.status === "PAID" && (
+                              <button
+                                onClick={() => handleOrderStatusAction(ord.id, "DISPATCHED")}
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2.5 rounded-lg text-[11px] shadow-sm"
+                              >
+                                Mark Dispatched
+                              </button>
+                            )}
+
+                            {ord.status === "DISPATCHED" && (
+                              <button
+                                onClick={() => handleOrderStatusAction(ord.id, "DELIVERED")}
+                                className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-1 px-2.5 rounded-lg text-[11px] shadow-sm"
+                              >
+                                Release Escrow Payout
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
         {/* ================================================================= */}
-        {/* TAB 5: DISPUTES & FRAUD SHIELD                                    */}
+        {/* TAB 5: DISPUTES & FRAUD MEDIATION                                 */}
         {/* ================================================================= */}
         {activeTab === "disputes" && (
           <div className="space-y-6">
@@ -1111,31 +1231,72 @@ export default function AdminDashboardPage() {
                     <span>Customer Dispute Center &amp; Heuristic Risk Monitor</span>
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Protecting the Kenyan marketplace against velocity anomalies, chargebacks, and disputed order packages.
+                    Mediate buyer disputes, unfreeze or release contested escrow funds, and log resolutions.
                   </p>
                 </div>
+                <button
+                  onClick={fetchDisputes}
+                  className="px-3 py-1.5 rounded-xl border border-border hover:bg-muted text-xs font-bold text-foreground flex items-center gap-1 self-start sm:self-auto"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loadingDisputes ? "animate-spin" : ""}`} />
+                  <span>Refresh Disputes</span>
+                </button>
               </div>
 
-              {/* Heuristic Anomaly Indicators */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                <div className="p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/40 space-y-1">
-                  <span className="text-[10px] font-black text-brand-red uppercase">HIGH RISK FLAG</span>
-                  <div className="font-bold text-foreground">Order #VL28910 (KSh 420,000)</div>
-                  <p className="text-[11px] text-muted-foreground">Unusually large first-time order. Escrow held for manual clearance.</p>
+              {loadingDisputes ? (
+                <div className="p-8 text-center text-xs text-muted-foreground">Loading disputes...</div>
+              ) : disputes.length === 0 ? (
+                <div className="p-8 text-center text-xs text-muted-foreground border border-dashed border-border rounded-2xl">
+                  No active disputes filed on the platform. All transactions in good standing!
                 </div>
+              ) : (
+                <div className="space-y-4">
+                  {disputes.map((d) => (
+                    <div
+                      key={d.id}
+                      className="p-5 rounded-2xl border border-border bg-muted/20 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded">
+                            {d.id}
+                          </span>
+                          <span className="font-bold text-xs text-foreground">Order Ref: {d.orderNumber}</span>
+                          <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                            d.status === "RESOLVED" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"
+                          }`}>
+                            {d.status.replace("_", " ")}
+                          </span>
+                        </div>
+                        <div className="text-xs text-foreground font-semibold">
+                          Reason: {d.reason} • Amount: <span className="text-brand-emerald font-black">{formatKSh(d.amount)}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{d.description}</p>
+                        <div className="text-[11px] text-muted-foreground">
+                          Buyer: <strong>{d.customerName}</strong> ({d.customerPhone}) • Seller: <strong>{d.sellerName}</strong>
+                        </div>
+                        {d.resolutionNotes && (
+                          <div className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 p-2 rounded-xl mt-1">
+                            Resolution: {d.resolutionNotes}
+                          </div>
+                        )}
+                      </div>
 
-                <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/40 space-y-1">
-                  <span className="text-[10px] font-black text-amber-600 uppercase">MEDIUM RISK FLAG</span>
-                  <div className="font-bold text-foreground">Rapid Repeat STK Pushes</div>
-                  <p className="text-[11px] text-muted-foreground">4 consecutive attempts in 3 minutes from IP in Nairobi.</p>
+                      {d.status !== "RESOLVED" && (
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            onClick={() => handleResolveDispute(d.id, "RESOLVED", "Mediation completed. Escrow released to rightful party.")}
+                            className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center gap-1 shadow-sm"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Resolve Dispute</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-
-                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 space-y-1">
-                  <span className="text-[10px] font-black text-brand-emerald uppercase">PLATFORM HEALTH</span>
-                  <div className="font-bold text-foreground">Escrow Vault Cleanliness</div>
-                  <p className="text-[11px] text-muted-foreground">99.2% of orders complete without dispute or delay.</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         )}
@@ -1202,7 +1363,7 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* STK Simulator (5 cols) */}
+              {/* STK Push Test Tool (5 cols) */}
               <div className="lg:col-span-5 bg-white dark:bg-brand-dark-card border border-border rounded-3xl p-6 shadow-sm space-y-4">
                 <div className="border-b border-border pb-3">
                   <h3 className="font-extrabold text-sm text-foreground flex items-center gap-2">
@@ -1267,43 +1428,49 @@ export default function AdminDashboardPage() {
                   onClick={fetchTransactions}
                   className="px-3 py-1 rounded-xl border border-border hover:bg-muted text-xs font-bold text-foreground flex items-center gap-1"
                 >
-                  <RefreshCw className={`w-3 h-3 ${loadingTxns ? "animate-spin" : ""}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 ${loadingTxns ? "animate-spin" : ""}`} />
                   <span>Refresh</span>
                 </button>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-border text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
-                      <th className="pb-3">M-Pesa Receipt</th>
-                      <th className="pb-3">Payer / Store</th>
-                      <th className="pb-3">Phone</th>
-                      <th className="pb-3">Amount</th>
-                      <th className="pb-3">Status</th>
-                      <th className="pb-3">Timestamp</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/60">
-                    {transactions.map((t) => (
-                      <tr key={t.id} className="hover:bg-muted/20">
-                        <td className="py-3 font-mono font-bold text-foreground">{t.mpesaReceiptNumber || t.checkoutRequestId.slice(0, 16)}</td>
-                        <td className="py-3 font-semibold text-foreground">{t.sellerName || "Direct Settlement"}</td>
-                        <td className="py-3 font-mono text-muted-foreground">{t.phoneNumber}</td>
-                        <td className="py-3 font-black text-brand-emerald">{formatKSh(t.amount)}</td>
-                        <td className="py-3">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            t.status === "COMPLETED" ? "bg-emerald-100 text-brand-emerald" : "bg-amber-100 text-amber-800"
-                          }`}>
-                            {t.status}
-                          </span>
-                        </td>
-                        <td className="py-3 text-muted-foreground text-[11px]">{t.timestamp}</td>
+              {transactions.length === 0 ? (
+                <div className="p-8 text-center text-xs text-muted-foreground border border-dashed border-border rounded-2xl">
+                  No M-Pesa transactions recorded yet.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-border text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
+                        <th className="pb-3">M-Pesa Receipt</th>
+                        <th className="pb-3">Payer / Store</th>
+                        <th className="pb-3">Phone</th>
+                        <th className="pb-3">Amount</th>
+                        <th className="pb-3">Status</th>
+                        <th className="pb-3">Timestamp</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-border/60">
+                      {transactions.map((t) => (
+                        <tr key={t.id} className="hover:bg-muted/20">
+                          <td className="py-3 font-mono font-bold text-foreground">{t.mpesaReceiptNumber || t.checkoutRequestId.slice(0, 16)}</td>
+                          <td className="py-3 font-semibold text-foreground">{t.sellerName || "Direct Settlement"}</td>
+                          <td className="py-3 font-mono text-muted-foreground">{t.phoneNumber}</td>
+                          <td className="py-3 font-black text-brand-emerald">{formatKSh(t.amount)}</td>
+                          <td className="py-3">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              t.status === "COMPLETED" ? "bg-emerald-100 text-brand-emerald" : "bg-amber-100 text-amber-800"
+                            }`}>
+                              {t.status}
+                            </span>
+                          </td>
+                          <td className="py-3 text-muted-foreground text-[11px]">{t.timestamp}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1334,63 +1501,69 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-border text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
-                    <th className="pb-3">Document ID</th>
-                    <th className="pb-3">Type &amp; Title</th>
-                    <th className="pb-3">Owner / Seller</th>
-                    <th className="pb-3">Amount</th>
-                    <th className="pb-3">Issued Date</th>
-                    <th className="pb-3">Status</th>
-                    <th className="pb-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  {filteredDocs.map((doc) => (
-                    <tr key={doc.id} className="hover:bg-muted/20">
-                      <td className="py-3.5 font-mono font-bold text-brand-emerald">{doc.publicDocumentId}</td>
-                      <td className="py-3.5">
-                        <div className="font-bold text-foreground">{doc.title}</div>
-                        <div className="text-[10px] text-muted-foreground uppercase">{doc.documentType.replace(/_/g, " ")}</div>
-                      </td>
-                      <td className="py-3.5">
-                        <div className="font-semibold text-foreground">{doc.ownerName}</div>
-                        <div className="text-[10px] text-muted-foreground">{doc.sellerName}</div>
-                      </td>
-                      <td className="py-3.5 font-bold text-foreground">{doc.amount > 0 ? formatKSh(doc.amount) : "—"}</td>
-                      <td className="py-3.5 text-muted-foreground">{new Date(doc.issuedAt).toLocaleDateString("en-KE")}</td>
-                      <td className="py-3.5">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                          doc.status === "VALID" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"
-                        }`}>
-                          {doc.status}
-                        </span>
-                      </td>
-                      <td className="py-3.5 text-right space-x-2 whitespace-nowrap">
-                        <a
-                          href={`/api/documents/${doc.publicDocumentId}/download`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold text-[11px] shadow-2xs"
-                        >
-                          <span>PDF</span>
-                        </a>
-                        <Link
-                          href={`/verify/${doc.publicDocumentId}`}
-                          target="_blank"
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-muted hover:bg-muted/70 text-foreground font-semibold text-[11px]"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          <span>Verify</span>
-                        </Link>
-                      </td>
+            {filteredDocs.length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted-foreground border border-dashed border-border rounded-2xl">
+                No documents matching search criteria.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-border text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
+                      <th className="pb-3">Document ID</th>
+                      <th className="pb-3">Type &amp; Title</th>
+                      <th className="pb-3">Owner / Seller</th>
+                      <th className="pb-3">Amount</th>
+                      <th className="pb-3">Issued Date</th>
+                      <th className="pb-3">Status</th>
+                      <th className="pb-3 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {filteredDocs.map((doc) => (
+                      <tr key={doc.id} className="hover:bg-muted/20">
+                        <td className="py-3.5 font-mono font-bold text-brand-emerald">{doc.publicDocumentId}</td>
+                        <td className="py-3.5">
+                          <div className="font-bold text-foreground">{doc.title}</div>
+                          <div className="text-[10px] text-muted-foreground uppercase">{doc.documentType.replace(/_/g, " ")}</div>
+                        </td>
+                        <td className="py-3.5">
+                          <div className="font-semibold text-foreground">{doc.ownerName}</div>
+                          <div className="text-[10px] text-muted-foreground">{doc.sellerName}</div>
+                        </td>
+                        <td className="py-3.5 font-bold text-foreground">{doc.amount > 0 ? formatKSh(doc.amount) : "—"}</td>
+                        <td className="py-3.5 text-muted-foreground">{new Date(doc.issuedAt).toLocaleDateString("en-KE")}</td>
+                        <td className="py-3.5">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                            doc.status === "VALID" ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800"
+                          }`}>
+                            {doc.status}
+                          </span>
+                        </td>
+                        <td className="py-3.5 text-right space-x-2 whitespace-nowrap">
+                          <a
+                            href={`/api/documents/${doc.publicDocumentId}/download`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold text-[11px] shadow-2xs"
+                          >
+                            <span>PDF</span>
+                          </a>
+                          <Link
+                            href={`/verify/${doc.publicDocumentId}`}
+                            target="_blank"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-muted hover:bg-muted/70 text-foreground font-semibold text-[11px]"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            <span>Verify</span>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
@@ -1400,209 +1573,104 @@ export default function AdminDashboardPage() {
         {activeTab === "heatmap" && <AICountyHeatmap />}
 
         {/* ================================================================= */}
-        {/* TAB 9: BUSINESS ADVERTISEMENTS MODERATION (KES 1,020 / 30 DAYS)   */}
+        {/* TAB 9: SPONSORED BUSINESS ADVERTISEMENTS                          */}
         {/* ================================================================= */}
         {activeTab === "advertisements" && (
-          <div className="space-y-6">
-            {/* Ad Stats Header */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4 space-y-1">
-                <span className="text-xs font-bold text-muted-foreground">Total Ad Orders</span>
-                <div className="text-xl font-black text-foreground">{advertisements.length}</div>
+          <div className="bg-white dark:bg-brand-dark-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+              <div>
+                <h3 className="font-extrabold text-base text-foreground flex items-center gap-2">
+                  <Megaphone className="w-5 h-5 text-brand-emerald" />
+                  <span>Sponsored Business Advertisements Moderation</span>
+                </h3>
+                <p className="text-xs text-muted-foreground">Review KES 1,020 / 30-day business promotion listings submitted across Kenya.</p>
               </div>
-              <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4 space-y-1">
-                <span className="text-xs font-bold text-amber-600">Pending Review</span>
-                <div className="text-xl font-black text-amber-600">
-                  {advertisements.filter((a) => a.status === "PENDING_REVIEW").length}
-                </div>
-              </div>
-              <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4 space-y-1">
-                <span className="text-xs font-bold text-emerald-600">Active Live Ads</span>
-                <div className="text-xl font-black text-emerald-600">
-                  {advertisements.filter((a) => a.status === "ACTIVE").length}
-                </div>
-              </div>
-              <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4 space-y-1">
-                <span className="text-xs font-bold text-brand-emerald">Ad Revenue (KES)</span>
-                <div className="text-xl font-black text-brand-emerald">
-                  {formatKSh(advertisements.filter((a) => a.paymentStatus === "PAID").length * 1020)}
-                </div>
+
+              <div className="flex items-center gap-2 text-xs">
+                <select
+                  value={adFilterStatus}
+                  onChange={(e) => setAdFilterStatus(e.target.value)}
+                  className="bg-muted/40 border border-border rounded-xl px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                >
+                  <option value="ALL">All Ad Statuses</option>
+                  <option value="PENDING_REVIEW">Pending Review</option>
+                  <option value="ACTIVE">Active (Live)</option>
+                  <option value="REJECTED">Rejected</option>
+                  <option value="EXPIRED">Expired</option>
+                </select>
+
+                <button
+                  onClick={fetchAdvertisements}
+                  className="p-2 border border-border rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loadingAds ? "animate-spin" : ""}`} />
+                </button>
               </div>
             </div>
 
-            {/* Filter Tabs & Refresh */}
-            <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold">
-                {["ALL", "PENDING_REVIEW", "ACTIVE", "REJECTED", "SUSPENDED", "EXPIRED"].map((status) => (
-                  <button
-                    key={status}
-                    onClick={() => setAdFilterStatus(status)}
-                    className={`px-3 py-1.5 rounded-xl transition-all ${
-                      adFilterStatus === status
-                        ? "bg-brand-emerald text-white"
-                        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {status.replace(/_/g, " ")}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={fetchAdvertisements}
-                disabled={loadingAds}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground bg-muted/60 px-3 py-1.5 rounded-xl self-start sm:self-auto"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loadingAds ? "animate-spin" : ""}`} />
-                <span>Refresh</span>
-              </button>
-            </div>
-
-            {/* Reject Reason Modal */}
-            {rejectReasonPrompt && (
-              <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-2xl p-4 space-y-3 animate-fadeIn">
-                <div className="text-xs font-bold text-red-700 dark:text-red-400">
-                  Specify reason for rejecting Advertisement #{rejectReasonPrompt.id}:
-                </div>
-                <input
-                  type="text"
-                  placeholder="e.g. Media contains blurry text or unverified claims. Please re-upload clearer JPEG."
-                  value={rejectReasonPrompt.reason}
-                  onChange={(e) => setRejectReasonPrompt({ ...rejectReasonPrompt, reason: e.target.value })}
-                  className="w-full bg-white dark:bg-brand-dark-bg border border-red-300 dark:border-red-800 rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-red-400"
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleRejectAd(rejectReasonPrompt.id, rejectReasonPrompt.reason)}
-                    className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-1.5 px-4 rounded-xl"
-                  >
-                    Confirm Rejection
-                  </button>
-                  <button
-                    onClick={() => setRejectReasonPrompt(null)}
-                    className="bg-muted hover:bg-muted/80 text-foreground font-semibold text-xs py-1.5 px-3 rounded-xl"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Ads List */}
-            {advertisements.length === 0 ? (
-              <div className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-12 text-center text-muted-foreground space-y-2">
-                <Megaphone className="w-8 h-8 mx-auto opacity-40 text-brand-emerald" />
-                <p className="text-xs font-semibold">No advertisements submitted yet.</p>
+            {loadingAds ? (
+              <div className="p-8 text-center text-xs text-muted-foreground">Loading advertisements...</div>
+            ) : filteredAds.length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted-foreground border border-dashed border-border rounded-2xl">
+                No advertisements found matching filter.
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {advertisements
-                  .filter((a) => adFilterStatus === "ALL" || a.status === adFilterStatus)
-                  .map((ad) => (
-                    <div
-                      key={ad.id}
-                      className="bg-white dark:bg-brand-dark-card border border-border rounded-2xl p-5 shadow-xs space-y-4 flex flex-col justify-between"
-                    >
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
-                              ad.status === "ACTIVE"
-                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-                                : ad.status === "PENDING_REVIEW"
-                                ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
-                                : ad.status === "REJECTED"
-                                ? "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300"
-                                : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {ad.status.replace(/_/g, " ")}
-                          </span>
-                          <span className="text-[11px] font-mono text-muted-foreground">
-                            {new Date(ad.createdAt).toLocaleDateString("en-KE")}
+              <div className="space-y-4">
+                {filteredAds.map((ad) => (
+                  <div
+                    key={ad.id}
+                    className="p-5 rounded-2xl border border-border bg-muted/20 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-brand-emerald/40 transition-colors"
+                  >
+                    <div className="flex items-start gap-4">
+                      {ad.mediaUrl && (
+                        <img
+                          src={ad.mediaUrl}
+                          alt={ad.title}
+                          className="w-16 h-16 rounded-xl object-cover border border-border shrink-0"
+                        />
+                      )}
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-sm text-foreground">{ad.title}</h4>
+                          <span className="text-[10px] bg-brand-emerald/10 text-brand-emerald font-black px-2 py-0.5 rounded">
+                            {formatKSh(ad.amount || 1020)} • 30 Days
                           </span>
                         </div>
-
-                        {/* Media Thumbnail & Details */}
-                        <div className="flex gap-3">
-                          <div className="w-20 h-20 rounded-xl bg-muted overflow-hidden shrink-0 border border-border">
-                            {ad.mediaType === "VIDEO" ? (
-                              <video
-                                src={ad.mediaUrl}
-                                className="w-full h-full object-cover"
-                                preload="none"
-                                muted
-                              />
-                            ) : (
-                              <img
-                                src={ad.mediaUrl}
-                                alt={ad.title}
-                                className="w-full h-full object-cover"
-                              />
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1 space-y-1">
-                            <h3 className="text-xs font-bold text-foreground truncate">{ad.title}</h3>
-                            <div className="text-[11px] text-brand-emerald font-semibold truncate">{ad.businessName}</div>
-                            <div className="text-[11px] text-muted-foreground">
-                              {ad.town}, {ad.county} &bull; {ad.category}
-                            </div>
-                            <div className="text-[10px] font-mono text-muted-foreground">
-                              Contact: {ad.contactPhone} {ad.mpesaReceipt ? `• M-Pesa: ${ad.mpesaReceipt}` : ""}
-                            </div>
-                          </div>
+                        <p className="text-xs text-muted-foreground line-clamp-1">{ad.description}</p>
+                        <div className="text-[11px] text-muted-foreground">
+                          Advertiser: <strong>{ad.businessName || ad.advertiserName}</strong> • Phone: <strong>{ad.contactPhone || ad.advertiserPhone}</strong> • County: <strong>{ad.county}</strong>
                         </div>
-
-                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed bg-muted/20 p-2 rounded-xl">
-                          {ad.description}
-                        </p>
-
-                        {/* Metrics bar */}
-                        <div className="grid grid-cols-3 gap-2 bg-muted/30 p-2 rounded-xl text-center text-[11px]">
-                          <div>
-                            <span className="text-muted-foreground block text-[10px]">Views</span>
-                            <span className="font-bold text-foreground">{ad.viewsCount}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground block text-[10px]">Clicks</span>
-                            <span className="font-bold text-foreground">{ad.clicksCount}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground block text-[10px]">Price</span>
-                            <span className="font-bold text-brand-emerald">KES 1,020</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="pt-2 border-t border-border flex items-center justify-end gap-2">
-                        {ad.status === "PENDING_REVIEW" && (
-                          <>
-                            <button
-                              onClick={() => handleApproveAd(ad.id)}
-                              className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold text-xs py-1.5 px-3 rounded-xl shadow-xs"
-                            >
-                              Approve &amp; Activate (30d)
-                            </button>
-                            <button
-                              onClick={() => setRejectReasonPrompt({ id: ad.id, reason: "" })}
-                              className="bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs py-1.5 px-3 rounded-xl"
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
-                        {ad.status === "ACTIVE" && (
-                          <button
-                            onClick={() => handleSuspendAd(ad.id)}
-                            className="bg-muted hover:bg-red-50 text-red-600 font-semibold text-xs py-1.5 px-3 rounded-xl"
-                          >
-                            Suspend Ad
-                          </button>
-                        )}
                       </div>
                     </div>
-                  ))}
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {ad.status === "PENDING_REVIEW" ? (
+                        <>
+                          <button
+                            onClick={() => handleApproveAd(ad.id)}
+                            className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-2 px-3.5 rounded-xl text-xs flex items-center gap-1 shadow-sm"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Approve Ad</span>
+                          </button>
+                          <button
+                            onClick={() => handleRejectAd(ad.id, "Did not meet advertising guidelines.")}
+                            className="bg-brand-red hover:bg-brand-red-dark text-white font-bold py-2 px-3.5 rounded-xl text-xs flex items-center gap-1 shadow-sm"
+                          >
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>Reject</span>
+                          </button>
+                        </>
+                      ) : (
+                        <span className={`px-3 py-1 rounded-xl text-xs font-bold ${
+                          ad.status === "ACTIVE" ? "bg-emerald-100 text-brand-emerald" : "bg-red-100 text-brand-red"
+                        }`}>
+                          {ad.status}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

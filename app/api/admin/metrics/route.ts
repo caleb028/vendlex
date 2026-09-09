@@ -20,14 +20,14 @@ export async function GET(req: NextRequest) {
 
     const totalGMV = orders
       .filter((o) => o.status === "PAID" || o.status === "DISPATCHED" || o.status === "DELIVERED")
-      .reduce((sum, o) => sum + o.totalAmount, 0) || 48500000;
+      .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
     const escrowInVault = orders
       .filter((o) => o.status === "PAID" || o.status === "DISPATCHED")
-      .reduce((sum, o) => sum + o.totalAmount, 0) || 12840000;
+      .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    const activeSellers = users.filter((u) => u.role === "SELLER" || u.role === "BUSINESS_OWNER").length || 1240;
-    const verifiedMerchants = users.filter((u) => u.isVerified && (u.role === "SELLER" || u.role === "BUSINESS_OWNER")).length || 1156;
+    const activeSellers = users.filter((u) => u.role === "SELLER" || u.role === "BUSINESS_OWNER").length;
+    const verifiedMerchants = users.filter((u) => u.isVerified && (u.role === "SELLER" || u.role === "BUSINESS_OWNER")).length;
 
     const openDisputes = disputes.filter((d) => d.status === "PENDING_REVIEW" || d.status === "INVESTIGATING").length;
     const openTickets = supportTickets.filter((t) => t.status === "OPEN" || t.status === "IN_PROGRESS").length;
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
       success: true,
       metrics: {
         totalUsers: users.length,
-        totalOrders: orders.length || 18420,
+        totalOrders: orders.length,
         totalGMV,
         escrowInVault,
         activeSellers,
