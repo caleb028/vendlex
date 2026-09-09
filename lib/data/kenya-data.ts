@@ -332,7 +332,7 @@ export const HERO_SLIDES = [
   },
   {
     id: 4,
-    image: "https://images.unsplash.com/photo-1556742049-0a67e55722c0?q=80&w=1800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1800&auto=format&fit=crop",
     title: "Instant M-Pesa STK Push & Escrow Protection",
     subtitle: "Frictionless checkout designed specifically for Kenyan shoppers with instant order confirmation.",
     badge: "🔒 ESCROW-PROTECTED COMMERCE",
@@ -364,7 +364,7 @@ export const HERO_SLIDES = [
   },
   {
     id: 8,
-    image: "https://images.unsplash.com/photo-1509391365360-2e959784a276?q=80&w=1800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?q=80&w=1800&auto=format&fit=crop",
     title: "Clean Solar PV Systems & Renewable Power",
     subtitle: "Off-grid solar panels, hybrid inverters, and lithium battery storage for homes and farms.",
     badge: "☀️ CLEAN ENERGY NETWORK",
@@ -388,7 +388,7 @@ export const HERO_SLIDES = [
   },
   {
     id: 11,
-    image: "https://images.unsplash.com/photo-1580674684081-7617fbf3d745?q=80&w=1800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1800&auto=format&fit=crop",
     title: "Nationwide Logistics & 24hr Courier Dispatch",
     subtitle: "Integrated with Fargo Courier, G4S, Wells Fargo, and local city delivery riders.",
     badge: "🚚 ALL 47 COUNTIES COVERAGE",

@@ -35,7 +35,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://images.unsplash.com https://plus.unsplash.com https://assets.unsplash.com",
+      "img-src 'self' data: blob: https: http:",
       "font-src 'self' https://fonts.gstatic.com data:",
       "connect-src 'self' https://api.vendlex.vercel.app https://*.onrender.com https://*.vercel.app https://sandbox.safaricom.co.ke https://api.safaricom.co.ke https://www.google-analytics.com https://analytics.google.com https://graph.facebook.com",
       "frame-ancestors 'none'",
@@ -50,18 +50,15 @@ const nextConfig: NextConfig = {
   poweredByHeader: false, // Disables X-Powered-By: Next.js banner
   reactStrictMode: true,
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "**",
       },
       {
-        protocol: "https",
-        hostname: "plus.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "assets.unsplash.com",
+        protocol: "http",
+        hostname: "**",
       },
     ],
   },
