@@ -106,8 +106,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["Inter", "Plus Jakarta Sans", "Poppins", "system-ui", "-apple-system", "sans-serif"],
-        display: ["Inter", "Plus Jakarta Sans", "Poppins", "system-ui", "-apple-system", "sans-serif"],
+        sans: ["var(--font-jakarta)", "var(--font-inter)", "Plus Jakarta Sans", "Inter", "sans-serif"],
+        display: ["var(--font-jakarta)", "var(--font-inter)", "Plus Jakarta Sans", "Inter", "sans-serif"],
       },
       fontSize: {
         hero: ["clamp(2rem, 4.5vw + 1rem, 3.75rem)", { lineHeight: "1.2", letterSpacing: "-0.025em", fontWeight: "800" }],

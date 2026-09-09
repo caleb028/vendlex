@@ -60,6 +60,7 @@ export const viewport: Viewport = {
 };
 
 import { Suspense } from "react";
+import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import { RouteProgressBar } from "@/components/ui/route-progress-bar";
 
 import { MobileBottomNav } from "@/components/navbar/mobile-bottom-nav";
@@ -70,22 +71,35 @@ import { MarketingTracker } from "@/components/marketing/tracker";
 import { MarketingPixelScripts } from "@/components/marketing/pixel-scripts";
 import { MarketingConsentBanner } from "@/components/marketing/consent-banner";
 
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${plusJakartaSans.variable} ${inter.variable}`}
+    >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
+        <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
       </head>
-      <body className="min-h-screen flex flex-col bg-brand-off-white dark:bg-brand-dark-bg text-foreground font-sans selection:bg-brand-emerald selection:text-white overflow-x-hidden">
+      <body className={`${plusJakartaSans.className} min-h-screen flex flex-col bg-brand-off-white dark:bg-brand-dark-bg text-foreground font-sans selection:bg-brand-emerald selection:text-white overflow-x-hidden`}>
         <Suspense fallback={null}>
           <RouteProgressBar />
           <MarketingTracker />
