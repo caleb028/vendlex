@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { serverDB } from "@/lib/server-db";
-import { requireAuth } from "@/lib/auth/session";
+import { requireAuth, requireRole } from "@/lib/auth/session";
 import { sanitizeInput } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
+    const auth = requireRole(req, ["ADMIN", "SUPER_ADMIN"]);
+    if (auth instanceof NextResponse) return auth;
+
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status") || undefined;
     const userId = searchParams.get("userId") || undefined;

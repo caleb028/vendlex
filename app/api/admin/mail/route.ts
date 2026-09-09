@@ -6,6 +6,9 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
+    const auth = requireRole(req, ["ADMIN", "SUPER_ADMIN"]);
+    if (auth instanceof NextResponse) return auth;
+
     const { searchParams } = new URL(req.url);
     const recipient = searchParams.get("to");
     const checkSmtp = searchParams.get("checkSmtp") === "true";
@@ -33,6 +36,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = requireRole(req, ["ADMIN", "SUPER_ADMIN"]);
+    if (auth instanceof NextResponse) return auth;
+
     const body = await req.json();
     const { to, subject, html, text, type, isTest } = body;
 
@@ -75,6 +81,9 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const auth = requireRole(req, ["ADMIN", "SUPER_ADMIN"]);
+    if (auth instanceof NextResponse) return auth;
+
     clearSentEmails();
     return NextResponse.json({ success: true, message: "Email spool cleared." });
   } catch (err: any) {

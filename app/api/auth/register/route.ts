@@ -23,7 +23,10 @@ export async function POST(req: NextRequest) {
     const email = (body.email || "").toLowerCase().trim();
     const phone = sanitizeInput(body.phone || "", 20);
     const password = body.password || "";
-    const role = body.role || "CUSTOMER";
+    const requestedRole = body.role || "CUSTOMER";
+    // Strictly prevent role escalation: external users can never register as ADMIN or SUPER_ADMIN
+    const ALLOWED_REGISTER_ROLES = ["CUSTOMER", "SELLER", "BUSINESS_OWNER", "SERVICE_PROVIDER"];
+    const role = ALLOWED_REGISTER_ROLES.includes(requestedRole) ? requestedRole : "CUSTOMER";
     const businessName = body.businessName ? sanitizeInput(body.businessName, 100) : undefined;
 
     if (!name || name.length < 2) {

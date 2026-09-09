@@ -94,10 +94,7 @@ export default function AdminDashboardPage() {
   const [adFilterStatus, setAdFilterStatus] = useState<string>("ALL");
   const [rejectReasonPrompt, setRejectReasonPrompt] = useState<{ id: string; reason: string } | null>(null);
 
-  // SuperAdmin Security Passcode Gate
-  const [passcode, setPasscode] = useState("");
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+
 
   // Live Metric Counts
   const [metrics, setMetrics] = useState({
@@ -275,25 +272,7 @@ export default function AdminDashboardPage() {
     fetchAdvertisements();
   }, []);
 
-  // Quick Admin Passcode Auth for direct administrator elevation
-  const handlePasscodeUnlock = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsAuthenticating(true);
-    setAuthError(null);
 
-    if (passcode.trim() === "admin123" || passcode.trim() === "vendlex2026") {
-      await login("admin@vendlex.vercel.app", "password123", true);
-      setIsAuthenticating(false);
-      setActionSuccess("SuperAdmin Privileges Verified. Full platform access granted.");
-      setTimeout(() => setActionSuccess(null), 3000);
-      fetchMetrics();
-      fetchSupportTickets();
-      fetchDocuments();
-    } else {
-      setIsAuthenticating(false);
-      setAuthError("Invalid Administrator Security Passcode. Access denied.");
-    }
-  };
 
   const handleKycAction = async (id: string, newStatus: "APPROVED" | "REJECTED") => {
     updateKYCStatus(id, newStatus);
@@ -418,78 +397,9 @@ export default function AdminDashboardPage() {
     );
   }, [documents, docSearchQuery]);
 
-  const isSuperAdmin = user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN");
-
   // =========================================================================
-  // SECURITY GATEKEEPER: Lock screen if unauthenticated or not Admin
-  // =========================================================================
-  if (!isSuperAdmin) {
-    return (
-      <div className="min-h-[85vh] bg-brand-off-white dark:bg-brand-dark-bg flex items-center justify-center p-4 sm:p-6">
-        <div className="max-w-md w-full bg-white dark:bg-brand-dark-card border border-border rounded-3xl p-8 shadow-2xl space-y-6 text-center animate-pop-up">
-          <div className="w-16 h-16 rounded-3xl bg-red-50 dark:bg-red-950/60 text-brand-red flex items-center justify-center mx-auto shadow-inner">
-            <Lock className="w-8 h-8" />
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 dark:bg-red-950 text-brand-red text-[11px] font-black uppercase tracking-wider">
-              <ShieldAlert className="w-3.5 h-3.5" />
-              <span>Restricted Security Area</span>
-            </div>
-            <h2 className="text-xl font-black text-foreground">
-              VendLex Platform HQ Access
-            </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              This command center is restricted to authorized platform administrators and compliance officers.
-            </p>
-          </div>
-
-          {authError && (
-            <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 text-brand-red text-xs rounded-xl font-semibold">
-              {authError}
-            </div>
-          )}
-
-          <form onSubmit={handlePasscodeUnlock} className="space-y-3 text-left">
-            <div>
-              <label className="block text-xs font-bold text-foreground mb-1">
-                Admin Security Passcode / PIN
-              </label>
-              <input
-                type="password"
-                required
-                value={passcode}
-                onChange={(e) => setPasscode(e.target.value)}
-                placeholder="Enter admin passcode (e.g. admin123)"
-                className="w-full bg-muted/40 border border-border rounded-xl px-3 py-2.5 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isAuthenticating || !passcode.trim()}
-              className="w-full bg-brand-emerald hover:bg-brand-emerald-dark disabled:opacity-60 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition-all"
-            >
-              <Key className="w-4 h-4" />
-              <span>{isAuthenticating ? "Verifying Credentials..." : "Unlock Admin Command Center"}</span>
-            </button>
-          </form>
-
-          <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
-            <Link href="/login" className="text-brand-emerald font-bold hover:underline">
-              Sign In with Admin Email &rarr;
-            </Link>
-            <Link href="/" className="text-muted-foreground hover:text-foreground">
-              Return Home
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // =========================================================================
-  // AUTHENTICATED SUPERADMIN COMMAND CENTER (Super Secure & Less Complicated)
+  // AUTHENTICATED SUPERADMIN COMMAND CENTER
+  // (Guarded by app/admin/layout.tsx zero-trust security gate)
   // =========================================================================
   return (
     <div className="min-h-screen bg-brand-off-white dark:bg-brand-dark-bg py-6 sm:py-8">
