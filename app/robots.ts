@@ -13,9 +13,21 @@ export default function robots(): MetadataRoute.Robots {
           "/admin/",
           "/seller/settings/",
           "/customer/dashboard/",
+          "/account/security/",
+        ],
+      },
+      {
+        userAgent: "Googlebot",
+        allow: "/",
+        disallow: [
+          "/api/",
+          "/admin/",
+          "/seller/settings/",
+          "/customer/dashboard/",
         ],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
+    host: baseUrl,
   };
 }

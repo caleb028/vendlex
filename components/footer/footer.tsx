@@ -178,6 +178,12 @@ export function Footer() {
             </h4>
             <ul className="space-y-2 text-xs text-gray-400">
               <li>
+                <Link href="/download" className="hover:text-white transition-colors font-bold text-amber-300 flex items-center gap-1.5">
+                  <span>Download App (APK)</span>
+                  <span className="text-[9px] bg-amber-400 text-brand-charcoal px-1.5 py-0.2 rounded font-black">ANDROID</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/" className="hover:text-white transition-colors">
                   About VendLex
                 </Link>

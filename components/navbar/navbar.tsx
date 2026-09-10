@@ -26,6 +26,8 @@ import {
   Lock,
   FileText,
   Megaphone,
+  Smartphone,
+  Download,
 } from "lucide-react";
 import { useCart } from "@/lib/store/cart-store";
 import { useWishlist } from "@/lib/store/wishlist-store";
@@ -132,6 +134,7 @@ export function Navbar() {
 
   // Secondary items moved to "More" dropdown per Section 9
   const moreLinks = [
+    { href: "/download", label: "Download App (APK)", desc: "Free Android mobile app with 1-tap M-Pesa", icon: Smartphone },
     { href: "/advertise", label: "Advertise Business", desc: "KES 1,020 / 30 Days physical business promotion", icon: Megaphone },
     { href: "/account/documents", label: "Verified Documents", desc: "Receipts, invoices & official certificates", icon: ShieldCheck },
     { href: "/discover", label: "Discover", desc: "Social commerce & trending posts", icon: Compass },
