@@ -6,14 +6,14 @@
 
 @layer base {
   :root {
-    /* VendLex Official Brand Tokens — Prestige Standard */
-    --vlx-emerald-500: #059669;
-    --vlx-emerald-600: #047857;
-    --vlx-emerald-700: #065F46;
-    --vlx-emerald-400: #10B981;
-    --vlx-emerald-hover: #10B981;
-    --vlx-emerald-light: #ECFDF5;
-    --vlx-emerald-soft: #D1FAE5;
+    /* VendLex Official Brand Tokens — African Emerald Standard */
+    --vlx-emerald-500: #087443;
+    --vlx-emerald-600: #076339;
+    --vlx-emerald-700: #054B2B;
+    --vlx-emerald-400: #32D583;
+    --vlx-emerald-hover: #09824B;
+    --vlx-emerald-light: #ECFDF3;
+    --vlx-emerald-soft: #D1FADF;
 
     --vlx-navy-900: #0F172A;
     --vlx-navy-950: #070E1B;
@@ -43,8 +43,8 @@
     --vlx-text-muted: #64748B;
 
     /* Semantic status */
-    --vlx-success: #059669;
-    --vlx-success-bg: rgba(5, 150, 105, 0.10);
+    --vlx-success: #087443;
+    --vlx-success-bg: rgba(8, 116, 67, 0.10);
     --vlx-warning: #D97706;
     --vlx-warning-bg: rgba(217, 119, 6, 0.10);
     --vlx-error: #DC2626;
@@ -57,10 +57,10 @@
     --foreground: #0F172A;
     --card: #FFFFFF;
     --card-foreground: #0F172A;
-    --primary: #059669;
+    --primary: #087443;
     --primary-foreground: #FFFFFF;
-    --primary-dark: #047857;
-    --primary-light: #10B981;
+    --primary-dark: #076339;
+    --primary-light: #32D583;
     --secondary: #0F172A;
     --secondary-foreground: #FFFFFF;
     --accent: #F59E0B;
@@ -75,14 +75,14 @@
     --border: #E2E8F0;
     --radius: 0.75rem;
 
-    --color-primary: #059669;
-    --color-primary-dark: #047857;
-    --color-primary-light: #10B981;
+    --color-primary: #087443;
+    --color-primary-dark: #076339;
+    --color-primary-light: #32D583;
     --color-navy: #0F172A;
     --color-navy-dark: #070E1B;
     --color-gold: #F59E0B;
     --color-gold-light: #FBBF24;
-    --color-success: #059669;
+    --color-success: #087443;
     --color-warning: #D97706;
     --color-error: #DC2626;
     --color-info: #2563EB;
@@ -188,6 +188,83 @@
   background: #94A3B8;
 }
 
+/* Standardized Component Classes */
+.card-premium {
+  border-radius: 1rem;
+  border-width: 1px;
+  border-color: hsl(var(--border));
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.09);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--brand-green);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+.btn-primary:hover {
+  background-color: var(--brand-green-hover);
+}
+.btn-primary:active {
+  transform: scale(0.96);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: hsl(var(--card));
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
+  font-weight: 700;
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+.btn-secondary:hover {
+  background-color: hsl(var(--muted));
+}
+.btn-secondary:active {
+  transform: scale(0.96);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: transparent;
+  color: var(--brand-green);
+  border: 1px solid var(--brand-green);
+  font-weight: 700;
+  padding: 0.625rem 1rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease-in-out;
+}
+.btn-outline:hover {
+  background-color: var(--brand-green);
+  color: #ffffff;
+}
+.btn-outline:active {
+  transform: scale(0.96);
+}
+
 /* Glassmorphism helpers */
 .glass-panel {
   background: rgba(255, 255, 255, 0.85);
@@ -203,7 +280,7 @@
 
 /* Gradient accents — Prestige Palette */
 .emerald-gradient {
-  background: linear-gradient(135deg, #059669 0%, #047857 50%, #0F172A 100%);
+  background: linear-gradient(135deg, #087443 0%, #076339 50%, #0F172A 100%);
 }
 
 .gold-gradient {

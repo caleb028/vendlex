@@ -34,21 +34,21 @@ const ICON_MAP: Record<string, any> = {
 
 export function CategoryGrid() {
   return (
-    <section className="py-10 sm:py-14 bg-brand-off-white dark:bg-brand-dark-bg">
+    <section className="py-14 sm:py-20 bg-brand-off-white dark:bg-brand-dark-bg border-t border-border/60 dark:border-brand-dark-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
-            <span className="text-xs font-bold text-brand-emerald dark:text-brand-emerald-light uppercase tracking-wider">
+            <span className="text-xs font-black text-brand-emerald dark:text-emerald-400 uppercase tracking-wider">
               Browse by Department
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight mt-1">
+            <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight mt-1">
               Explore Popular Categories
             </h2>
           </div>
           <Link
             href="/marketplace"
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-brand-emerald hover:text-brand-emerald-dark transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-brand-emerald hover:text-brand-emerald-dark transition-colors focus-visible:outline-none focus-visible:underline"
           >
             <span>View All Categories</span>
             <ArrowRight className="w-4 h-4" />
@@ -63,30 +63,30 @@ export function CategoryGrid() {
               <Link
                 key={cat.id}
                 href={`/marketplace?category=${cat.id}`}
-                className="group relative bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-2xl overflow-hidden shadow-sm hover:shadow-card-hover hover:border-brand-emerald/50 card-elevated flex flex-col"
+                className="group relative bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover hover:border-brand-emerald/50 hover:-translate-y-1 transition-all duration-300 flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
               >
                 {/* Category Image */}
                 <div className="relative h-28 w-full overflow-hidden bg-muted">
                   <img
                     src={cat.image}
                     alt={cat.name}
-                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-112"
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                   
-                  {/* Floating Icon with Micro-tilt on hover */}
-                  <div className="absolute top-2.5 left-2.5 w-7 h-7 rounded-lg bg-white/95 dark:bg-brand-dark-card/95 backdrop-blur-sm text-brand-emerald flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                  {/* Floating Icon with Micro-lift */}
+                  <div className="absolute top-2.5 left-2.5 w-7 h-7 rounded-lg bg-white/95 dark:bg-brand-dark-card/95 backdrop-blur-sm text-brand-emerald dark:text-emerald-400 flex items-center justify-center shadow-md group-hover:scale-110 transition-all duration-300">
                     <Icon className="w-4 h-4" />
                   </div>
 
                   {/* Item count badge */}
-                  <span className="absolute bottom-2 left-2.5 text-[10px] font-bold text-white/90 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                  <span className="absolute bottom-2 left-2.5 text-[10px] font-bold text-white bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full">
                     {cat.productCount}+ items
                   </span>
                 </div>
 
                 {/* Content */}
-                <div className="p-3 flex-1 flex flex-col justify-between">
+                <div className="p-3.5 flex-1 flex flex-col justify-between">
                   <h3 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-brand-emerald transition-colors line-clamp-1">
                     {cat.name}
                   </h3>

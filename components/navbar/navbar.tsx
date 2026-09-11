@@ -28,6 +28,7 @@ import {
   Megaphone,
   Smartphone,
   Download,
+  Flame,
 } from "lucide-react";
 import { useCart } from "@/lib/store/cart-store";
 import { useWishlist } from "@/lib/store/wishlist-store";
@@ -132,17 +133,33 @@ export function Navbar() {
     { href: "/deals", label: "Deals" },
   ];
 
-  // Secondary items moved to "More" dropdown per Section 9
-  const moreLinks = [
-    { href: "/download", label: "Download App (APK)", desc: "Free Android mobile app with 1-tap M-Pesa", icon: Smartphone },
-    { href: "/advertise", label: "Advertise Business", desc: "KES 1,020 / 30 Days physical business promotion", icon: Megaphone },
-    { href: "/account/documents", label: "Verified Documents", desc: "Receipts, invoices & official certificates", icon: ShieldCheck },
-    { href: "/discover", label: "Discover", desc: "Social commerce & trending posts", icon: Compass },
-    { href: "/customer/dashboard", label: "Rewards", desc: "VendPoints loyalty vouchers", icon: Gift },
-    { href: "/b2b", label: "Business (B2B)", desc: "Corporate & institutional procurement", icon: Briefcase },
-    { href: "/counties", label: "Counties", desc: "Explore all 47 Kenyan counties", icon: MapPin },
-    { href: "/help", label: "Help & Support", desc: "24/7 customer care & disputes", icon: HelpCircle },
-    { href: "/", label: "About VendLex", desc: "Our platform mission & standards", icon: Info },
+  // Categorized More items for a structured, polished dropdown
+  const moreCategories = [
+    {
+      group: "Explore & Deals",
+      items: [
+        { href: "/deals", label: "Today's Hot Deals", desc: "Limited-time flash discounts", icon: Flame },
+        { href: "/counties", label: "All 47 Counties", desc: "Explore Kenya region by region", icon: MapPin },
+        { href: "/account/documents", label: "Verified Documents", desc: "Digital receipts & certificates", icon: ShieldCheck },
+        { href: "/customer/dashboard", label: "Rewards & Vouchers", desc: "VendPoints loyalty perks", icon: Gift },
+      ],
+    },
+    {
+      group: "Business & Growth",
+      items: [
+        { href: "/advertise", label: "Advertise Business", desc: "KES 1,020 / 30 Days local promo", icon: Megaphone },
+        { href: "/b2b", label: "Corporate B2B Hub", desc: "Wholesale & institutional procurement", icon: Briefcase },
+        { href: "/discover", label: "Discover Feed", desc: "Trending local commerce posts", icon: Compass },
+      ],
+    },
+    {
+      group: "Mobile & Trust",
+      items: [
+        { href: "/download", label: "Download App (APK)", desc: "Direct Android APK & WebAPK (Not PlayStore)", icon: Smartphone },
+        { href: "/help", label: "Help & Buyer Protection", desc: "24/7 Escrow & dispute care", icon: HelpCircle },
+        { href: "/", label: "About VendLex", desc: "Our platform mission & standards", icon: Info },
+      ],
+    },
   ];
 
   return (
@@ -156,7 +173,7 @@ export function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-3 lg:gap-4">
-            {/* 1. LARGE BRANDING CONTAINER (Section 2 & 3) */}
+            {/* 1. LARGE BRANDING CONTAINER */}
             <div className="flex items-center gap-3 lg:gap-5 xl:gap-6 shrink-0">
               <Link
                 href="/"
@@ -186,7 +203,7 @@ export function Navbar() {
                 </div>
               </Link>
 
-              {/* 2. PRIMARY DESKTOP NAV LINKS (Section 9: Shop, Businesses, Services, Deals, More ▾) */}
+              {/* 2. PRIMARY DESKTOP NAV LINKS */}
               <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold text-muted-foreground">
                 {primaryLinks.map((link) => {
                   const isActive = pathname.startsWith(link.href);
@@ -205,7 +222,7 @@ export function Navbar() {
                   );
                 })}
 
-                {/* "More ▾" Dropdown */}
+                {/* "More ▾" Structured Mega Dropdown */}
                 <div ref={moreRef} className="relative">
                   <button
                     onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
@@ -220,30 +237,39 @@ export function Navbar() {
                   </button>
 
                   {moreDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-1.5 w-64 bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-2xl shadow-xl p-2 z-50 animate-scaleUp">
-                      {moreLinks.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={() => setMoreDropdownOpen(false)}
-                            className="flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-muted/50 transition-colors group"
-                          >
-                            <div className="p-1.5 rounded-lg bg-muted text-muted-foreground group-hover:text-brand-emerald group-hover:bg-brand-emerald-soft transition-colors mt-0.5">
-                              <Icon className="w-3.5 h-3.5" />
-                            </div>
-                            <div>
-                              <span className="text-xs font-bold text-foreground block group-hover:text-brand-emerald transition-colors">
-                                {item.label}
-                              </span>
-                              <span className="text-[10px] text-muted-foreground block leading-tight">
-                                {item.desc}
-                              </span>
-                            </div>
-                          </Link>
-                        );
-                      })}
+                    <div className="absolute top-full left-0 mt-2 w-[480px] bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-2xl shadow-modal p-4 z-50 animate-scaleUp grid grid-cols-2 gap-4">
+                      {moreCategories.map((cat, idx) => (
+                        <div key={idx} className={idx === 2 ? "col-span-2 pt-2 border-t border-border/60 dark:border-brand-dark-border/60" : "space-y-1"}>
+                          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground px-2 block mb-1">
+                            {cat.group}
+                          </span>
+                          <div className={idx === 2 ? "grid grid-cols-3 gap-2" : "space-y-1"}>
+                            {cat.items.map((item) => {
+                              const Icon = item.icon;
+                              return (
+                                <Link
+                                  key={item.href}
+                                  href={item.href}
+                                  onClick={() => setMoreDropdownOpen(false)}
+                                  className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-muted/50 transition-colors group"
+                                >
+                                  <div className="p-1.5 rounded-lg bg-muted text-muted-foreground group-hover:text-brand-emerald group-hover:bg-brand-emerald-soft transition-colors mt-0.5 shrink-0">
+                                    <Icon className="w-3.5 h-3.5" />
+                                  </div>
+                                  <div>
+                                    <span className="text-xs font-bold text-foreground block group-hover:text-brand-emerald transition-colors leading-snug">
+                                      {item.label}
+                                    </span>
+                                    <span className="text-[10px] text-muted-foreground block leading-tight line-clamp-1">
+                                      {item.desc}
+                                    </span>
+                                  </div>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -333,25 +359,30 @@ export function Navbar() {
               {/* Notifications */}
               <NotificationDropdown />
 
-              {/* Account Dropdown Menu with Sign Out Option */}
+              {/* Account Dropdown Menu with Sign Out Option - Elevated Polish */}
               {user ? (
                 <div ref={userMenuRef} className="relative hidden sm:block">
                   <button
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border transition-all text-xs font-semibold ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-all text-xs font-semibold ${
                       userDropdownOpen
-                        ? "bg-muted/70 border-brand-emerald/40 text-foreground"
-                        : "bg-muted/30 hover:bg-muted/60 border-border/60 text-foreground"
+                        ? "bg-muted/80 border-brand-emerald/60 text-foreground ring-2 ring-brand-emerald/20"
+                        : "bg-muted/40 hover:bg-muted/70 border-border/80 text-foreground hover:border-brand-emerald/40"
                     }`}
                     title="User Account Menu"
                     aria-expanded={userDropdownOpen}
                   >
-                    <div className="w-6 h-6 rounded-full bg-brand-emerald/10 text-brand-emerald flex items-center justify-center font-bold text-[11px] shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-brand-emerald text-white flex items-center justify-center font-black text-[11px] shadow-xs shrink-0">
                       {user.name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="max-w-[100px] truncate text-xs font-bold text-foreground">
-                      {user.name.split(" ")[0]}
-                    </span>
+                    <div className="flex flex-col text-left leading-none">
+                      <span className="max-w-[85px] truncate text-xs font-bold text-foreground">
+                        {user.name.split(" ")[0]}
+                      </span>
+                      <span className="text-[9px] text-brand-emerald font-semibold uppercase tracking-wider">
+                        {user.role === "SUPER_ADMIN" ? "Admin" : user.role === "SELLER" ? "Seller" : "Account"}
+                      </span>
+                    </div>
                     <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${userDropdownOpen ? "rotate-180" : ""}`} />
                   </button>
 
@@ -429,11 +460,11 @@ export function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors hidden sm:flex items-center gap-1.5 text-xs font-semibold"
-                  title="Sign In"
+                  className="px-3 py-1.5 rounded-xl border border-brand-emerald/30 bg-emerald-50/70 dark:bg-emerald-950/40 hover:bg-brand-emerald hover:text-white text-brand-emerald dark:text-emerald-300 transition-all hidden sm:flex items-center gap-1.5 text-xs font-bold shadow-xs active:scale-98"
+                  title="Sign In or Create Account"
                 >
-                  <User className="w-4 h-4" />
-                  <span className="hidden lg:inline">Sign In</span>
+                  <User className="w-3.5 h-3.5" />
+                  <span>Sign In</span>
                 </Link>
               )}
 
@@ -508,7 +539,7 @@ export function Navbar() {
 
             <div className="border-t border-border pt-2 space-y-1">
               <span className="text-[10px] font-bold text-muted-foreground uppercase px-2">Discover &amp; Services</span>
-              {moreLinks.map((item) => (
+              {moreCategories.flatMap((c) => c.items).map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}

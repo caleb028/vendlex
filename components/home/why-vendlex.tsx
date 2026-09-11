@@ -17,7 +17,7 @@ export function WhyVendlex() {
       subtitle: "Buy with 100% Peace of Mind",
       description: "Enjoy genuine electronics, authentic African fashion, and home goods with instant M-Pesa STK Push and fast courier delivery.",
       accent: "from-brand-emerald/20 to-brand-emerald/5",
-      iconColor: "text-brand-emerald",
+      iconColor: "text-brand-emerald dark:text-emerald-400",
     },
     {
       icon: TrendingUp,
@@ -38,18 +38,18 @@ export function WhyVendlex() {
   ];
 
   return (
-    <section className="py-10 sm:py-14 bg-white dark:bg-brand-dark-card border-t border-border/60 dark:border-brand-dark-border/60">
+    <section className="py-14 sm:py-20 bg-brand-off-white dark:bg-brand-dark-bg border-t border-border/60 dark:border-brand-dark-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 space-y-2">
-          <span className="text-xs font-bold text-brand-emerald dark:text-brand-emerald-light uppercase tracking-wider">
-            The VendLex Advantage
+        <div className="text-center max-w-3xl mx-auto mb-12 space-y-2">
+          <span className="text-xs font-black text-brand-emerald dark:text-emerald-400 uppercase tracking-wider">
+            The VendLex Standard
           </span>
           <h2 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
-            Why Kenya Chooses VendLex
+            Why Kenyan Merchants &amp; Shoppers Trust VendLex
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            We are more than just a marketplace — VendLex is the unified technology engine powering modern African commerce across all 47 counties.
+            We are more than a marketplace — VendLex is the unified technology engine powering modern African commerce across all 47 counties.
           </p>
         </div>
 
@@ -60,17 +60,17 @@ export function WhyVendlex() {
             return (
               <div
                 key={index}
-                className="group relative bg-brand-off-white dark:bg-brand-dark-bg/60 border border-border dark:border-brand-dark-border rounded-3xl p-6 sm:p-7 shadow-sm hover:shadow-card-hover hover:border-brand-emerald/50 transition-all duration-300 card-elevated flex flex-col justify-between"
+                className="group relative bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl p-6 sm:p-7 shadow-card hover:shadow-card-hover hover:border-brand-emerald/50 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
               >
                 <div className="space-y-4">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${pillar.accent} flex items-center justify-center ${pillar.iconColor} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="w-7 h-7" />
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${pillar.accent} flex items-center justify-center ${pillar.iconColor} shadow-xs group-hover:scale-108 transition-transform duration-300`}>
+                    <Icon className="w-6 h-6" />
                   </div>
                   <div>
                     <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                       {pillar.title}
                     </span>
-                    <h3 className="text-lg font-bold text-foreground mt-0.5 group-hover:text-brand-emerald transition-colors">
+                    <h3 className="text-base sm:text-lg font-bold text-foreground mt-0.5 group-hover:text-brand-emerald transition-colors">
                       {pillar.subtitle}
                     </h3>
                   </div>
@@ -79,7 +79,7 @@ export function WhyVendlex() {
                   </p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-border/60 dark:border-brand-dark-border/60 flex items-center justify-between text-xs font-semibold text-brand-emerald">
+                <div className="mt-6 pt-4 border-t border-border/60 dark:border-brand-dark-border/60 flex items-center justify-between text-xs font-semibold text-brand-emerald dark:text-emerald-400">
                   <span>Pillar 0{index + 1}</span>
                   <Zap className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
                 </div>

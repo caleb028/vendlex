@@ -452,7 +452,7 @@ function OnboardingContent() {
           </div>
         ) : (
           /* Card Body for authenticated users */
-          <div className="bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-3xl p-6 sm:p-10 shadow-sm space-y-6">
+          <div className="bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-3xl p-6 sm:p-10 shadow-card space-y-6">
             {/* STEP 1: Offering Type & Owner Contact */}
             {step === 1 && (
               <div className="space-y-6 animate-fadeIn">
@@ -466,12 +466,12 @@ function OnboardingContent() {
                       onClick={() => handleTypeChange("PRODUCT")}
                       className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
                       offeringType === "PRODUCT"
-                        ? "border-brand-emerald bg-brand-emerald-soft/30 dark:bg-brand-dark-bg ring-2 ring-brand-emerald/20 shadow-sm"
-                        : "border-border hover:border-brand-emerald/40"
+                        ? "border-brand-emerald bg-brand-emerald-soft/30 dark:bg-brand-dark-bg ring-2 ring-brand-emerald/20 shadow-card"
+                        : "border-border hover:border-brand-emerald/40 hover:shadow-sm"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white ${offeringType === "PRODUCT" ? "bg-brand-emerald" : "bg-muted-foreground/40"}`}>
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-sm ${offeringType === "PRODUCT" ? "bg-brand-emerald" : "bg-muted-foreground/40"}`}>
                         <Package className="w-5 h-5" />
                       </div>
                       <div>
@@ -486,12 +486,12 @@ function OnboardingContent() {
                     onClick={() => handleTypeChange("SERVICE")}
                     className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
                       offeringType === "SERVICE"
-                        ? "border-brand-emerald bg-brand-emerald-soft/30 dark:bg-brand-dark-bg ring-2 ring-brand-emerald/20 shadow-sm"
-                        : "border-border hover:border-brand-emerald/40"
+                        ? "border-brand-emerald bg-brand-emerald-soft/30 dark:bg-brand-dark-bg ring-2 ring-brand-emerald/20 shadow-card"
+                        : "border-border hover:border-brand-emerald/40 hover:shadow-sm"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white ${offeringType === "SERVICE" ? "bg-brand-emerald" : "bg-muted-foreground/40"}`}>
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-sm ${offeringType === "SERVICE" ? "bg-brand-emerald" : "bg-muted-foreground/40"}`}>
                         <Wrench className="w-5 h-5" />
                       </div>
                       <div>
@@ -513,7 +513,7 @@ function OnboardingContent() {
                       value={ownerName}
                       onChange={(e) => setOwnerName(e.target.value)}
                       placeholder="e.g. Kevin Mwangi"
-                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                     />
                   </div>
 
@@ -524,7 +524,7 @@ function OnboardingContent() {
                       value={ownerPhone}
                       onChange={(e) => setOwnerPhone(e.target.value)}
                       placeholder="07XX XXX XXX or +254 7XX..."
-                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground font-mono focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                     />
                   </div>
                 </div>
@@ -536,7 +536,7 @@ function OnboardingContent() {
                     value={ownerEmail}
                     onChange={(e) => setOwnerEmail(e.target.value)}
                     placeholder="kevin@business.co.ke"
-                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                    className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                   />
                 </div>
               </div>
@@ -566,7 +566,7 @@ function OnboardingContent() {
                     type="text"
                     value={bizName}
                     onChange={(e) => setBizName(e.target.value)}
-                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                    className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                   />
                 </div>
 
@@ -578,7 +578,7 @@ function OnboardingContent() {
                     <select
                       value={bizCategory}
                       onChange={(e) => setBizCategory(e.target.value)}
-                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald font-medium"
+                      className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald font-medium transition-colors"
                     >
                       {isService
                         ? SERVICE_CATEGORIES.map((c) => (
@@ -607,7 +607,7 @@ function OnboardingContent() {
                         setTown(available[0] || "CBD");
                         setCustomTown("");
                       }}
-                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald font-semibold"
+                      className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald font-semibold transition-colors"
                     >
                       {KENYAN_COUNTIES.map((c) => (
                         <option key={c} value={c}>
@@ -622,7 +622,7 @@ function OnboardingContent() {
                     <select
                       value={town}
                       onChange={(e) => setTown(e.target.value)}
-                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald font-medium"
+                      className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald font-medium transition-colors"
                     >
                       {countyTowns.map((t) => (
                         <option key={t} value={t}>
@@ -642,7 +642,7 @@ function OnboardingContent() {
                       value={customTown}
                       onChange={(e) => setCustomTown(e.target.value)}
                       placeholder="e.g. Mlolongo Phase 2, Ruaka Center, Nyali Links"
-                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                     />
                   </div>
                 )}
@@ -656,7 +656,7 @@ function OnboardingContent() {
                     value={physicalLocation}
                     onChange={(e) => setPhysicalLocation(e.target.value)}
                     placeholder="e.g. Bazaar Plaza, 4th Floor, Suite 412, Nairobi"
-                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                    className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                   />
                 </div>
 
@@ -668,7 +668,7 @@ function OnboardingContent() {
                     rows={2}
                     value={bizDesc}
                     onChange={(e) => setBizDesc(e.target.value)}
-                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground resize-none"
+                    className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald resize-none transition-colors"
                   />
                 </div>
               </div>
@@ -700,7 +700,7 @@ function OnboardingContent() {
                       value={regNumber}
                       onChange={(e) => setRegNumber(e.target.value)}
                       placeholder="e.g. BN/2024/984210 or PVT-98214"
-                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground font-mono focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                     />
                   </div>
 
@@ -711,7 +711,7 @@ function OnboardingContent() {
                       value={nationalId}
                       onChange={(e) => setNationalId(e.target.value)}
                       placeholder="e.g. 32984124"
-                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground font-mono focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                     />
                   </div>
                 </div>
@@ -722,7 +722,7 @@ function OnboardingContent() {
                   <select
                     value={selectedDocType}
                     onChange={(e) => setSelectedDocType(e.target.value)}
-                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground font-medium focus:outline-none focus:border-brand-emerald"
+                    className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                   >
                     {DOCUMENT_TYPES.map((dt) => (
                       <option key={dt.id} value={dt.label}>
@@ -829,7 +829,7 @@ function OnboardingContent() {
                     value={itemTitle}
                     onChange={(e) => setItemTitle(e.target.value)}
                     placeholder={isService ? "e.g. Emergency Home Electrical Wiring & Solar Repair" : "e.g. Samsung Galaxy A54 5G (128GB)"}
-                    className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                    className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                   />
                 </div>
 
@@ -840,7 +840,7 @@ function OnboardingContent() {
                   </label>
 
                   {itemPhotoUrl ? (
-                    <div className="p-3 bg-muted/30 border border-border rounded-2xl flex items-center justify-between gap-3">
+                    <div className="p-3 bg-muted/30 dark:bg-brand-dark-bg/40 border border-border rounded-2xl flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <img
                           src={itemPhotoUrl}
@@ -867,7 +867,7 @@ function OnboardingContent() {
                             setItemPhotoUrl("");
                             setItemPhotoName("");
                           }}
-                          className="text-xs text-red-500 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40"
+                          className="text-xs text-red-500 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
                           title="Remove photo"
                         >
                           <X className="w-4 h-4" />
@@ -877,7 +877,7 @@ function OnboardingContent() {
                   ) : (
                     <label
                       htmlFor="onboarding-img"
-                      className="border-2 border-dashed border-border hover:border-brand-emerald bg-muted/10 p-5 rounded-2xl text-center space-y-1.5 cursor-pointer flex flex-col items-center justify-center transition-all group"
+                      className="border-2 border-dashed border-border hover:border-brand-emerald bg-muted/10 hover:bg-muted/25 p-5 rounded-2xl text-center space-y-1.5 cursor-pointer flex flex-col items-center justify-center transition-all group"
                     >
                       <ImageIcon className="w-7 h-7 text-brand-emerald group-hover:scale-110 transition-transform" />
                       <span className="text-xs font-bold text-brand-emerald hover:underline block">
@@ -905,7 +905,7 @@ function OnboardingContent() {
                       type="number"
                       value={itemPrice}
                       onChange={(e) => setItemPrice(e.target.value)}
-                      className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground font-bold focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                     />
                   </div>
 
@@ -917,7 +917,7 @@ function OnboardingContent() {
                       <select
                         value={pricingModel}
                         onChange={(e) => setPricingModel(e.target.value)}
-                        className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                        className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                       >
                         <option value="Starting From">Starting From (Base Rate)</option>
                         <option value="Fixed Price">Fixed Price Per Job</option>
@@ -929,7 +929,7 @@ function OnboardingContent() {
                         type="number"
                         value={itemStock}
                         onChange={(e) => setItemStock(e.target.value)}
-                        className="w-full bg-muted/20 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                        className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                       />
                     )}
                   </div>
@@ -959,8 +959,8 @@ function OnboardingContent() {
                     }}
                     className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
                       selectedPlan === plan.id
-                        ? "border-brand-emerald bg-brand-emerald-soft/30 dark:bg-brand-dark-bg shadow-sm ring-1 ring-brand-emerald"
-                        : "border-border hover:border-brand-emerald/40"
+                        ? "border-brand-emerald bg-brand-emerald-soft/30 dark:bg-brand-dark-bg shadow-card ring-1 ring-brand-emerald"
+                        : "border-border hover:border-brand-emerald/40 hover:shadow-card-hover"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -975,7 +975,7 @@ function OnboardingContent() {
               </div>
 
               {/* Live Safaricom Daraja STK Push Payment Box */}
-              <div className="bg-gradient-to-br from-brand-emerald-dark/15 via-muted/30 to-brand-emerald/10 border border-brand-emerald/30 rounded-2xl p-5 sm:p-6 space-y-4">
+              <div className="bg-gradient-to-br from-brand-emerald-dark/15 via-muted/30 to-brand-emerald/10 border border-brand-emerald/30 rounded-2xl p-5 sm:p-6 space-y-4 shadow-card">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Smartphone className="w-5 h-5 text-brand-emerald animate-bounce" />
@@ -997,7 +997,7 @@ function OnboardingContent() {
                       onChange={(e) => setPaymentPhone(e.target.value)}
                       placeholder="e.g. 0798159503"
                       disabled={paymentStatus === "sending" || paymentStatus === "sent"}
-                      className="w-full bg-white dark:bg-brand-dark-card border border-border rounded-xl p-3 text-xs font-mono font-bold text-foreground focus:outline-none focus:border-brand-emerald"
+                      className="w-full bg-white dark:bg-brand-dark-card border border-border rounded-xl p-3 text-xs font-mono font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                     />
                   </div>
 
@@ -1159,7 +1159,7 @@ function OnboardingContent() {
                 <button
                   onClick={handleInitiateSTK}
                   disabled={paymentStatus === "sending" || paymentStatus === "sent" || paymentStatus === "success"}
-                  className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-extrabold py-3 px-7 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg hover:shadow-glow-green transition-all"
+                  className="bg-brand-emerald hover:bg-brand-emerald-dark disabled:opacity-60 text-white font-extrabold py-3 px-7 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg hover:shadow-glow-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald/40 transition-all"
                 >
                   {paymentStatus === "sending" ? (
                     <>
@@ -1181,7 +1181,7 @@ function OnboardingContent() {
               ) : (
                 <button
                   onClick={() => setStep((prev) => prev + 1)}
-                  className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-3 px-6 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all"
+                  className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-3 px-6 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-md hover:shadow-glow-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald/40 transition-all"
                 >
                   <span>Next Step</span>
                   <ArrowRight className="w-4 h-4" />

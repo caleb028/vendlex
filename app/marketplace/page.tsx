@@ -17,6 +17,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { ProductGridSkeleton } from "@/components/ui/product-card-skeleton";
+
 function MarketplaceContent() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category") || "all";
@@ -36,7 +38,7 @@ function MarketplaceContent() {
   const [deliverySpeed, setDeliverySpeed] = useState<"all" | "same-day" | "pickup">("all");
   const [sortBy, setSortBy] = useState<"featured" | "price-low" | "price-high" | "rating">("featured");
 
-  // Drawer state per Section 12
+  // Drawer state
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
   // Available towns based on selected county
@@ -147,14 +149,26 @@ function MarketplaceContent() {
   return (
     <div className="bg-brand-off-white dark:bg-brand-dark-bg min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        {/* Top Header & Search per Section 12 */}
+        {/* Trust Highlight Banner */}
+        <div className="bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl p-4 shadow-card flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-foreground font-bold">
+            <ShieldCheck className="w-4 h-4 text-brand-emerald shrink-0" />
+            <span>VendLex Buyer Guarantee: 100% Escrow Protection &amp; Verified M-Pesa STK</span>
+          </div>
+          <div className="flex items-center gap-4 text-muted-foreground font-medium text-[11px]">
+            <span>🚚 47 Counties Courier</span>
+            <span>📑 Instant eTIMS Receipts</span>
+          </div>
+        </div>
+
+        {/* Top Header & Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
-              Marketplace
+              Kenyan Marketplace
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-              Discover verified Kenyan products with direct Lipa na M-Pesa.
+              Discover verified Kenyan products, genuine brands, and vetted regional suppliers.
             </p>
           </div>
 
@@ -165,7 +179,7 @@ function MarketplaceContent() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products, brands, stores..."
-                className="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-brand-dark-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-brand-emerald shadow-xs"
+                className="w-full pl-9 pr-8 py-2.5 text-xs rounded-xl bg-white dark:bg-brand-dark-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-brand-emerald shadow-xs font-medium"
               />
               <Search className="absolute left-3 top-3 w-3.5 h-3.5 text-muted-foreground" />
               {searchQuery && (
@@ -180,7 +194,7 @@ function MarketplaceContent() {
           </div>
         </div>
 
-        {/* Category Scroll Pills per Section 12 */}
+        {/* Category Scroll Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
           <button
             onClick={() => setSelectedCategory("all")}
@@ -190,7 +204,7 @@ function MarketplaceContent() {
                 : "bg-white dark:bg-brand-dark-card border border-border text-muted-foreground hover:text-foreground"
             }`}
           >
-            All Categories
+            All Departments
           </button>
           {CATEGORIES.map((cat) => (
             <button

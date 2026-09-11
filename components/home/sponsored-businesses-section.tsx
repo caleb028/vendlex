@@ -41,7 +41,7 @@ export function SponsoredBusinessesSection() {
   }
 
   return (
-    <section className="py-10 sm:py-14 bg-gradient-to-b from-amber-500/[0.03] via-transparent to-transparent border-b border-border/50">
+    <section className="py-14 sm:py-20 bg-gradient-to-b from-amber-500/[0.03] via-transparent to-transparent border-t border-border/60 dark:border-brand-dark-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -50,20 +50,20 @@ export function SponsoredBusinessesSection() {
               <Sparkles className="w-3.5 h-3.5" />
               <span>Verified Business Spotlights</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-foreground">
-              Sponsored Local Businesses &amp; Services
+            <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+              Sponsored Kenyan Businesses &amp; Services
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              Discover verified physical shops, workshops, clinics, and service experts across Kenya.
+              Discover verified physical shops, workshops, clinics, and professional service experts across all 47 counties.
             </p>
           </div>
 
           <Link
             href="/advertise"
-            className="inline-flex items-center gap-2 text-xs font-bold text-brand-emerald hover:text-brand-emerald-dark transition-colors self-start sm:self-auto bg-brand-emerald/10 hover:bg-brand-emerald/20 px-3.5 py-2 rounded-xl"
+            className="inline-flex items-center gap-2 text-xs font-bold text-brand-emerald hover:text-brand-emerald-dark transition-colors self-start sm:self-auto bg-emerald-50 dark:bg-emerald-950/40 border border-brand-emerald/30 hover:border-brand-emerald px-3.5 py-2 rounded-xl shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
           >
-            <Megaphone className="w-4 h-4" />
-            <span>Advertise Your Business (KES 1,020 / 30 Days)</span>
+            <Megaphone className="w-4 h-4 text-brand-emerald" />
+            <span>Advertise Business (KES 1,020 / 30 Days)</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

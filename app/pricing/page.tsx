@@ -33,15 +33,15 @@ export default function PricingPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 bg-brand-emerald-soft text-brand-emerald text-xs font-black px-3.5 py-1 rounded-full uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/60 text-brand-emerald dark:text-emerald-400 text-xs font-black px-3.5 py-1 rounded-full uppercase tracking-wider border border-emerald-200/60 dark:border-emerald-800">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Kenyan Merchant Pricing</span>
+            <span>Kenyan Merchant &amp; Business Pricing</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
-            Simple, Transparent Plans for Every Kenyan Hustle
+            Transparent Plans for Every Kenyan Enterprise
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Zero hidden transaction fees on marketplace sales. Choose a tier designed to grow with your business.
+            Zero hidden transaction commissions on your sales. Receive direct M-Pesa payments with verified merchant tools.
           </p>
 
           {/* Billing Switcher */}
@@ -51,18 +51,18 @@ export default function PricingPage() {
             </span>
             <button
               onClick={() => setIsYearly(!isYearly)}
-              className="relative w-14 h-8 bg-brand-emerald rounded-full p-1 transition-colors"
+              className="relative w-14 h-8 bg-brand-emerald rounded-full p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
               aria-label="Toggle Monthly / Yearly Billing"
             >
               <div
-                className={`w-6 h-6 rounded-full bg-white transition-transform ${
+                className={`w-6 h-6 rounded-full bg-white transition-transform duration-200 ${
                   isYearly ? "translate-x-6" : "translate-x-0"
                 }`}
               />
             </button>
             <span className={`text-xs font-bold flex items-center gap-1.5 ${isYearly ? "text-foreground" : "text-muted-foreground"}`}>
               <span>Annual Billing</span>
-              <span className="bg-brand-gold text-brand-charcoal text-[10px] font-black px-2 py-0.5 rounded-full">
+              <span className="bg-brand-gold text-brand-charcoal text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs">
                 SAVE 20%
               </span>
             </span>
@@ -78,16 +78,16 @@ export default function PricingPage() {
             return (
               <div
                 key={plan.id}
-                className={`relative rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 ${
+                className={`relative rounded-2xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 shadow-card hover:shadow-card-hover ${
                   isPopular
-                    ? "bg-gradient-to-b from-brand-emerald-dark to-brand-charcoal text-white shadow-2xl ring-2 ring-brand-emerald scale-[1.02] z-10"
-                    : "bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border text-foreground hover:shadow-card-hover"
+                    ? "bg-gradient-to-b from-brand-emerald-dark to-brand-charcoal text-white shadow-xl ring-2 ring-brand-emerald scale-[1.02] z-10"
+                    : "bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border text-foreground"
                 }`}
               >
                 {isPopular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-gold-dark to-brand-gold text-brand-charcoal text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-gold-dark to-brand-gold text-brand-charcoal text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
-                    <span>MOST POPULAR</span>
+                    <span>RECOMMENDED FOR SMES</span>
                   </div>
                 )}
 
@@ -96,7 +96,7 @@ export default function PricingPage() {
                     <span className={`text-[11px] font-bold uppercase tracking-wider ${isPopular ? "text-emerald-300" : "text-muted-foreground"}`}>
                       {plan.badge}
                     </span>
-                    <h3 className="text-xl font-extrabold mt-0.5">{plan.name}</h3>
+                    <h3 className="text-xl font-black mt-0.5">{plan.name}</h3>
                   </div>
 
                   <div className="flex items-baseline gap-1">
@@ -124,7 +124,7 @@ export default function PricingPage() {
                     {plan.features.map((feature, idx) => (
                       <div key={idx} className="flex items-start gap-2 text-xs">
                         <Check className={`w-4 h-4 shrink-0 mt-0.5 ${isPopular ? "text-amber-400" : "text-brand-emerald"}`} />
-                        <span className={isPopular ? "text-gray-200" : "text-foreground"}>
+                        <span className={isPopular ? "text-gray-200" : "text-foreground font-medium"}>
                           {feature}
                         </span>
                       </div>
@@ -135,9 +135,9 @@ export default function PricingPage() {
                 <div className="pt-8">
                   <Link
                     href={`/seller/onboarding?plan=${plan.id}`}
-                    className={`w-full py-3.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm ${
+                    className={`w-full py-3.5 px-4 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald ${
                       isPopular
-                        ? "bg-brand-emerald hover:bg-brand-emerald-light text-white shadow-glow-green"
+                        ? "bg-brand-emerald hover:bg-brand-emerald-dark text-white shadow-glow-green"
                         : "bg-brand-off-white dark:bg-brand-dark-bg border border-border hover:bg-muted text-foreground"
                     }`}
                   >
@@ -150,8 +150,21 @@ export default function PricingPage() {
           })}
         </div>
 
+        {/* Trust Badges Bar */}
+        <div className="bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl p-6 shadow-card flex flex-wrap items-center justify-between gap-4 text-xs">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-brand-emerald" />
+            <span className="font-bold text-foreground">100% Kenyan Bank &amp; M-Pesa Settlements</span>
+          </div>
+          <div className="flex items-center gap-6 text-muted-foreground font-medium">
+            <span>✓ Cancel anytime with 1-click</span>
+            <span>✓ No credit card required for onboarding</span>
+            <span>✓ eTIMS &amp; KRA Tax Compliant</span>
+          </div>
+        </div>
+
         {/* FAQs */}
-        <div className="max-w-4xl mx-auto space-y-6 pt-10">
+        <div className="max-w-4xl mx-auto space-y-6 pt-4">
           <div className="text-center space-y-2">
             <h2 className="text-2xl font-black text-foreground">Frequently Asked Questions</h2>
             <p className="text-xs text-muted-foreground">Everything you need to know about selling on VendLex</p>
@@ -159,8 +172,8 @@ export default function PricingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {faqs.map((faq, idx) => (
-              <div key={idx} className="bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-2xl p-5 space-y-2">
-                <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
+              <div key={idx} className="bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl p-5 space-y-2 shadow-card">
+                <h4 className="font-black text-sm text-foreground flex items-center gap-2">
                   <HelpCircle className="w-4 h-4 text-brand-emerald shrink-0" />
                   <span>{faq.q}</span>
                 </h4>

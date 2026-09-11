@@ -1,11 +1,13 @@
 import React from "react";
 import { HeroSlideshow } from "@/components/hero/hero-slideshow";
+import { TrustStrip } from "@/components/home/trust-strip";
 import { CategoryGrid } from "@/components/home/category-grid";
 import { DealsSection } from "@/components/home/deals-section";
 import { ServicesSection } from "@/components/home/services-section";
 import { SponsoredBusinessesSection } from "@/components/home/sponsored-businesses-section";
 import { CountyDiscoverySection } from "@/components/home/county-discovery-section";
 import { WhyVendlex } from "@/components/home/why-vendlex";
+import { TestimonialsSection } from "@/components/home/testimonials-section";
 import { FinalCTA } from "@/components/home/final-cta";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
@@ -15,37 +17,45 @@ export default function HomePage() {
       {/* 1. Streamlined High-Impact Hero */}
       <HeroSlideshow />
 
-      {/* 2. Department & Popular Categories Grid */}
+      {/* 2. Official Trust & Compliance Strip */}
+      <TrustStrip />
+
+      {/* 3. Department & Popular Categories Grid */}
       <ScrollReveal variant="fade-up" delay={50}>
         <CategoryGrid />
       </ScrollReveal>
 
-      {/* 3. Today's Deals & Hot Discounts */}
+      {/* 4. Today's Deals & Hot Discounts */}
       <ScrollReveal variant="fade-up" delay={60}>
         <DealsSection />
       </ScrollReveal>
 
-      {/* 4. Certified Local Services & Trades */}
+      {/* 5. Certified Local Services & Trades */}
       <ScrollReveal variant="fade-up" delay={60}>
         <ServicesSection />
       </ScrollReveal>
 
-      {/* 5. Sponsored Local Businesses */}
+      {/* 6. Sponsored Local Businesses */}
       <ScrollReveal variant="fade-up" delay={60}>
         <SponsoredBusinessesSection />
       </ScrollReveal>
 
-      {/* 6. Explore Kenya Across All 47 Counties */}
+      {/* 7. Explore Kenya Across All 47 Counties */}
       <ScrollReveal variant="fade-up" delay={60}>
         <CountyDiscoverySection />
       </ScrollReveal>
 
-      {/* 7. Why VendLex - Trust, Protection & Tools */}
+      {/* 8. Why VendLex - Trust, Protection & Tools */}
       <ScrollReveal variant="fade-up" delay={60}>
         <WhyVendlex />
       </ScrollReveal>
 
-      {/* 8. Final Call-to-Action */}
+      {/* 9. Verified Customer & Merchant Stories */}
+      <ScrollReveal variant="fade-up" delay={60}>
+        <TestimonialsSection />
+      </ScrollReveal>
+
+      {/* 10. Final Call-to-Action */}
       <ScrollReveal variant="pop-up" delay={80}>
         <FinalCTA />
       </ScrollReveal>

@@ -93,11 +93,11 @@ function ServicesContent() {
   };
 
   return (
-    <div className="bg-brand-off-white dark:bg-brand-dark-bg min-h-screen py-8">
+    <div className="bg-brand-off-white dark:bg-brand-dark-bg min-h-screen py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Exact Guideline #15 Hero: "What service do you need?" */}
         <div className="bg-gradient-to-r from-brand-charcoal via-gray-900 to-brand-emerald-dark rounded-3xl p-8 sm:p-12 text-white shadow-xl space-y-6 relative overflow-hidden border border-brand-emerald/30">
-          <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-brand-emerald/20 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute top-0 right-0 -mt-8 -mr-8 w-72 h-72 bg-brand-emerald/20 rounded-full blur-3xl pointer-events-none" />
 
           <div className="max-w-3xl space-y-3 relative z-10">
             <div className="inline-flex items-center gap-2 bg-emerald-950/80 border border-emerald-400/60 text-emerald-200 text-xs font-black px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
@@ -118,9 +118,9 @@ function ServicesContent() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setSelectedCategory("all")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   selectedCategory === "all"
-                    ? "bg-brand-emerald text-white shadow-sm"
+                    ? "bg-brand-emerald text-white shadow-md"
                     : "bg-white/15 hover:bg-white/25 text-gray-200"
                 }`}
               >
@@ -130,9 +130,9 @@ function ServicesContent() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                     selectedCategory === cat
-                      ? "bg-brand-emerald text-white shadow-sm"
+                      ? "bg-brand-emerald text-white shadow-md"
                       : "bg-white/15 hover:bg-white/25 text-gray-200 hover:text-white"
                   }`}
                 >
@@ -144,7 +144,7 @@ function ServicesContent() {
         </div>
 
         {/* Filter Controls: Search, County, Town */}
-        <div className="bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-2xl p-4 sm:p-5 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl p-4 sm:p-5 shadow-card grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-3.5 text-muted-foreground" />
             <input
@@ -152,7 +152,7 @@ function ServicesContent() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search service e.g. Electrician, Solar, Plumbing..."
-              className="w-full bg-muted/40 dark:bg-brand-dark-bg/60 border border-border rounded-xl pl-9 pr-3 py-2.5 text-xs text-foreground focus:outline-none focus:border-brand-emerald font-semibold"
+              className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl pl-9 pr-3 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald font-semibold transition-colors"
             />
           </div>
 
@@ -164,7 +164,7 @@ function ServicesContent() {
                 setSelectedCounty(e.target.value);
                 setSelectedTown("all");
               }}
-              className="w-full bg-muted/40 dark:bg-brand-dark-bg/60 border border-border rounded-xl pl-9 pr-3 py-2.5 text-xs text-foreground focus:outline-none focus:border-brand-emerald font-semibold"
+              className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl pl-9 pr-3 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald font-semibold transition-colors"
             >
               <option value="all">All 47 Counties</option>
               {KENYAN_COUNTIES.map((c) => (
@@ -180,7 +180,7 @@ function ServicesContent() {
               value={selectedTown}
               onChange={(e) => setSelectedTown(e.target.value)}
               disabled={availableTowns.length === 0}
-              className="w-full bg-muted/40 dark:bg-brand-dark-bg/60 border border-border rounded-xl px-3 py-2.5 text-xs text-foreground focus:outline-none focus:border-brand-emerald font-semibold disabled:opacity-50"
+              className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl px-3 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald font-semibold disabled:opacity-50 transition-colors"
             >
               <option value="all">
                 {availableTowns.length > 0 ? `All Towns in ${selectedCounty}` : "Select County first for Towns"}
@@ -195,7 +195,7 @@ function ServicesContent() {
         </div>
 
         {/* Guideline #17: Quote Comparison & Fast Job Request Banner */}
-        <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+        <div className="bg-brand-emerald-soft/30 dark:bg-emerald-950/40 border border-brand-emerald/30 dark:border-emerald-800/60 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-card">
           <div className="space-y-1.5">
             <span className="text-xs font-black text-brand-emerald uppercase tracking-wider flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5" />
@@ -211,7 +211,7 @@ function ServicesContent() {
 
           <button
             onClick={() => setQuoteRequestOpen(!quoteRequestOpen)}
-            className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-black px-6 py-3 rounded-xl text-xs sm:text-sm shadow-md transition-all shrink-0 flex items-center gap-2"
+            className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-extrabold px-6 py-3 rounded-xl text-xs sm:text-sm shadow-md hover:shadow-glow-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald/40 transition-all shrink-0 flex items-center gap-2"
           >
             <span>{quoteRequestOpen ? "Close Request Form" : "Request Free Quotes"}</span>
             <Send className="w-3.5 h-3.5" />
@@ -222,7 +222,7 @@ function ServicesContent() {
         {quoteRequestOpen && (
           <form
             onSubmit={handleQuoteSubmit}
-            className="bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-3xl p-6 sm:p-8 shadow-md space-y-4 animate-fadeIn"
+            className="bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-3xl p-6 sm:p-8 shadow-card space-y-4 animate-fadeIn"
           >
             <h4 className="text-base font-black text-foreground">Submit a Service Request for Multi-Quote Comparison</h4>
             
@@ -240,7 +240,7 @@ function ServicesContent() {
                     <select
                       value={quoteService}
                       onChange={(e) => setQuoteService(e.target.value)}
-                      className="w-full p-2.5 rounded-xl border border-border bg-muted/40 text-xs font-semibold"
+                      className="w-full p-2.5 rounded-xl border border-border bg-muted/30 dark:bg-brand-dark-bg/60 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald"
                     >
                       {SERVICE_CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -253,7 +253,7 @@ function ServicesContent() {
                     <select
                       value={quoteCounty}
                       onChange={(e) => setQuoteCounty(e.target.value)}
-                      className="w-full p-2.5 rounded-xl border border-border bg-muted/40 text-xs font-semibold"
+                      className="w-full p-2.5 rounded-xl border border-border bg-muted/30 dark:bg-brand-dark-bg/60 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald"
                     >
                       {KENYAN_COUNTIES.map((c) => (
                         <option key={c} value={c}>{c} County</option>
@@ -270,13 +270,13 @@ function ServicesContent() {
                     value={quoteDesc}
                     onChange={(e) => setQuoteDesc(e.target.value)}
                     placeholder="e.g. Need electrical rewiring for a 3-bedroom house in Kilimani, Nairobi. Available tomorrow afternoon."
-                    className="w-full p-3 rounded-xl border border-border bg-muted/40 text-xs text-foreground focus:outline-none focus:border-brand-emerald"
+                    className="w-full p-3 rounded-xl border border-border bg-muted/30 dark:bg-brand-dark-bg/60 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-black py-3 px-6 rounded-xl text-xs shadow-md transition-all flex items-center gap-2"
+                  className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-extrabold py-3 px-6 rounded-xl text-xs shadow-md hover:shadow-glow-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald/40 transition-all flex items-center gap-2"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Send Request to Verified Technicians</span>
