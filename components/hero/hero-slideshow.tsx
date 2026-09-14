@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { HERO_SLIDES } from "@/lib/data/kenya-data";
-import { SearchAutocomplete } from "../navbar/search-autocomplete";
-import { Sparkles, ArrowRight, Store, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 export function HeroSlideshow() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -55,88 +54,32 @@ export function HeroSlideshow() {
         );
       })}
 
-      {/* Hero Content Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full">
-        <div className="max-w-3xl space-y-6 animate-fadeIn">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-emerald/30 border border-brand-emerald/50 backdrop-blur-md text-emerald-300 text-xs sm:text-sm font-bold tracking-wide shadow-glow-green">
-            <span>🇰🇪 KENYA&apos;S PREMIER DIGITAL COMMERCE PLATFORM</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-          </div>
+      {/* Clean Dynamic Hero Banner Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 w-full flex items-center min-h-[420px] sm:min-h-[480px]">
+        <div key={slide.id} className="max-w-2xl space-y-5 animate-fadeIn">
+          {slide.badge && (
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-emerald/30 border border-brand-emerald/50 backdrop-blur-md text-emerald-300 text-xs font-bold tracking-wide">
+              <span>{slide.badge}</span>
+            </div>
+          )}
 
-          {/* Heading */}
           <div className="space-y-2">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.08]">
-              Discover. <span className="text-emerald-400">Shop.</span> <span className="text-amber-400">Prosper.</span>
+            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+              {slide.title}
             </h1>
-            <p className="text-base sm:text-xl font-semibold text-emerald-100/95 max-w-2xl leading-snug">
-              Authentic Kenyan merchants, genuine products, and verified local services across all 47 counties.
+            <p className="text-sm sm:text-base font-medium text-emerald-100/90 leading-relaxed max-w-xl">
+              {slide.subtitle}
             </p>
           </div>
 
-          {/* Description */}
-          <p className="text-xs sm:text-sm text-gray-200 leading-relaxed max-w-2xl">
-            Direct Lipa na M-Pesa escrow protection, 24-hour countrywide door-to-door courier dispatch, and cryptographic receipts for every purchase.
-          </p>
-
-          {/* Search Box */}
-          <div className="pt-2 max-w-2xl space-y-3">
-            <SearchAutocomplete
-              placeholder="Search products, verified electronics, kitenge, or plumbers..."
-              className="shadow-2xl"
-              initialLocation="Nairobi"
-            />
-            {/* Quick Suggestions Tags */}
-            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-200">
-              <span className="font-bold text-amber-300">Trending Now:</span>
-              <Link href="/marketplace?q=Samsung" className="hover:text-white bg-white/15 hover:bg-white/25 px-2.5 py-1 rounded-lg backdrop-blur-sm transition-colors text-[11px] font-medium border border-white/10">
-                Smartphones
-              </Link>
-              <Link href="/marketplace?q=Laptops" className="hover:text-white bg-white/15 hover:bg-white/25 px-2.5 py-1 rounded-lg backdrop-blur-sm transition-colors text-[11px] font-medium border border-white/10">
-                Laptops &amp; Tech
-              </Link>
-              <Link href="/marketplace?category=fashion-clothing" className="hover:text-white bg-white/15 hover:bg-white/25 px-2.5 py-1 rounded-lg backdrop-blur-sm transition-colors text-[11px] font-medium border border-white/10">
-                African Fashion
-              </Link>
-              <Link href="/services" className="hover:text-white bg-white/15 hover:bg-white/25 px-2.5 py-1 rounded-lg backdrop-blur-sm transition-colors text-[11px] font-medium border border-white/10">
-                Solar &amp; Electricians
-              </Link>
-            </div>
-          </div>
-
-          {/* Action CTAs */}
-          <div className="flex flex-wrap items-center gap-3.5 pt-2">
+          <div className="pt-2">
             <Link
               href="/marketplace"
-              className="inline-flex items-center gap-2 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-black px-7 py-3.5 rounded-xl text-xs sm:text-sm shadow-xl hover:shadow-glow-green transition-all transform hover:-translate-y-0.5 active:scale-98"
+              className="inline-flex items-center gap-2 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-black px-6 py-3 rounded-xl text-xs sm:text-sm shadow-xl hover:shadow-glow-green transition-all transform hover:-translate-y-0.5 active:scale-95"
             >
-              <span>Explore Marketplace</span>
+              <span>Shop Now</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
-
-            <Link
-              href="/seller/onboarding"
-              className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 backdrop-blur-md font-bold px-6 py-3.5 rounded-xl text-xs sm:text-sm transition-all active:scale-98"
-            >
-              <Store className="w-4 h-4 text-amber-400" />
-              <span>Sell on VendLex</span>
-            </Link>
-          </div>
-
-          {/* Trust Highlights */}
-          <div className="pt-3 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-gray-200 font-medium">
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Verified Merchant Escrow</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Instant M-Pesa STK Push</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>All 47 Counties Delivery</span>
-            </div>
           </div>
         </div>
       </div>

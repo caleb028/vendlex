@@ -1,8 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Download, Smartphone, X, CheckCircle2, ShieldCheck, Sparkles, ChevronDown, ChevronUp, Check, ExternalLink } from "lucide-react";
+import {
+  Smartphone,
+  X,
+  CheckCircle2,
+  ShieldCheck,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  Share2,
+  MoreVertical,
+  PlusSquare,
+  Compass,
+  ArrowRight,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+type BrowserType = "chrome_android" | "safari_ios" | "samsung_internet" | "generic";
 
 export function MobileAppPrompt() {
   const [isMobileDevice, setIsMobileDevice] = useState(false);
@@ -10,13 +25,13 @@ export function MobileAppPrompt() {
   const [modalOpen, setModalOpen] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
-  const [downloadStarted, setDownloadStarted] = useState(false);
+  const [browserType, setBrowserType] = useState<BrowserType>("chrome_android");
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // 1. Check if running inside installed standalone app
+    // 1. Check if running in standalone mode (already installed WebAPK / PWA)
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as any).standalone === true ||
@@ -26,20 +41,30 @@ export function MobileAppPrompt() {
 
     if (isStandalone || markedInstalled) {
       setIsAlreadyInstalled(true);
-      return; // Do NOT show prompt if already installed in mobile phone
+      return; // Do NOT show prompt if already installed in phone
     }
 
-    // 2. Check if client is on mobile / tablet browser
+    // 2. Detect platform & browser
     const ua = navigator.userAgent || navigator.vendor || (window as any).opera || "";
-    const isMobileUA = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua);
-    const isSmallScreen = window.innerWidth <= 860;
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+    const isSamsung = /SamsungBrowser/i.test(ua);
+    const isAndroid = /Android/i.test(ua);
+    const isMobile = isIOS || isAndroid || /mobile|blackberry|iemobile|opera mini/i.test(ua) || window.innerWidth <= 860;
 
-    if (isMobileUA || isSmallScreen) {
+    if (isIOS) {
+      setBrowserType("safari_ios");
+    } else if (isSamsung) {
+      setBrowserType("samsung_internet");
+    } else if (isAndroid) {
+      setBrowserType("chrome_android");
+    } else {
+      setBrowserType("generic");
+    }
+
+    if (isMobile) {
       setIsMobileDevice(true);
 
-      // Check if user dismissed it during the current session
       const sessionDismissed = sessionStorage.getItem("vendlex_prompt_dismissed") === "true";
-
       if (!sessionDismissed) {
         const timer = setTimeout(() => {
           setModalOpen(true);
@@ -52,19 +77,27 @@ export function MobileAppPrompt() {
       }
     }
 
-    // 3. Register service worker and capture native PWA/WebAPK install event
+    // 3. Check for early captured prompt or listen for event
+    if ((window as any).__vendlex_deferred_prompt) {
+      setDeferredPrompt((window as any).__vendlex_deferred_prompt);
+    }
+
+    const handlePromptReady = () => {
+      if ((window as any).__vendlex_deferred_prompt) {
+        setDeferredPrompt((window as any).__vendlex_deferred_prompt);
+      }
+    };
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
+      (window as any).__vendlex_deferred_prompt = e;
       setDeferredPrompt(e);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("vendlex:pwa-ready", handlePromptReady);
 
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }
-
-    // 4. Listen for appinstalled event
+    // 4. Listen for native appinstalled event
     const handleAppInstalled = () => {
       localStorage.setItem("vendlex_app_installed", "true");
       setIsAlreadyInstalled(true);
@@ -76,37 +109,36 @@ export function MobileAppPrompt() {
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("vendlex:pwa-ready", handlePromptReady);
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
-  const handleNativeInstall = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === "accepted") {
-        localStorage.setItem("vendlex_app_installed", "true");
-        setModalOpen(false);
-        setBannerVisible(false);
+  const handleInstallClick = async () => {
+    const promptEvent = deferredPrompt || (typeof window !== "undefined" ? (window as any).__vendlex_deferred_prompt : null);
+
+    if (promptEvent) {
+      try {
+        await promptEvent.prompt();
+        const { outcome } = await promptEvent.userChoice;
+        if (outcome === "accepted") {
+          localStorage.setItem("vendlex_app_installed", "true");
+          setIsAlreadyInstalled(true);
+          setModalOpen(false);
+          setBannerVisible(false);
+        }
+        setDeferredPrompt(null);
+        if (typeof window !== "undefined") {
+          (window as any).__vendlex_deferred_prompt = null;
+        }
+        return;
+      } catch (err) {
+        console.warn("[VendLex Install] Prompt error:", err);
       }
-      setDeferredPrompt(null);
-    } else {
-      handleApkDownload();
     }
-  };
 
-  const handleApkDownload = () => {
-    setDownloadStarted(true);
-    const link = document.createElement("a");
-    link.href = "/api/download/apk";
-    link.download = "VendLex-Kenya.apk";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    setTimeout(() => {
-      setShowInstructions(true);
-    }, 1200);
+    // If deferredPrompt is unavailable (iOS Safari, Samsung Internet, or browser policy), show interactive in-browser instructions
+    setShowInstructions(true);
   };
 
   const handleDismissModal = () => {
@@ -121,12 +153,12 @@ export function MobileAppPrompt() {
     setBannerVisible(false);
   };
 
-  // If already installed or not on mobile, do not show anything
+  // If already installed or not on mobile, do not render
   if (isAlreadyInstalled || !isMobileDevice) return null;
 
   return (
     <>
-      {/* 1. Optional Smart Top Banner for Mobile Browsers */}
+      {/* 1. Sleek Mobile Top Banner */}
       <AnimatePresence>
         {bannerVisible && !modalOpen && (
           <motion.div
@@ -140,11 +172,13 @@ export function MobileAppPrompt() {
                 <img src="/logo/vendlex-logo.png" alt="VendLex App" className="w-full h-full object-contain" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-white truncate flex items-center gap-1">
+                <p className="text-xs font-bold text-white truncate flex items-center gap-1.5">
                   <span>VendLex App</span>
-                  <span className="text-[9px] bg-amber-400 text-brand-charcoal px-1 py-0.2 rounded-sm font-black">ANDROID</span>
+                  <span className="text-[9px] bg-amber-400 text-brand-charcoal px-1.5 py-0.2 rounded-sm font-black">
+                    FREE
+                  </span>
                 </p>
-                <p className="text-[10px] text-emerald-100 truncate">1-Tap Lipa na M-Pesa &amp; Push Alerts</p>
+                <p className="text-[10px] text-emerald-100 truncate">1-Tap M-Pesa &amp; Instant Live Delivery Alerts</p>
               </div>
             </div>
 
@@ -153,7 +187,7 @@ export function MobileAppPrompt() {
                 onClick={() => setModalOpen(true)}
                 className="bg-brand-gold text-brand-charcoal font-black text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm active:scale-95 transition-transform"
               >
-                <Download className="w-3.5 h-3.5" />
+                <Smartphone className="w-3.5 h-3.5" />
                 <span>Get App</span>
               </button>
               <button
@@ -168,23 +202,23 @@ export function MobileAppPrompt() {
         )}
       </AnimatePresence>
 
-      {/* 2. Optional Slide-Up / Pop-up App Download Modal */}
+      {/* 2. Optional Slide-Up App Install Modal */}
       <AnimatePresence>
         {modalOpen && (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs">
             <motion.div
               initial={{ y: "100%", opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 0, opacity: 0 }}
+              exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="w-full max-w-md bg-white dark:bg-brand-dark-card border-t sm:border border-border dark:border-brand-dark-border rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto"
             >
-              {/* Top Bar with Cancel / Close */}
+              {/* Header with Cancel / Close */}
               <div className="flex items-center justify-between pb-1">
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-brand-emerald text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
-                    <span>Android App</span>
+                    <span>Official Mobile App</span>
                   </span>
                   <span className="text-[10px] text-muted-foreground">Optional Install</span>
                 </div>
@@ -205,14 +239,14 @@ export function MobileAppPrompt() {
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-lg font-black text-foreground leading-tight">
-                    Get the VendLex Mobile App
+                    Add VendLex to Your Phone
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Direct Lipa na M-Pesa, instant order alerts, and faster mobile shopping.
+                    Instant 1-tap Lipa na M-Pesa STK, real-time delivery alerts, and offline access.
                   </p>
                   <div className="flex items-center gap-1 text-amber-500 text-[11px] font-bold">
                     <span>★★★★★</span>
-                    <span className="text-muted-foreground ml-1">4.9 • 100% Free &amp; Optional</span>
+                    <span className="text-muted-foreground ml-1">4.9 • 100% Free &amp; Zero Install Errors</span>
                   </div>
                 </div>
               </div>
@@ -225,39 +259,29 @@ export function MobileAppPrompt() {
                 </div>
                 <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
-                  <span className="font-semibold text-foreground text-[11px]">Live Delivery Tracker</span>
+                  <span className="font-semibold text-foreground text-[11px]">Live Courier Tracking</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
-                  <span className="font-semibold text-foreground text-[11px]">Offline Receipts &amp; QR</span>
+                  <span className="font-semibold text-foreground text-[11px]">Offline Invoices &amp; QR</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-brand-emerald shrink-0" />
-                  <span className="font-semibold text-foreground text-[11px]">Zero Data Waste</span>
+                  <span className="font-semibold text-foreground text-[11px]">Saves Mobile Data</span>
                 </div>
               </div>
 
-              {/* Action Buttons: 1-Tap Install + Download APK + Cancel */}
+              {/* Action Buttons: 1-Tap Install + Cancel */}
               <div className="space-y-2 pt-1">
-                {/* 1-Tap Browser Native Install (Guaranteed zero parse errors) */}
                 <button
-                  onClick={handleNativeInstall}
+                  onClick={handleInstallClick}
                   className="w-full bg-brand-emerald hover:bg-brand-emerald-dark active:scale-[0.98] text-white font-extrabold py-3.5 px-4 rounded-2xl text-sm flex items-center justify-center gap-2.5 shadow-lg transition-all"
                 >
                   <Smartphone className="w-5 h-5 text-amber-300" />
                   <span>Install App on Phone (1-Tap)</span>
                 </button>
 
-                {/* Direct APK Download Option */}
-                <button
-                  onClick={handleApkDownload}
-                  className="w-full bg-muted/60 hover:bg-muted text-foreground font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors border border-border"
-                >
-                  <Download className="w-4 h-4 text-brand-emerald" />
-                  <span>{downloadStarted ? "Downloading APK..." : "Or Download APK Package (.apk)"}</span>
-                </button>
-
-                {/* Explicit Cancel / Continue in Web Button */}
+                {/* Explicit Cancel / Continue in Web Button & Already Installed */}
                 <div className="flex items-center justify-between pt-1">
                   <button
                     onClick={handleDismissModal}
@@ -275,15 +299,21 @@ export function MobileAppPrompt() {
                 </div>
               </div>
 
-              {/* How to Install Guidance */}
+              {/* Browser-Tailored Installation Guide */}
               <div className="border-t border-border pt-3">
                 <button
                   onClick={() => setShowInstructions(!showInstructions)}
                   className="w-full flex items-center justify-between text-xs font-bold text-brand-emerald hover:underline text-left"
                 >
                   <span className="flex items-center gap-1.5">
-                    <Smartphone className="w-3.5 h-3.5" />
-                    <span>How it Works on Android</span>
+                    <Compass className="w-3.5 h-3.5" />
+                    <span>
+                      {browserType === "safari_ios"
+                        ? "How to Add on iPhone / Safari"
+                        : browserType === "samsung_internet"
+                        ? "How to Install on Samsung Internet"
+                        : "How to Install on Android / Chrome"}
+                    </span>
                   </span>
                   {showInstructions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                 </button>
@@ -294,16 +324,82 @@ export function MobileAppPrompt() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="mt-2.5 p-3 rounded-xl bg-muted/40 text-xs space-y-2 border border-border"
+                      className="mt-2.5 p-3.5 rounded-2xl bg-muted/50 dark:bg-muted/20 text-xs space-y-2.5 border border-border"
                     >
-                      <div className="flex items-start gap-2">
-                        <span className="w-4 h-4 rounded-full bg-brand-emerald text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">✓</span>
-                        <p className="text-muted-foreground">Tap <strong>&quot;Install App on Phone (1-Tap)&quot;</strong> for instant installation directly through your browser with zero parse issues.</p>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <span className="w-4 h-4 rounded-full bg-brand-emerald text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">✓</span>
-                        <p className="text-muted-foreground">Once installed on your phone, VendLex will launch like a native Android app and will not prompt you to download again.</p>
-                      </div>
+                      {browserType === "safari_ios" ? (
+                        <>
+                          <div className="flex items-start gap-2.5">
+                            <div className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                              1
+                            </div>
+                            <p className="text-foreground leading-relaxed">
+                              Tap the <strong>Share</strong> button <Share2 className="w-3.5 h-3.5 inline mx-0.5 text-brand-emerald" /> at the bottom of your Safari screen.
+                            </p>
+                          </div>
+                          <div className="flex items-start gap-2.5">
+                            <div className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                              2
+                            </div>
+                            <p className="text-foreground leading-relaxed">
+                              Scroll down and tap <strong>&quot;Add to Home Screen&quot;</strong> <PlusSquare className="w-3.5 h-3.5 inline mx-0.5 text-brand-emerald" />.
+                            </p>
+                          </div>
+                          <div className="flex items-start gap-2.5">
+                            <div className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                              3
+                            </div>
+                            <p className="text-foreground leading-relaxed">
+                              Tap <strong>Add</strong> at top right. VendLex will appear directly on your home screen like any native app.
+                            </p>
+                          </div>
+                        </>
+                      ) : browserType === "samsung_internet" ? (
+                        <>
+                          <div className="flex items-start gap-2.5">
+                            <div className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                              1
+                            </div>
+                            <p className="text-foreground leading-relaxed">
+                              Tap the <strong>Menu</strong> button (<strong>☰</strong> bottom right) in Samsung Internet.
+                            </p>
+                          </div>
+                          <div className="flex items-start gap-2.5">
+                            <div className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                              2
+                            </div>
+                            <p className="text-foreground leading-relaxed">
+                              Tap <strong>&quot;Add page to&quot;</strong> &rarr; select <strong>&quot;Home screen&quot;</strong>.
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex items-start gap-2.5">
+                            <div className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                              1
+                            </div>
+                            <p className="text-foreground leading-relaxed">
+                              Tap the <strong>Install App on Phone (1-Tap)</strong> button above, or tap the browser menu <MoreVertical className="w-3.5 h-3.5 inline mx-0.5 text-brand-emerald" /> (3 dots at top right).
+                            </p>
+                          </div>
+                          <div className="flex items-start gap-2.5">
+                            <div className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                              2
+                            </div>
+                            <p className="text-foreground leading-relaxed">
+                              Select <strong>&quot;Install app&quot;</strong> or <strong>&quot;Add to Home screen&quot;</strong>.
+                            </p>
+                          </div>
+                          <div className="flex items-start gap-2.5">
+                            <div className="w-5 h-5 rounded-full bg-brand-emerald text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                              3
+                            </div>
+                            <p className="text-foreground leading-relaxed">
+                              Confirm <strong>Install</strong>. VendLex will be installed directly to your phone&apos;s app drawer with zero APK parsing errors.
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -312,7 +408,7 @@ export function MobileAppPrompt() {
               {/* Trust & Verification Badge */}
               <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
                 <ShieldCheck className="w-3.5 h-3.5 text-brand-emerald" />
-                <span>Verified Safe &amp; Lightweight • VendLex Technologies Kenya</span>
+                <span>Official Direct WebAPK / PWA • VendLex Technologies Kenya</span>
               </div>
             </motion.div>
           </div>

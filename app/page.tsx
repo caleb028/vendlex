@@ -1,6 +1,5 @@
 import React from "react";
 import { HeroSlideshow } from "@/components/hero/hero-slideshow";
-import { TrustStrip } from "@/components/home/trust-strip";
 import { CategoryGrid } from "@/components/home/category-grid";
 import { DealsSection } from "@/components/home/deals-section";
 import { ServicesSection } from "@/components/home/services-section";
@@ -14,13 +13,10 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 export default function HomePage() {
   return (
     <div className="flex flex-col w-full min-h-screen">
-      {/* 1. Streamlined High-Impact Hero */}
+      {/* 1. Clean High-Impact Hero */}
       <HeroSlideshow />
 
-      {/* 2. Official Trust & Compliance Strip */}
-      <TrustStrip />
-
-      {/* 3. Department & Popular Categories Grid */}
+      {/* 2. Department & Popular Categories Grid */}
       <ScrollReveal variant="fade-up" delay={50}>
         <CategoryGrid />
       </ScrollReveal>

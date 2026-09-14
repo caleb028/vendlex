@@ -153,6 +153,32 @@ export default function RootLayout({
     >
       <head>
         <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="VendLex" />
+        <link rel="manifest" href="/manifest.json" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                window.__vendlex_deferred_prompt = null;
+                window.addEventListener('beforeinstallprompt', function(e) {
+                  e.preventDefault();
+                  window.__vendlex_deferred_prompt = e;
+                  try {
+                    window.dispatchEvent(new CustomEvent('vendlex:pwa-ready'));
+                  } catch(err) {}
+                });
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').catch(function() {});
+                  });
+                }
+              })();
+            `,
+          }}
+        />
         <StructuredData />
       </head>
       <body className={`${plusJakartaSans.className} min-h-screen flex flex-col bg-brand-off-white dark:bg-brand-dark-bg text-foreground font-sans selection:bg-brand-emerald selection:text-white overflow-x-hidden`}>
