@@ -36,7 +36,7 @@ export function Footer() {
           <div className="col-span-2 md:col-span-3 lg:col-span-1 space-y-3">
             <Link href="/" className="inline-block bg-white p-2.5 rounded-xl border border-white/40 shadow-sm max-w-full">
               <img
-                src="/logo/vendlex-logo.png"
+                src="/logo/vendlex-brand-handshake.svg"
                 alt="VendLex - SHOP • GROW • PROSPER"
                 className="h-10 sm:h-12 w-auto max-w-[200px] object-contain"
               />
