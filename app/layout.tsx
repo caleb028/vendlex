@@ -95,7 +95,7 @@ export const metadata: Metadata = {
     apple: "/logo/vendlex-icon.png",
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "google-site-verification=vendlex_google_verification",
+    google: "JNUdU_YnrdCnuckWSsUl-TEW59aiFKCmTJdWpCa4C7c",
   },
   other: {
     "geo.region": "KE",
@@ -155,6 +155,7 @@ export default function RootLayout({
       className={`${plusJakartaSans.variable} ${inter.variable}`}
     >
       <head>
+        <meta name="google-site-verification" content="JNUdU_YnrdCnuckWSsUl-TEW59aiFKCmTJdWpCa4C7c" />
         <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
