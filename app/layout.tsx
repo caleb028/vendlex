@@ -88,11 +88,11 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: [
-      { url: "/logo/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.png", type: "image/png" },
       { url: "/logo/vendlex-icon.png", type: "image/png" },
     ],
-    shortcut: "/logo/favicon.svg",
-    apple: "/logo/vendlex-icon.png",
+    shortcut: "/favicon.png",
+    apple: "/apple-touch-icon.png",
   },
   verification: {
     google: "JNUdU_YnrdCnuckWSsUl-TEW59aiFKCmTJdWpCa4C7c",

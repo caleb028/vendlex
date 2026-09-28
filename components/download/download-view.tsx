@@ -174,8 +174,20 @@ export function DownloadView() {
           </div>
         </div>
 
-        <div className="hidden md:block absolute -right-10 -bottom-10 w-96 h-96 opacity-15">
-          <Smartphone className="w-full h-full text-white" />
+        <div className="hidden md:flex absolute right-8 lg:right-12 top-1/2 -translate-y-1/2 items-center justify-center">
+          <div className="relative">
+            <div className="absolute inset-0 bg-brand-gold/30 rounded-3xl blur-2xl animate-pulse" />
+            <div className="relative w-40 h-40 lg:w-48 lg:h-48 rounded-3xl bg-white p-2.5 shadow-2xl border-4 border-white/90 flex flex-col items-center justify-center transform hover:scale-105 transition-transform duration-300">
+              <img
+                src="/logo/vendlex-icon.png"
+                alt="VendLex Official Mobile App"
+                className="w-full h-full object-contain rounded-2xl"
+              />
+              <div className="absolute -bottom-3 bg-brand-gold text-brand-charcoal text-[10px] font-black uppercase tracking-wider px-3 py-0.5 rounded-full shadow-md">
+                Official App
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
