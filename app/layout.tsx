@@ -94,6 +94,9 @@ export const metadata: Metadata = {
     shortcut: "/logo/favicon.svg",
     apple: "/logo/vendlex-icon.png",
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "google-site-verification=vendlex_google_verification",
+  },
   other: {
     "geo.region": "KE",
     "geo.placename": "Nairobi, Kenya",
