@@ -57,7 +57,7 @@ export default function RegisterPage() {
       >
         <div className="text-center space-y-2">
           <Link href="/" className="inline-block bg-white p-3 rounded-2xl border border-gray-200/90 shadow-md">
-            <img src="/logo/vendlex-brand-handshake.svg" alt="VendLex" className="h-16 sm:h-20 md:h-24 w-auto mx-auto object-contain max-w-[320px]" />
+            <img src="/logo/vendlex-logo.png" alt="VendLex" className="h-16 sm:h-20 md:h-24 w-auto mx-auto object-contain max-w-[320px] rounded-xl" />
           </Link>
           <h2 className="text-2xl font-black text-foreground">Create Your Account</h2>
           <p className="text-xs text-muted-foreground">Join Kenya&apos;s fastest growing digital commerce platform.</p>

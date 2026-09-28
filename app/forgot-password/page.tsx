@@ -122,7 +122,7 @@ export default function ForgotPasswordPage() {
         className="max-w-lg w-full bg-white dark:bg-brand-dark-card border border-border dark:border-brand-dark-border rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-center"
       >
         <Link href="/" className="inline-block bg-white p-2.5 rounded-2xl border border-gray-200/90 shadow-xs">
-          <img src="/logo/vendlex-brand-handshake.svg" alt="VendLex" className="h-12 w-auto mx-auto object-contain" />
+          <img src="/logo/vendlex-logo.png" alt="VendLex" className="h-12 w-auto mx-auto object-contain rounded-xl" />
         </Link>
 
         {sent ? (

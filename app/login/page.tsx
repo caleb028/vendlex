@@ -110,7 +110,7 @@ function LoginForm() {
       <div className="md:col-span-5 bg-gradient-to-br from-brand-emerald-dark to-brand-emerald p-8 text-white flex flex-col justify-between space-y-8">
         <div className="space-y-4">
           <div className="bg-white p-3 rounded-2xl inline-block shadow-md">
-            <img src="/logo/vendlex-brand-handshake.svg" alt="VendLex" className="h-16 sm:h-20 w-auto max-w-[280px] object-contain" />
+            <img src="/logo/vendlex-logo.png" alt="VendLex" className="h-16 sm:h-20 w-auto max-w-[280px] object-contain rounded-xl" />
           </div>
           <div className="space-y-1">
             <h3 className="text-xl font-extrabold text-white">Karibu VendLex</h3>

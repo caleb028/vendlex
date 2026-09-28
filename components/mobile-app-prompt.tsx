@@ -168,8 +168,8 @@ export function MobileAppPrompt() {
             className="sticky top-0 z-50 bg-gradient-to-r from-brand-emerald-dark via-brand-emerald to-brand-charcoal text-white px-3 py-2 shadow-md flex items-center justify-between gap-2 border-b border-white/10"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-xl bg-white p-1 shrink-0 shadow-xs flex items-center justify-center">
-                <img src="/logo/vendlex-brand-handshake-icon.svg" alt="VendLex App" className="w-full h-full object-contain" />
+              <div className="w-8 h-8 rounded-xl bg-white p-0.5 shrink-0 shadow-xs flex items-center justify-center overflow-hidden">
+                <img src="/logo/vendlex-icon.png" alt="VendLex App" className="w-full h-full object-contain rounded-lg" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-bold text-white truncate flex items-center gap-1.5">
@@ -234,8 +234,8 @@ export function MobileAppPrompt() {
 
               {/* App Presentation Header */}
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-white p-2 border-2 border-brand-emerald/30 shadow-md shrink-0 flex items-center justify-center">
-                  <img src="/logo/vendlex-brand-handshake-icon.svg" alt="VendLex" className="w-full h-full object-contain" />
+                <div className="w-16 h-16 rounded-2xl bg-white p-1 border-2 border-brand-emerald/30 shadow-md shrink-0 flex items-center justify-center overflow-hidden">
+                  <img src="/logo/vendlex-icon.png" alt="VendLex" className="w-full h-full object-contain rounded-xl" />
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-lg font-black text-foreground leading-tight">

@@ -183,12 +183,9 @@ export function Navbar() {
                 {/* Large Logo / Mark: 40–52px height desktop, 36–40px mobile */}
                 <div className="relative flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-[1.04]">
                   <img
-                    src="/logo/vendlex-brand-handshake-icon.svg"
+                    src="/logo/vendlex-icon.png"
                     alt="VendLex Logo"
-                    className="h-9 sm:h-10 lg:h-11 xl:h-12 w-auto object-contain transition-all duration-200"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "/logo/vendlex-logo.png";
-                    }}
+                    className="h-9 sm:h-10 lg:h-11 xl:h-12 w-auto object-contain rounded-lg transition-all duration-200"
                   />
                 </div>
 
