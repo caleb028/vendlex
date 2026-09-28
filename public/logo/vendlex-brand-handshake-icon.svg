@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="emeraldPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#087443" />
+      <stop offset="100%" stop-color="#044D2B" />
+    </linearGradient>
+
+    <linearGradient id="emeraldBagSide" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#087443" />
+      <stop offset="100%" stop-color="#022B18" />
+    </linearGradient>
+
+    <linearGradient id="goldAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="40%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+
+    <filter id="iconShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#087443" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <!-- Centered Icon Group -->
+  <g transform="translate(-44, 25)" filter="url(#iconShadow)">
+    <!-- Bag Handle -->
+    <path 
+      d="M 230,170 C 230,50 370,50 370,170" 
+      fill="none" 
+      stroke="url(#emeraldPrimary)" 
+      stroke-width="26" 
+      stroke-linecap="round" 
+    />
+    <path 
+      d="M 244,160 C 244,70 356,70 356,160" 
+      fill="none" 
+      stroke="#34D399" 
+      stroke-width="6" 
+      stroke-linecap="round" 
+      opacity="0.7"
+    />
+
+    <!-- Eyelets -->
+    <circle cx="230" cy="175" r="16" fill="url(#goldAccent)" stroke="#044D2B" stroke-width="4" />
+    <circle cx="230" cy="175" r="7" fill="#FFFFFF" />
+    <circle cx="370" cy="175" r="16" fill="url(#goldAccent)" stroke="#044D2B" stroke-width="4" />
+    <circle cx="370" cy="175" r="7" fill="#FFFFFF" />
+
+    <!-- 3D Bag Side -->
+    <polygon 
+      points="140,165 200,140 180,390 110,425" 
+      fill="url(#emeraldBagSide)" 
+    />
+
+    <!-- Bag Front -->
+    <polygon 
+      points="190,145 410,145 455,410 145,410" 
+      fill="#FFFFFF" 
+      stroke="url(#emeraldPrimary)" 
+      stroke-width="20" 
+      stroke-linejoin="round" 
+    />
+
+    <!-- Handshake -->
+    <!-- Left Hand (Emerald) -->
+    <g>
+      <polygon points="160,225 245,245 220,315 150,285" fill="url(#emeraldPrimary)" />
+      <path 
+        d="M 235,245 C 275,255 305,275 315,300 C 310,320 285,330 250,315 L 225,310 Z" 
+        fill="url(#emeraldPrimary)" 
+      />
+      <circle cx="265" cy="328" r="10" fill="url(#emeraldPrimary)" />
+      <circle cx="288" cy="337" r="10" fill="url(#emeraldPrimary)" />
+      <circle cx="310" cy="343" r="10" fill="url(#emeraldPrimary)" />
+      <circle cx="332" cy="345" r="10" fill="url(#emeraldPrimary)" />
+    </g>
+
+    <!-- Right Hand (Gold) -->
+    <g>
+      <polygon points="440,230 355,250 375,320 445,290" fill="url(#goldAccent)" />
+      <path 
+        d="M 365,250 C 320,250 280,280 270,300 C 285,320 325,325 360,310 L 380,300 Z" 
+        fill="url(#goldAccent)" 
+      />
+      <path 
+        d="M 310,275 C 325,260 350,270 340,295 C 325,300 300,290 310,275 Z" 
+        fill="#FDE047" 
+      />
+    </g>
+  </g>
+</svg>
