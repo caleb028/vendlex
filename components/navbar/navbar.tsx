@@ -177,26 +177,16 @@ export function Navbar() {
             <div className="flex items-center gap-3 lg:gap-5 xl:gap-6 shrink-0">
               <Link
                 href="/"
-                className="flex items-center gap-2.5 sm:gap-3 group shrink-0 select-none py-0.5 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
+                className="flex items-center group shrink-0 select-none py-0.5 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
                 aria-label="VendLex Kenya - Home"
               >
-                {/* Large Logo / Mark: 40–52px height desktop, 36–40px mobile */}
-                <div className="relative flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-[1.04]">
+                {/* Large Horizontal 3D Logo Lockup (Name beside logo in brand colors) */}
+                <div className="relative flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-[1.03]">
                   <img
-                    src="/logo/vendlex-icon.png"
-                    alt="VendLex Logo"
-                    className="h-9 sm:h-10 lg:h-11 xl:h-12 w-auto object-contain rounded-lg transition-all duration-200"
+                    src="/logo/vendlex-horizontal.png"
+                    alt="VendLex - Kenya's Digital Commerce"
+                    className="h-10 sm:h-12 lg:h-13 xl:h-14 w-auto max-w-[210px] sm:max-w-[260px] lg:max-w-[290px] object-contain transition-all duration-200 drop-shadow-xs"
                   />
-                </div>
-
-                {/* Authoritative Brand Name: VENDLEX with Official Slogan */}
-                <div className="flex flex-col justify-center leading-none">
-                  <span className="text-[18px] sm:text-[21px] lg:text-[24px] xl:text-[26px] font-black tracking-[-0.02em] text-foreground transition-colors duration-200 group-hover:text-brand-emerald">
-                    VENDLEX
-                  </span>
-                  <span className="text-[7.5px] sm:text-[8.5px] lg:text-[9.5px] font-extrabold tracking-[0.16em] text-brand-gold uppercase mt-0.5 select-none">
-                    SHOP • GROW • PROSPER
-                  </span>
                 </div>
               </Link>
 
