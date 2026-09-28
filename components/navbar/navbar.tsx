@@ -180,12 +180,12 @@ export function Navbar() {
                 className="flex items-center group shrink-0 select-none py-0.5 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
                 aria-label="VendLex Kenya - Home"
               >
-                {/* Large Horizontal 3D Logo Lockup (Name beside logo in brand colors) */}
+                {/* Large Horizontal 3D Logo Lockup (Emblem + Name + Slogan) */}
                 <div className="relative flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-[1.03]">
                   <img
                     src="/logo/vendlex-horizontal.png"
-                    alt="VendLex - Kenya's Digital Commerce"
-                    className="h-10 sm:h-12 lg:h-13 xl:h-14 w-auto max-w-[210px] sm:max-w-[260px] lg:max-w-[290px] object-contain transition-all duration-200 drop-shadow-xs"
+                    alt="VendLex - SHOP • GROW • PROSPER"
+                    className="h-12 sm:h-14 lg:h-15 xl:h-16 w-auto max-w-[240px] sm:max-w-[300px] lg:max-w-[340px] object-contain transition-all duration-200 drop-shadow-xs"
                   />
                 </div>
               </Link>

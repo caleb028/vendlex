@@ -14,6 +14,7 @@ import {
   PlusSquare,
   Compass,
   ArrowRight,
+  Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -31,17 +32,17 @@ export function MobileAppPrompt() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // 1. Check if running in standalone mode (already installed WebAPK / PWA)
+    // 1. Check if running in standalone mode (already actively inside installed WebAPK / PWA)
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as any).standalone === true ||
       document.referrer.startsWith("android-app://");
 
-    const markedInstalled = localStorage.getItem("vendlex_app_installed") === "true";
-
-    if (isStandalone || markedInstalled) {
+    if (isStandalone) {
       setIsAlreadyInstalled(true);
-      return; // Do NOT show prompt if already installed in phone
+      return; // Do NOT show prompt if actively running inside standalone app
+    } else {
+      setIsAlreadyInstalled(false);
     }
 
     // 2. Detect platform & browser
@@ -271,15 +272,26 @@ export function MobileAppPrompt() {
                 </div>
               </div>
 
-              {/* Action Buttons: 1-Tap Install + Cancel */}
+              {/* Action Buttons: 1-Tap Install + Direct APK Download */}
               <div className="space-y-2 pt-1">
-                <button
-                  onClick={handleInstallClick}
-                  className="w-full bg-brand-emerald hover:bg-brand-emerald-dark active:scale-[0.98] text-white font-extrabold py-3.5 px-4 rounded-2xl text-sm flex items-center justify-center gap-2.5 shadow-lg transition-all"
-                >
-                  <Smartphone className="w-5 h-5 text-amber-300" />
-                  <span>Install App on Phone (1-Tap)</span>
-                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={handleInstallClick}
+                    className="bg-brand-emerald hover:bg-brand-emerald-dark active:scale-[0.98] text-white font-extrabold py-3.5 px-3 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg transition-all"
+                  >
+                    <Smartphone className="w-4 h-4 text-amber-300" />
+                    <span>1-Tap Install</span>
+                  </button>
+
+                  <a
+                    href="/api/download/apk"
+                    download="VendLex-Kenya.apk"
+                    className="bg-brand-gold hover:bg-yellow-400 active:scale-[0.98] text-brand-charcoal font-black py-3.5 px-3 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md transition-all text-center"
+                  >
+                    <Download className="w-4 h-4 text-brand-charcoal" />
+                    <span>Direct APK</span>
+                  </a>
+                </div>
 
                 {/* Explicit Cancel / Continue in Web Button & Already Installed */}
                 <div className="flex items-center justify-between pt-1">

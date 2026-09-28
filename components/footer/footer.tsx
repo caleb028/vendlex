@@ -34,16 +34,13 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 pb-12 border-b border-gray-800">
           {/* Brand & Mission Column */}
           <div className="col-span-2 md:col-span-3 lg:col-span-1 space-y-3">
-            <Link href="/" className="inline-block bg-white p-2.5 rounded-2xl border border-white/40 shadow-sm max-w-full">
+            <Link href="/" className="inline-block bg-white p-3 rounded-2xl border border-white/40 shadow-sm max-w-full">
               <img
                 src="/logo/vendlex-logo.png"
                 alt="VendLex - SHOP • GROW • PROSPER"
-                className="h-10 sm:h-12 w-auto max-w-[200px] object-contain rounded-lg"
+                className="h-12 sm:h-14 w-auto max-w-[260px] object-contain rounded-lg"
               />
             </Link>
-            <div className="text-[10px] sm:text-[11px] font-extrabold tracking-[0.16em] text-brand-gold uppercase select-none">
-              SHOP • GROW • PROSPER
-            </div>
             <p className="text-xs text-gray-400 leading-relaxed">
               Kenya&apos;s digital commerce and SaaS ecosystem. Connecting shoppers, merchants, and service experts across all 47 counties.
             </p>

@@ -16,6 +16,8 @@ import {
   PlusSquare,
   Sparkles,
   Check,
+  Download,
+  RotateCcw,
 } from "lucide-react";
 
 export function DownloadView() {
@@ -27,12 +29,19 @@ export function DownloadView() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    if (
+    // Only mark as installed if ACTUALLY actively running inside standalone PWA mode
+    const isRunningStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as any).standalone === true ||
-      localStorage.getItem("vendlex_app_installed") === "true"
-    ) {
+      document.referrer.startsWith("android-app://");
+
+    if (isRunningStandalone) {
       setIsInstalled(true);
+    } else {
+      // If user is accessing from browser, they may have uninstalled the app
+      // Clear stale flag to allow immediate 1-tap re-install
+      localStorage.removeItem("vendlex_app_installed");
+      setIsInstalled(false);
     }
 
     if ((window as any).__vendlex_deferred_prompt) {
@@ -97,7 +106,7 @@ export function DownloadView() {
 
   const handleCopyLink = () => {
     if (typeof window !== "undefined") {
-      navigator.clipboard.writeText("https://vendlex.vercel.app");
+      navigator.clipboard.writeText("https://vendlex.vercel.app/download");
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2500);
     }
@@ -110,56 +119,53 @@ export function DownloadView() {
         <div className="relative z-10 max-w-xl space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-xs text-xs font-black uppercase tracking-wider text-amber-300">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{isInstalled ? "App Installed on Device" : "Direct Mobile App Installation"}</span>
+            <span>{isInstalled ? "App Active in Standalone" : "Official Android App & Direct WebAPK"}</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-black leading-tight tracking-tight">
-            {isInstalled ? "VendLex is Installed on Your Device" : "Get the VendLex App on Your Phone"}
+            {isInstalled ? "VendLex Mobile App Active" : "Get the VendLex Mobile App on Your Phone"}
           </h1>
 
           <p className="text-sm sm:text-base text-emerald-100 leading-relaxed">
             {isInstalled
-              ? "You already have the official VendLex application configured on your mobile phone. Launch it anytime from your home screen."
-              : "Install VendLex directly through your browser in 1 tap. Enjoy instant Lipa na M-Pesa STK checkout, live courier tracking, push notifications, and offline receipts with zero APK download issues."}
+              ? "You are currently running VendLex in standalone mode. You can also re-install or download the direct APK anytime below."
+              : "Install VendLex directly in 1 tap with zero errors, or download the direct APK. Enjoy instant Lipa na M-Pesa STK checkout, live courier tracking, push notifications, and offline receipts."}
           </p>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-            {!isInstalled ? (
-              <>
-                <button
-                  onClick={handleNativeInstall}
-                  className="bg-brand-gold hover:bg-yellow-400 text-brand-charcoal font-black py-4 px-8 rounded-2xl text-sm flex items-center justify-center gap-2.5 shadow-xl hover:scale-105 active:scale-95 transition-all"
-                >
-                  <Smartphone className="w-5 h-5 text-brand-charcoal" />
-                  <span>Install App on Phone (1-Tap)</span>
-                </button>
+          <div className="flex flex-wrap items-stretch sm:items-center gap-3 pt-2">
+            <button
+              onClick={handleNativeInstall}
+              className="bg-brand-gold hover:bg-yellow-400 text-brand-charcoal font-black py-4 px-7 rounded-2xl text-sm flex items-center justify-center gap-2.5 shadow-xl hover:scale-105 active:scale-95 transition-all"
+            >
+              <Smartphone className="w-5 h-5 text-brand-charcoal" />
+              <span>{isInstalled ? "Re-Install App (1-Tap)" : "Install App on Phone (1-Tap)"}</span>
+            </button>
 
-                <button
-                  onClick={handleCopyLink}
-                  className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold py-4 px-6 rounded-2xl text-sm flex items-center justify-center gap-2 transition-colors"
-                >
-                  {copiedLink ? (
-                    <>
-                      <Check className="w-4 h-4 text-amber-300" />
-                      <span>Link Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Share2 className="w-4 h-4" />
-                      <span>Share Install Link</span>
-                    </>
-                  )}
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/marketplace"
-                className="bg-brand-gold text-brand-charcoal font-black py-4 px-8 rounded-2xl text-sm flex items-center justify-center gap-2 shadow-xl hover:scale-105 transition-all"
-              >
-                <span>Launch Marketplace</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            )}
+            <a
+              href="/api/download/apk"
+              download="VendLex-Kenya.apk"
+              className="bg-white/15 hover:bg-white/25 border border-white/40 text-white font-bold py-4 px-6 rounded-2xl text-sm flex items-center justify-center gap-2 transition-all hover:scale-105"
+            >
+              <Download className="w-4 h-4 text-amber-300" />
+              <span>Download APK</span>
+            </a>
+
+            <button
+              onClick={handleCopyLink}
+              className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold py-4 px-5 rounded-2xl text-sm flex items-center justify-center gap-2 transition-colors"
+            >
+              {copiedLink ? (
+                <>
+                  <Check className="w-4 h-4 text-amber-300" />
+                  <span>Link Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4" />
+                  <span>Share</span>
+                </>
+              )}
+            </button>
           </div>
 
           <div className="flex items-center gap-4 text-xs text-emerald-100 pt-2">
