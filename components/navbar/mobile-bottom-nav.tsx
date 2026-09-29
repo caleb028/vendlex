@@ -16,6 +16,12 @@ import { useAuth } from "@/lib/store/auth-store";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+
+  // Hide on admin routes
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   const { itemCount, setIsCartOpen } = useCart();
   const { user, role } = useAuth();
 

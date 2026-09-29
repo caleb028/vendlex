@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/store/auth-store";
 import { useCart } from "@/lib/store/cart-store";
 import { formatKSh } from "@/lib/utils";
@@ -40,8 +40,14 @@ interface ChatItem {
 
 export function AIChatbot() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, role } = useAuth();
   const { addToCart } = useCart();
+
+  // Hide AI shopping assistant on admin command portal
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");

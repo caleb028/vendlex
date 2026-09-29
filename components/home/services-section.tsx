@@ -93,40 +93,41 @@ export function ServicesSection() {
         </div>
 
         {/* 6-Item Popular Categories Grid with Photographic Images */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-5">
           {POPULAR_SERVICES.map((item) => {
             const Icon = item.icon;
             return (
               <Link
                 key={item.name}
                 href={`/services?search=${encodeURIComponent(item.query)}`}
-                className="group bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover hover:border-brand-emerald/50 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
+                className="group bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl overflow-hidden shadow-xs hover:shadow-card-hover hover:border-brand-emerald/50 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
               >
                 {/* Photographic Header */}
-                <div className="relative aspect-4/3 w-full overflow-hidden bg-muted">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted/40">
                   <img
                     src={item.image}
                     alt={item.name}
+                    loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
 
                   {/* Floating Icon Pill */}
                   <div className="absolute top-2.5 right-2.5 p-1.5 rounded-xl bg-black/60 backdrop-blur-md text-amber-400 border border-white/20 shadow-sm">
                     <Icon className="w-3.5 h-3.5" />
                   </div>
 
-                  <span className="absolute bottom-2 left-2.5 text-[10px] text-white font-bold drop-shadow-xs bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-xs">
+                  <span className="absolute bottom-2 left-2.5 text-[10px] text-white font-bold drop-shadow-xs bg-black/50 px-2 py-0.5 rounded-md backdrop-blur-xs border border-white/10">
                     {item.tag}
                   </span>
                 </div>
 
                 {/* Body */}
-                <div className="p-3.5 text-center space-y-0.5">
-                  <span className="text-xs font-bold text-foreground group-hover:text-brand-emerald transition-colors block truncate">
+                <div className="p-3 sm:p-3.5 text-center space-y-0.5">
+                  <span className="text-xs sm:text-sm font-black text-foreground group-hover:text-brand-emerald transition-colors block truncate">
                     {item.name}
                   </span>
-                  <span className="text-[11px] text-muted-foreground block font-medium">
+                  <span className="text-[11px] text-muted-foreground block font-semibold">
                     {item.prosCount}
                   </span>
                 </div>

@@ -20,6 +20,10 @@ export interface ServerUser {
   businessId?: string;
   businessSlug?: string;
   businessName?: string;
+  businessCategory?: string;
+  category?: string;
+  county?: string;
+  town?: string;
   isVerified: boolean;
   // Login lockout
   loginAttempts?: number;

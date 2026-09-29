@@ -65,49 +65,51 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* 2. Card Body */}
+      {/* 2. Card Body with uniform spacing */}
       <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between space-y-3">
         <div className="space-y-1.5">
           {/* Seller & Verified Status */}
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-            <span className="truncate max-w-[70%] font-medium">
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground gap-1.5">
+            <span className="truncate font-semibold flex-1">
               {product.businessName}
             </span>
             {product.businessVerified && (
-              <span className="text-[10px] font-bold text-brand-emerald dark:text-emerald-400 shrink-0 flex items-center gap-0.5">
+              <span className="text-[10px] font-bold text-brand-emerald dark:text-emerald-400 shrink-0 flex items-center gap-0.5 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded">
                 <span>✓</span> Verified
               </span>
             )}
           </div>
 
-          {/* Product Title */}
+          {/* Product Title with fixed 2-line height so cards align seamlessly */}
           <Link
             href={`/products/${product.slug}`}
-            className="font-bold text-xs sm:text-sm text-foreground group-hover:text-brand-emerald transition-colors line-clamp-2 leading-snug focus-visible:outline-none focus-visible:underline"
+            className="font-black text-xs sm:text-sm text-foreground group-hover:text-brand-emerald transition-colors line-clamp-2 leading-snug min-h-[2.5rem] focus-visible:outline-none focus-visible:underline"
             title={product.title}
           >
             {product.title}
           </Link>
 
           {/* Rating & Location */}
-          <div className="flex items-center justify-between text-xs pt-0.5">
-            <div className="flex items-center text-amber-500 font-semibold">
+          <div className="flex items-center justify-between text-xs pt-1">
+            <div className="flex items-center text-amber-500 font-bold">
               <Star className="w-3 h-3 fill-current mr-1" />
-              <span className="text-[11px] font-bold">{product.rating}</span>
+              <span className="text-[11px]">{product.rating}</span>
               <span className="text-[10px] text-muted-foreground ml-1">({product.reviewCount})</span>
             </div>
-            <span className="text-[10px] text-muted-foreground font-medium">{product.county}</span>
+            <span className="text-[10px] text-muted-foreground font-semibold bg-muted/40 px-1.5 py-0.5 rounded">
+              {product.county}
+            </span>
           </div>
         </div>
 
-        {/* 3. Pricing & Primary CTA */}
-        <div className="pt-2 border-t border-border/60 dark:border-brand-dark-border/60 space-y-2">
-          <div className="flex items-baseline justify-between">
+        {/* 3. Pricing & Primary CTA with aligned layout */}
+        <div className="pt-2.5 border-t border-border/60 dark:border-brand-dark-border/60 space-y-2.5">
+          <div className="flex items-baseline justify-between gap-1.5 flex-wrap">
             <div className="text-sm sm:text-base font-black text-brand-emerald dark:text-emerald-400">
               {formatKSh(product.price)}
             </div>
             {product.originalPrice && (
-              <div className="text-[11px] text-muted-foreground line-through">
+              <div className="text-[11px] text-muted-foreground line-through font-medium">
                 {formatKSh(product.originalPrice)}
               </div>
             )}
@@ -116,7 +118,7 @@ export function ProductCard({ product }: { product: Product }) {
           {/* Primary Action Button */}
           <button
             onClick={handleAdd}
-            className={`w-full py-2.5 px-3.5 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald ${
+            className={`w-full py-2.5 px-3 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-1.5 shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald ${
               isAdded
                 ? "bg-emerald-700 text-white"
                 : "bg-brand-emerald hover:bg-brand-emerald-dark text-white active:scale-98"

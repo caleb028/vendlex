@@ -36,8 +36,8 @@ export function DealsSection() {
           </Link>
         </div>
 
-        {/* 4 Products Preview Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        {/* 4 Products Preview Grid with generous uncrowded spacing */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6">
           {deals.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
