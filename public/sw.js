@@ -3,10 +3,16 @@ const CACHE_NAME = 'vendlex-v2';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
+  '/favicon.ico',
+  '/favicon-48x48.png',
+  '/favicon-96x96.png',
+  '/favicon-192x192.png',
+  '/favicon-512x512.png',
+  '/favicon.png',
+  '/apple-touch-icon.png',
   '/logo/vendlex-logo.png',
   '/logo/vendlex-icon.png',
-  '/logo/favicon.svg',
-  '/favicon.png'
+  '/logo/vendlex-horizontal.png'
 ];
 
 self.addEventListener('install', (event) => {

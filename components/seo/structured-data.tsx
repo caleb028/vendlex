@@ -11,12 +11,12 @@ export function StructuredData() {
     url: "https://vendlex.vercel.app",
     logo: {
       "@type": "ImageObject",
-      url: "https://vendlex.vercel.app/logo/vendlex-logo.png",
+      url: "https://vendlex.vercel.app/logo/vendlex-icon.png",
       width: 512,
       height: 512,
-      caption: "VendLex Kenya Logo",
+      caption: "VendLex Kenya Official Logo",
     },
-    image: "https://vendlex.vercel.app/logo/vendlex-logo.png",
+    image: "https://vendlex.vercel.app/logo/vendlex-icon.png",
     description:
       "Kenya's premier digital commerce marketplace and SaaS business ecosystem powering verified merchants, escrow payments, and Lipa na M-Pesa transactions across all 47 counties.",
     email: "support@vendlex.vercel.app",

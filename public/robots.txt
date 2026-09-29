@@ -13,6 +13,11 @@ Allow: /discover
 Allow: /b2b
 Allow: /counties
 Allow: /help
+Allow: /favicon.ico
+Allow: /favicon*
+Allow: /icon*
+Allow: /logo/
+Allow: /apple-touch-icon.png
 
 # Disallow private user/admin dashboards and sensitive API routes
 Disallow: /admin
