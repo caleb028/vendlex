@@ -58,140 +58,79 @@ export function HeroSlideshow() {
       })}
 
       {/* Dynamic Hero Banner Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-18 lg:py-24 w-full flex items-center min-h-[540px] sm:min-h-[600px] lg:min-h-[660px]">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={slide.id}
-              className="lg:col-span-7 space-y-5 sm:space-y-6"
-            >
-              {slide.badge && (
-                <motion.div
-                  initial={isReduced ? false : { opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: isReduced ? 0 : 0.4, ease: "easeOut" }}
-                >
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-emerald/30 border border-brand-emerald/50 backdrop-blur-md text-emerald-300 text-xs sm:text-sm font-black tracking-wide">
-                    <span>{slide.badge}</span>
-                  </div>
-                </motion.div>
-              )}
-
-              <div className="space-y-3.5">
-                {/* Headline: Responsive typography with proper breathing room and zero awkward breaks */}
-                <motion.h1
-                  initial={isReduced ? false : { opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: isReduced ? 0 : 0.5, ease: "easeOut" }}
-                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.15]"
-                >
-                  {slide.title}
-                </motion.h1>
-
-                {/* Subheadline: Comfortable text size and line height */}
-                <motion.p
-                  initial={isReduced ? false : { opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: isReduced ? 0 : 0.5,
-                    delay: isReduced ? 0 : 0.12,
-                    ease: "easeOut",
-                  }}
-                  className="text-sm sm:text-base md:text-lg font-normal text-emerald-100/90 leading-relaxed max-w-xl"
-                >
-                  {slide.subtitle}
-                </motion.p>
-              </div>
-
-              {/* CTA Buttons: Spacious Shop Now + Sell on VendLex */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-32 w-full flex items-center min-h-[480px] sm:min-h-[540px] lg:min-h-[600px]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={slide.id}
+            className="max-w-4xl space-y-6 sm:space-y-8"
+          >
+            {slide.badge && (
               <motion.div
-                initial={isReduced ? false : { opacity: 0, y: 20 }}
+                initial={isReduced ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: isReduced ? 0 : 0.5, ease: "easeOut" }}
+              >
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-emerald/30 border border-brand-emerald/50 backdrop-blur-md text-emerald-300 text-xs sm:text-sm font-bold tracking-wide">
+                  <span>{slide.badge}</span>
+                </div>
+              </motion.div>
+            )}
+
+            <div className="space-y-4">
+              {/* Headline: text-5xl on mobile up to text-7xl on desktop, tight leading, font-extrabold */}
+              <motion.h1
+                initial={isReduced ? false : { opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: isReduced ? 0 : 0.6, ease: "easeOut" }}
+                className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-tight"
+              >
+                {slide.title}
+              </motion.h1>
+
+              {/* Subheadline: text-lg on mobile up to text-2xl on desktop, max-w-2xl, lighter weight */}
+              <motion.p
+                initial={isReduced ? false : { opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: isReduced ? 0 : 0.5,
-                  delay: isReduced ? 0 : 0.24,
+                  duration: isReduced ? 0 : 0.6,
+                  delay: isReduced ? 0 : 0.15,
                   ease: "easeOut",
                 }}
-                className="flex flex-wrap items-center gap-3.5 pt-2"
+                className="text-lg sm:text-xl lg:text-2xl font-normal text-emerald-100/90 leading-relaxed max-w-2xl"
               >
-                <Link
-                  href="/marketplace"
-                  className="inline-flex items-center gap-2.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-extrabold px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm shadow-xl hover:shadow-glow-green transition-all transform hover:-translate-y-0.5 active:scale-95"
-                >
-                  <span>Explore Marketplace</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-
-                <Link
-                  href="/seller"
-                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/25 backdrop-blur-md font-bold px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm shadow-md transition-all transform hover:-translate-y-0.5 active:scale-95"
-                >
-                  <Store className="w-4 h-4 text-amber-300" />
-                  <span>Open Your Store</span>
-                </Link>
-              </motion.div>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Desktop Right Highlights Glass Card: Balances the Hero seamlessly */}
-          <div className="hidden lg:block lg:col-span-5">
-            <div className="bg-black/40 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl space-y-4 text-white">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs font-black uppercase tracking-wider text-emerald-300">
-                    Live Kenya Commerce
-                  </span>
-                </div>
-                <span className="text-[10px] text-gray-300 font-mono bg-white/10 px-2 py-0.5 rounded-full border border-white/10">
-                  47 Counties
-                </span>
-              </div>
-
-              <div className="space-y-3">
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <span className="text-[11px] text-gray-400 block">Buyer Protection</span>
-                    <span className="text-xs font-black text-white block">Lipa na M-Pesa Escrow</span>
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2 py-1 rounded-lg border border-emerald-500/30">
-                    100% Protected
-                  </span>
-                </div>
-
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <span className="text-[11px] text-gray-400 block">Courier Transit</span>
-                    <span className="text-xs font-black text-white block">Same-Day &amp; 24h Nationwide</span>
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2 py-1 rounded-lg border border-amber-500/30">
-                    Tracked Dispatch
-                  </span>
-                </div>
-
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <span className="text-[11px] text-gray-400 block">Verified Merchants</span>
-                    <span className="text-xs font-black text-white block">1,200+ Licensed Kenyan Stores</span>
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-brand-emerald-light bg-emerald-500/20 px-2 py-1 rounded-lg border border-emerald-500/30">
-                    KYC Vetted
-                  </span>
-                </div>
-              </div>
-
-              <div className="pt-2 text-center">
-                <Link
-                  href="/download"
-                  className="text-xs font-bold text-amber-300 hover:text-white transition-colors inline-flex items-center gap-1.5"
-                >
-                  <span>Get the VendLex Mobile App (Android APK)</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
+                {slide.subtitle}
+              </motion.p>
             </div>
-          </div>
-        </div>
+
+            {/* CTA Buttons: Shop Now + Sell on VendLex */}
+            <motion.div
+              initial={isReduced ? false : { opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: isReduced ? 0 : 0.6,
+                delay: isReduced ? 0 : 0.3,
+                ease: "easeOut",
+              }}
+              className="flex flex-wrap items-center gap-3.5 pt-2 sm:pt-4"
+            >
+              <Link
+                href="/marketplace"
+                className="inline-flex items-center gap-2.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-extrabold px-7 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base shadow-xl hover:shadow-glow-green transition-all transform hover:-translate-y-0.5 active:scale-95"
+              >
+                <span>Shop Now</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+
+              <Link
+                href="/seller"
+                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/25 backdrop-blur-md font-bold px-7 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base shadow-md transition-all transform hover:-translate-y-0.5 active:scale-95"
+              >
+                <Store className="w-5 h-5 text-amber-300" />
+                <span>Sell on VendLex</span>
+              </Link>
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Manual Slide Controls */}

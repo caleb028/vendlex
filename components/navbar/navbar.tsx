@@ -40,12 +40,6 @@ import { KENYAN_COUNTIES } from "@/lib/data/kenya-data";
 export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
-
-  // Completely isolate Admin Dashboard from public shopping navbar
-  if (pathname?.startsWith("/admin")) {
-    return null;
-  }
-
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
@@ -191,7 +185,7 @@ export function Navbar() {
                   <img
                     src="/logo/vendlex-horizontal.png"
                     alt="VendLex - SHOP • GROW • PROSPER"
-                    className="h-10 sm:h-12 lg:h-13 w-auto max-w-[200px] sm:max-w-[230px] lg:max-w-[260px] object-contain transition-all duration-200 drop-shadow-xs"
+                    className="h-12 sm:h-14 lg:h-15 xl:h-16 w-auto max-w-[240px] sm:max-w-[300px] lg:max-w-[340px] object-contain transition-all duration-200 drop-shadow-xs"
                   />
                 </div>
               </Link>

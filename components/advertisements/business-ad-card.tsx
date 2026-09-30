@@ -179,31 +179,29 @@ export function BusinessAdCard({ ad, className = "", compact = false }: Business
           )}
         </div>
 
-        {/* Action Buttons with clean 2-column grid that never squeezes */}
-        <div className="pt-3 border-t border-border/50 space-y-2">
-          <div className="grid grid-cols-2 gap-2">
-            {/* Call button */}
-            <a
-              href={telLink}
-              onClick={trackClick}
-              className="inline-flex items-center justify-center gap-1.5 bg-muted/60 hover:bg-muted text-foreground text-xs font-bold py-2.5 px-3 rounded-xl transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 text-brand-emerald" />
-              <span>Call Store</span>
-            </a>
+        {/* Action Buttons */}
+        <div className="pt-2 border-t border-border/40 flex flex-wrap items-center gap-2">
+          {/* Call button */}
+          <a
+            href={telLink}
+            onClick={trackClick}
+            className="flex-1 min-w-[90px] inline-flex items-center justify-center gap-1.5 bg-muted hover:bg-muted/80 text-foreground text-xs font-bold py-2 px-2.5 rounded-xl transition-colors"
+          >
+            <Phone className="w-3.5 h-3.5 text-brand-emerald" />
+            <span>Call</span>
+          </a>
 
-            {/* WhatsApp button */}
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={trackClick}
-              className="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-xs transition-colors"
-            >
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span>WhatsApp</span>
-            </a>
-          </div>
+          {/* WhatsApp button */}
+          <a
+            href={whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={trackClick}
+            className="flex-1 min-w-[100px] inline-flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-2 px-2.5 rounded-xl shadow-xs transition-colors"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span>WhatsApp</span>
+          </a>
 
           {/* Primary CTA / Website */}
           {ad.websiteUrl ? (
@@ -212,16 +210,16 @@ export function BusinessAdCard({ ad, className = "", compact = false }: Business
               target="_blank"
               rel="noopener noreferrer"
               onClick={trackClick}
-              className="w-full inline-flex items-center justify-center gap-1.5 bg-brand-charcoal dark:bg-zinc-800 hover:bg-black dark:hover:bg-zinc-700 text-white text-xs font-bold py-2.5 px-3 rounded-xl transition-colors"
+              className="w-full inline-flex items-center justify-center gap-1.5 bg-brand-charcoal dark:bg-zinc-800 hover:bg-black dark:hover:bg-zinc-700 text-white text-xs font-bold py-2 px-3 rounded-xl transition-colors"
             >
-              <span>{ad.ctaLabel || "Visit Official Website"}</span>
+              <span>{ad.ctaLabel || "Visit Website"}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           ) : (
             <a
               href={telLink}
               onClick={trackClick}
-              className="w-full inline-flex items-center justify-center gap-1.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-sm transition-colors"
+              className="w-full inline-flex items-center justify-center gap-1.5 bg-brand-emerald hover:bg-brand-emerald-dark text-white text-xs font-bold py-2 px-3 rounded-xl shadow-sm transition-colors"
             >
               <span>{ad.ctaLabel || "Connect With Business"}</span>
               <ExternalLink className="w-3.5 h-3.5" />
