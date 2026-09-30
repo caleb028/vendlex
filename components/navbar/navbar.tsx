@@ -174,7 +174,7 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-3 lg:gap-4">
             {/* 1. LARGE BRANDING CONTAINER */}
-            <div className="flex items-center gap-3 lg:gap-5 xl:gap-6 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5 shrink-0">
               <Link
                 href="/"
                 className="flex items-center group shrink-0 select-none py-0.5 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
@@ -185,20 +185,20 @@ export function Navbar() {
                   <img
                     src="/logo/vendlex-horizontal.png"
                     alt="VendLex - SHOP • GROW • PROSPER"
-                    className="h-12 sm:h-14 lg:h-15 xl:h-16 w-auto max-w-[240px] sm:max-w-[300px] lg:max-w-[340px] object-contain transition-all duration-200 drop-shadow-xs"
+                    className="h-9 sm:h-10 lg:h-11 w-auto max-w-[170px] sm:max-w-[195px] lg:max-w-[215px] object-contain transition-all duration-200 drop-shadow-xs"
                   />
                 </div>
               </Link>
 
               {/* 2. PRIMARY DESKTOP NAV LINKS */}
-              <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+              <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 text-xs font-semibold text-muted-foreground">
                 {primaryLinks.map((link) => {
                   const isActive = pathname.startsWith(link.href);
                   return (
                     <Link
                       key={link.href}
                       href={link.href}
-                      className={`px-3 py-1.5 rounded-lg transition-colors ${
+                      className={`px-2.5 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                         isActive
                           ? "text-brand-emerald font-bold bg-emerald-50 dark:bg-emerald-950/40"
                           : "hover:text-foreground hover:bg-muted/40"
@@ -264,7 +264,7 @@ export function Navbar() {
             </div>
 
             {/* 3. SEARCH BAR (Protected width to prevent right actions from shifting) */}
-            <div className="hidden md:flex flex-1 min-w-[140px] max-w-xs lg:max-w-sm xl:max-w-md mx-1 lg:mx-2">
+            <div className="hidden md:flex flex-1 min-w-[100px] max-w-[160px] lg:max-w-[210px] xl:max-w-[270px] mx-1 lg:mx-2">
               <form onSubmit={handleSearchSubmit} className="relative w-full">
                 <input
                   type="text"
@@ -278,7 +278,7 @@ export function Navbar() {
             </div>
 
             {/* 4. RIGHT ACTIONS: Location, Wishlist, Cart, Account, Sell CTA */}
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 xl:gap-2 shrink-0">
               {/* County Location Pill (Compact) */}
               <div ref={locationRef} className="relative hidden xl:block">
                 <button
@@ -447,37 +447,48 @@ export function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="px-3 py-1.5 rounded-xl border border-brand-emerald/30 bg-emerald-50/70 dark:bg-emerald-950/40 hover:bg-brand-emerald hover:text-white text-brand-emerald dark:text-emerald-300 transition-all hidden sm:flex items-center gap-1.5 text-xs font-bold shadow-xs active:scale-98"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-xl border border-brand-emerald/30 bg-emerald-50/70 dark:bg-emerald-950/40 hover:bg-brand-emerald hover:text-white text-brand-emerald dark:text-emerald-300 transition-all hidden sm:flex items-center gap-1.5 text-xs font-bold shadow-xs active:scale-98 whitespace-nowrap shrink-0"
                   title="Sign In or Create Account"
                 >
-                  <User className="w-3.5 h-3.5" />
-                  <span>Sign In</span>
+                  <User className="w-3.5 h-3.5 shrink-0" />
+                  <span className="whitespace-nowrap">Sign In</span>
                 </Link>
               )}
 
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+                className="p-1.5 sm:p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors shrink-0"
                 title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
                 aria-label="Toggle theme"
               >
                 {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
               </button>
 
-              {/* Primary CTA (Section 9: Sell on VendLex) */}
+              {/* Primary CTA (Sell on VendLex) - Always Completely Visible */}
               <Link
                 href={
                   user && (role === "SELLER" || role === "BUSINESS_OWNER")
                     ? "/seller/dashboard"
                     : "/seller/onboarding"
                 }
-                className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold text-xs py-2 px-3.5 rounded-xl shadow-xs hover:shadow-sm transition-all shrink-0 ml-1 hidden sm:inline-flex items-center gap-1"
-              >
-                <span>
-                  {user && (role === "SELLER" || role === "BUSINESS_OWNER")
+                className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold text-xs py-1.5 sm:py-2 px-2.5 sm:px-3.5 rounded-xl shadow-xs hover:shadow-sm transition-all shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 active:scale-98"
+                title={
+                  user && (role === "SELLER" || role === "BUSINESS_OWNER")
                     ? "Seller Hub"
-                    : "Sell on VendLex"}
+                    : "Sell on VendLex"
+                }
+              >
+                <Store className="w-3.5 h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">
+                  {user && (role === "SELLER" || role === "BUSINESS_OWNER") ? (
+                    "Seller Hub"
+                  ) : (
+                    <>
+                      <span>Sell</span>
+                      <span className="hidden sm:inline"> on VendLex</span>
+                    </>
+                  )}
                 </span>
               </Link>
 

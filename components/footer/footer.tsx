@@ -41,14 +41,18 @@ export function Footer() {
         </div>
 
         {/* 5-Column Navigation Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 pb-12 border-b border-gray-800">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 lg:gap-8 pb-12 border-b border-gray-800">
           {/* Brand & Mission Column */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-1 space-y-3">
-            <Link href="/" className="inline-block bg-white p-3 rounded-2xl border border-white/40 shadow-sm max-w-full">
+          <div className="col-span-2 md:col-span-3 lg:col-span-1 space-y-3 min-w-0">
+            <Link
+              href="/"
+              className="inline-flex items-center bg-white px-2.5 py-1.5 rounded-xl border border-white/30 shadow-xs max-w-full hover:bg-gray-50 transition-colors"
+              aria-label="VendLex Home"
+            >
               <img
                 src="/logo/vendlex-logo.png"
                 alt="VendLex - SHOP • GROW • PROSPER"
-                className="h-12 sm:h-14 w-auto max-w-[260px] object-contain rounded-lg"
+                className="h-7 sm:h-8 w-auto max-w-[130px] sm:max-w-[140px] object-contain rounded"
               />
             </Link>
             <p className="text-xs text-gray-400 leading-relaxed">
