@@ -171,8 +171,8 @@ export function Navbar() {
             : "bg-white dark:bg-brand-dark-bg border-b border-border/50 dark:border-brand-dark-border/50 py-2.5"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-3 lg:gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-6 xl:px-8">
+          <div className="flex items-center justify-between gap-2 lg:gap-3 xl:gap-4">
             {/* 1. LARGE BRANDING CONTAINER */}
             <div className="flex items-center gap-2 lg:gap-3 xl:gap-4 shrink-0">
               <Link
@@ -185,7 +185,7 @@ export function Navbar() {
                   <img
                     src="/logo/vendlex-horizontal.png"
                     alt="VendLex - SHOP • GROW • PROSPER"
-                    className="h-11 sm:h-12 lg:h-[48px] xl:h-[54px] w-auto max-w-[200px] sm:max-w-[230px] lg:max-w-[250px] xl:max-w-[275px] object-contain transition-all duration-200 drop-shadow-xs"
+                    className="h-12 sm:h-14 lg:h-[56px] xl:h-[62px] w-auto max-w-[230px] sm:max-w-[260px] lg:max-w-[285px] xl:max-w-[310px] object-contain transition-all duration-200 drop-shadow-xs"
                   />
                 </div>
               </Link>
@@ -264,7 +264,7 @@ export function Navbar() {
             </div>
 
             {/* 3. SEARCH BAR (Protected width to prevent right actions from shifting) */}
-            <div className="hidden md:flex flex-1 min-w-[70px] max-w-[150px] lg:max-w-[190px] xl:max-w-[270px] mx-1 lg:mx-2">
+            <div className="hidden md:flex flex-1 min-w-[60px] max-w-[150px] lg:max-w-[190px] xl:max-w-[270px] mx-1 lg:mx-2">
               <form onSubmit={handleSearchSubmit} className="relative w-full">
                 <input
                   type="text"
