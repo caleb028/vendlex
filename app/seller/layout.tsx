@@ -46,7 +46,7 @@ export default function SellerLayout({
 
   const navItems = [
     { href: "/seller/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: `/businesses/${user?.businessSlug || "nairobi-tech-hub"}`, label: "My Public Store", icon: Store, external: true },
+    { href: `/businesses/${user?.businessSlug || (user?.businessName ? user.businessName.toLowerCase().replace(/[^a-z0-9]+/g, "-") : "my-store")}`, label: "My Public Store", icon: Store, external: true },
     { href: "/seller/products", label: "Products", icon: Package },
     { href: "/seller/inventory", label: "Inventory Tracker", icon: Boxes },
     { href: "/seller/orders", label: "Orders & Delivery", icon: ShoppingBag, badge: "3 New" },
@@ -99,19 +99,23 @@ export default function SellerLayout({
         <div className="space-y-6">
           {/* Store Info Header */}
           <div className="p-3 bg-brand-emerald-soft/40 dark:bg-brand-dark-bg/60 rounded-2xl border border-brand-emerald/20 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden bg-white shrink-0 border">
-              <img
-                src={user?.avatar || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop"}
-                alt="Store"
-                className="w-full h-full object-cover"
-              />
+            <div className="w-10 h-10 rounded-xl overflow-hidden bg-brand-emerald text-white font-bold flex items-center justify-center shrink-0 border border-brand-emerald/30 shadow-xs">
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.businessName || "Store"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Store className="w-5 h-5 text-white" />
+              )}
             </div>
             <div className="min-w-0">
               <h4 className="font-bold text-xs text-foreground truncate">
-                {user?.businessName || "Nairobi Tech Hub"}
+                {user?.businessName || (user?.name ? `${user.name}'s Store` : "My Merchant Store")}
               </h4>
               <p className="text-[10px] text-brand-emerald font-semibold flex items-center gap-1">
-                <span>Business Plan</span> • <span>Active</span>
+                <span>{user?.plan ? `${user.plan.toUpperCase()} Plan` : "Merchant Plan"}</span> • <span>Active</span>
               </p>
             </div>
           </div>

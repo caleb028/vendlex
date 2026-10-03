@@ -14,6 +14,7 @@ export interface User {
   businessId?: string;
   businessSlug?: string;
   businessName?: string;
+  plan?: string;
   isVerified?: boolean;
 }
 

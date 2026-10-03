@@ -84,27 +84,21 @@ function OnboardingContent() {
 
   // Form State
   const [ownerName, setOwnerName] = useState(user?.name || "");
-  const [ownerPhone, setOwnerPhone] = useState(user?.phone || "+254798159503");
+  const [ownerPhone, setOwnerPhone] = useState(user?.phone || "");
   const [ownerEmail, setOwnerEmail] = useState(user?.email || "");
 
-  const [bizName, setBizName] = useState(
-    offeringType === "SERVICE" ? "Rift Solar & Power Solutions" : "Nairobi Tech Hub"
-  );
+  const [bizName, setBizName] = useState(user?.businessName || "");
   const [bizCategory, setBizCategory] = useState(
-    offeringType === "SERVICE" ? "Solar Installation & Maintenance" : "Computers & Tech"
+    offeringType === "SERVICE" ? "Electrician & Power Systems" : "Electronics & Gadgets"
   );
   const [county, setCounty] = useState("Nairobi");
   const [town, setTown] = useState("CBD");
   const [customTown, setCustomTown] = useState("");
-  const [physicalLocation, setPhysicalLocation] = useState("Bazaar Plaza, 4th Floor, Suite 412");
-  const [bizDesc, setBizDesc] = useState(
-    offeringType === "SERVICE"
-      ? "Certified electrical & solar energy installations with same-day emergency dispatch across Nairobi and surrounding counties."
-      : "Premier retailer of high performance laptops, smartphones, and genuine accessories in Nairobi."
-  );
+  const [physicalLocation, setPhysicalLocation] = useState("");
+  const [bizDesc, setBizDesc] = useState("");
 
-  const [regNumber, setRegNumber] = useState("BN/2024/984210");
-  const [nationalId, setNationalId] = useState("32984124");
+  const [regNumber, setRegNumber] = useState("");
+  const [nationalId, setNationalId] = useState("");
 
   // Document Upload State (Functional)
   const [selectedDocType, setSelectedDocType] = useState(DOCUMENT_TYPES[0].label);
@@ -115,13 +109,9 @@ function OnboardingContent() {
   const [isDocUploading, setIsDocUploading] = useState(false);
 
   // Product / Service Item State
-  const [itemTitle, setItemTitle] = useState(
-    offeringType === "SERVICE"
-      ? "Residential Solar Installation & Inverter Setup"
-      : "HP Envy x360 Convertible 14-inch (Core i7, 16GB RAM, 512GB SSD)"
-  );
-  const [itemPrice, setItemPrice] = useState(offeringType === "SERVICE" ? "3500" : "114999");
-  const [itemStock, setItemStock] = useState("10");
+  const [itemTitle, setItemTitle] = useState("");
+  const [itemPrice, setItemPrice] = useState("");
+  const [itemStock, setItemStock] = useState("");
   const [pricingModel, setPricingModel] = useState("Starting From");
   const [turnaroundTime, setTurnaroundTime] = useState("Within 24 Hours");
 
@@ -133,7 +123,7 @@ function OnboardingContent() {
   const [selectedPlan, setSelectedPlan] = useState(initialPlan);
 
   // M-Pesa STK Push Payment State
-  const [paymentPhone, setPaymentPhone] = useState(user?.phone || "0798159503");
+  const [paymentPhone, setPaymentPhone] = useState(user?.phone || "");
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "sending" | "sent" | "success" | "error">("idle");
   const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
   const [receiptNumber, setReceiptNumber] = useState<string | null>(null);
@@ -146,21 +136,13 @@ function OnboardingContent() {
   // Available towns for the selected county
   const countyTowns = KENYAN_TOWNS[county] || ["Central", "Town CBD", "Market Center"];
 
-  // Update default category when offeringType switches
+  // Update default category when offeringType switches without overwriting user data
   const handleTypeChange = (type: "PRODUCT" | "SERVICE") => {
     setOfferingType(type);
     if (type === "SERVICE") {
-      setBizCategory("Solar Installation & Maintenance");
-      setItemTitle("Residential Solar Installation & Inverter Setup");
-      setItemPrice("3500");
-      setBizName("Rift Solar & Power Solutions");
-      setBizDesc("Certified electrical & solar energy installations with same-day emergency dispatch across Nairobi and surrounding counties.");
+      setBizCategory((prev) => (SERVICE_CATEGORIES.includes(prev) ? prev : "Electrician & Power Systems"));
     } else {
-      setBizCategory("Computers & Tech");
-      setItemTitle("HP Envy x360 Convertible 14-inch (Core i7, 16GB RAM, 512GB SSD)");
-      setItemPrice("114999");
-      setBizName("Nairobi Tech Hub");
-      setBizDesc("Premier retailer of high performance laptops, smartphones, and genuine accessories in Nairobi.");
+      setBizCategory((prev) => (CATEGORIES.some((c) => c.name === prev) ? prev : "Electronics & Gadgets"));
     }
   };
 
@@ -170,13 +152,14 @@ function OnboardingContent() {
       if (!ownerName) setOwnerName(user.name || "");
       if (!ownerEmail) setOwnerEmail(user.email || "");
       if (!ownerPhone) setOwnerPhone(user.phone || "");
-      if (!paymentPhone) setPaymentPhone(user.phone || "0798159503");
+      if (!paymentPhone) setPaymentPhone(user.phone || "");
+      if (!bizName && user.businessName) setBizName(user.businessName);
     }
   }, [user]);
 
   // Keep paymentPhone synced with ownerPhone if user edits step 1
   useEffect(() => {
-    if (ownerPhone && (paymentPhone === "0798159503" || !paymentPhone)) {
+    if (ownerPhone && !paymentPhone) {
       setPaymentPhone(ownerPhone.replace(/\s+/g, ""));
     }
   }, [ownerPhone]);
@@ -308,6 +291,8 @@ function OnboardingContent() {
     }
   };
 
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
   const handleLaunch = async (receipt?: string) => {
     const finalReceipt = receipt || receiptNumber;
     if (!finalReceipt || paymentStatus !== "success") {
@@ -324,7 +309,7 @@ function OnboardingContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          bizName,
+          bizName: bizName || (ownerName ? `${ownerName}'s Store` : "My Business Store"),
           bizCategory,
           county,
           town: effectiveTown,
@@ -338,9 +323,9 @@ function OnboardingContent() {
           docName: docName || "Business_Registration_Certificate.pdf",
           docType: selectedDocType,
           docDataUrl,
-          productTitle: itemTitle,
-          productPrice: itemPrice,
-          productStock: offeringType === "SERVICE" ? 999 : itemStock,
+          productTitle: itemTitle || (offeringType === "SERVICE" ? "Primary Service Offering" : "Featured Product"),
+          productPrice: itemPrice || (offeringType === "SERVICE" ? "1500" : "2500"),
+          productStock: offeringType === "SERVICE" ? 999 : (itemStock || "10"),
           productImages: itemPhotoUrl ? [itemPhotoUrl] : [],
           offeringType,
           selectedPlan,
@@ -358,17 +343,24 @@ function OnboardingContent() {
 
     await refreshSession();
     submitKYC({
-      bizName: bizName || "VendLex Merchant",
-      ownerName: ownerName || "Kevin Mwangi",
+      bizName: bizName || (ownerName ? `${ownerName}'s Store` : "VendLex Merchant"),
+      ownerName: ownerName || "Verified Merchant",
       regNumber: regNumber || `BN/2026/${Math.floor(100000 + Math.random() * 900000)}`,
       nationalId: nationalId || "32984124",
       county: county || "Nairobi",
       docUrl: docName || "Business_Registration_Certificate.pdf",
     });
+
     setStep(6);
+    setIsRedirecting(true);
     try {
       confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
     } catch (e) {}
+
+    // Automatically navigate to seller dashboard
+    setTimeout(() => {
+      router.push("/seller/dashboard");
+    }, 2200);
   };
 
   const storeSlug = (bizName || "my-store")
@@ -566,6 +558,7 @@ function OnboardingContent() {
                     type="text"
                     value={bizName}
                     onChange={(e) => setBizName(e.target.value)}
+                    placeholder={isService ? "e.g. Rift Solar & Power Solutions or Nairobi Pro Electricians" : "e.g. Nairobi Tech Hub, Mama Mboga Fresh, Mombasa Electronics"}
                     className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald transition-colors"
                   />
                 </div>
@@ -668,6 +661,11 @@ function OnboardingContent() {
                     rows={2}
                     value={bizDesc}
                     onChange={(e) => setBizDesc(e.target.value)}
+                    placeholder={
+                      isService
+                        ? "Describe your certifications, experience, emergency dispatch areas, response times..."
+                        : "Describe your products, warranty policies, pickup points, opening hours..."
+                    }
                     className="w-full bg-muted/30 dark:bg-brand-dark-bg/60 border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-brand-emerald/40 focus:border-brand-emerald resize-none transition-colors"
                   />
                 </div>
@@ -1066,11 +1064,18 @@ function OnboardingContent() {
                   Onboarding Complete ✓
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black text-foreground">
-                  Hongera! {bizName} is Live on VendLex!
+                  Hongera! {bizName || "Your Store"} is Live on VendLex!
                 </h2>
                 <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
                   Your store and initial listing in <strong className="text-foreground">{county} County</strong> have been indexed across Kenya.
                 </p>
+
+                {isRedirecting && (
+                  <div className="pt-2 flex items-center justify-center gap-2 text-brand-emerald font-bold text-xs animate-pulse">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Redirecting directly to your Merchant Dashboard...</span>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3">

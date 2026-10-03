@@ -24,6 +24,7 @@ export interface ServerUser {
   category?: string;
   county?: string;
   town?: string;
+  plan?: string;
   isVerified: boolean;
   // Login lockout
   loginAttempts?: number;

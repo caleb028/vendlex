@@ -185,7 +185,7 @@ export function Navbar() {
                   <img
                     src="/logo/vendlex-horizontal.png"
                     alt="VendLex - SHOP • GROW • PROSPER"
-                    className="h-12 sm:h-14 lg:h-[56px] xl:h-[62px] w-auto max-w-[230px] sm:max-w-[260px] lg:max-w-[285px] xl:max-w-[310px] object-contain transition-all duration-200 drop-shadow-xs"
+                    className="h-8 xs:h-9 sm:h-12 md:h-14 lg:h-[56px] xl:h-[62px] w-auto max-w-[130px] xs:max-w-[155px] sm:max-w-[240px] lg:max-w-[285px] xl:max-w-[310px] object-contain transition-all duration-200 drop-shadow-xs"
                   />
                 </div>
               </Link>
@@ -313,10 +313,10 @@ export function Navbar() {
                 )}
               </div>
 
-              {/* Wishlist */}
+              {/* Wishlist (Accessible on mobile via drawer menu) */}
               <Link
                 href="/customer/wishlist"
-                className="relative p-2 rounded-xl text-muted-foreground hover:text-brand-red hover:bg-muted/40 transition-colors"
+                className="relative p-1.5 sm:p-2 rounded-xl text-muted-foreground hover:text-brand-red hover:bg-muted/40 transition-colors hidden sm:flex shrink-0"
                 title="Wishlist"
                 aria-label="Wishlist"
               >
@@ -331,7 +331,7 @@ export function Navbar() {
               {/* Cart */}
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2 rounded-xl text-muted-foreground hover:text-brand-emerald hover:bg-muted/40 transition-colors"
+                className="relative p-1.5 sm:p-2 rounded-xl text-muted-foreground hover:text-brand-emerald hover:bg-muted/40 transition-colors shrink-0"
                 title="Shopping Cart"
                 aria-label="Shopping Cart"
               >
@@ -455,10 +455,10 @@ export function Navbar() {
                 </Link>
               )}
 
-              {/* Theme Toggle */}
+              {/* Theme Toggle (Accessible on mobile via drawer menu) */}
               <button
                 onClick={toggleTheme}
-                className="p-1.5 sm:p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors shrink-0"
+                className="p-1.5 sm:p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors shrink-0 hidden sm:flex"
                 title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
                 aria-label="Toggle theme"
               >
@@ -472,7 +472,7 @@ export function Navbar() {
                     ? "/seller/dashboard"
                     : "/seller/onboarding"
                 }
-                className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold text-xs py-1.5 sm:py-2 px-2.5 sm:px-3.5 rounded-xl shadow-xs hover:shadow-sm transition-all shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 active:scale-98"
+                className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold text-[11px] sm:text-xs py-1.5 sm:py-2 px-2 sm:px-3.5 rounded-xl shadow-xs hover:shadow-sm transition-all shrink-0 whitespace-nowrap inline-flex items-center gap-1 active:scale-98"
                 title={
                   user && (role === "SELLER" || role === "BUSINESS_OWNER")
                     ? "Seller Hub"
@@ -495,7 +495,7 @@ export function Navbar() {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors ml-1"
+                className="lg:hidden p-1.5 sm:p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors ml-0.5 sm:ml-1 shrink-0"
                 aria-label="Open mobile menu"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -547,6 +547,37 @@ export function Navbar() {
                   {item.label}
                 </Link>
               ))}
+
+              {/* Wishlist Link in Mobile Drawer */}
+              <Link
+                href="/customer/wishlist"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-foreground hover:bg-muted/50"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Heart className="w-4 h-4 text-brand-red" />
+                  <span>Saved Wishlist</span>
+                </div>
+                {wishlistCount > 0 && (
+                  <span className="bg-brand-red text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Theme Toggle in Mobile Drawer */}
+              <button
+                onClick={toggleTheme}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-foreground hover:bg-muted/50 text-left"
+              >
+                <div className="flex items-center gap-2.5">
+                  {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
+                  <span>Display Theme</span>
+                </div>
+                <span className="text-[11px] text-muted-foreground font-medium">
+                  {darkMode ? "Dark" : "Light"}
+                </span>
+              </button>
             </div>
 
             {/* Mobile User Profile & Sign Out or Sign In */}
@@ -576,6 +607,27 @@ export function Navbar() {
                 >
                   Security &amp; Sessions
                 </Link>
+
+                {role === "SELLER" || role === "BUSINESS_OWNER" ? (
+                  <Link
+                    href="/seller/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-1.5 bg-brand-emerald text-white font-bold text-xs py-2.5 rounded-xl shadow-xs hover:bg-brand-emerald-dark transition-colors"
+                  >
+                    <Store className="w-3.5 h-3.5" />
+                    <span>Seller Hub Dashboard</span>
+                  </Link>
+                ) : (
+                  <Link
+                    href="/seller/onboarding"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-center gap-1.5 bg-brand-emerald text-white font-bold text-xs py-2.5 rounded-xl shadow-xs hover:bg-brand-emerald-dark transition-colors"
+                  >
+                    <Store className="w-3.5 h-3.5" />
+                    <span>Sell on VendLex</span>
+                  </Link>
+                )}
+
                 <button
                   onClick={handleSignOut}
                   className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold text-red-600 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 transition-colors"
@@ -596,9 +648,10 @@ export function Navbar() {
                 <Link
                   href="/seller/onboarding"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full block text-center bg-brand-emerald text-white font-bold text-xs py-2.5 rounded-xl shadow-xs"
+                  className="w-full flex items-center justify-center gap-1.5 bg-brand-emerald text-white font-bold text-xs py-2.5 rounded-xl shadow-xs hover:bg-brand-emerald-dark transition-colors"
                 >
-                  Sell on VendLex
+                  <Store className="w-3.5 h-3.5" />
+                  <span>Sell on VendLex</span>
                 </Link>
               </div>
             )}
