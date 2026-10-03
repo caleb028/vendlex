@@ -105,27 +105,25 @@ export async function getDarajaAccessToken(config: DarajaConfig = DEFAULT_DARAJA
 
   const auth = Buffer.from(`${config.consumerKey}:${config.consumerSecret}`).toString("base64");
 
-  try {
-    const res = await fetch(`${baseUrl}/oauth/v1/generate?grant_type=client_credentials`, {
-      method: "GET",
-      headers: {
-        Authorization: `Basic ${auth}`,
-      },
-      cache: "no-store",
-    });
+  const res = await fetch(`${baseUrl}/oauth/v1/generate?grant_type=client_credentials`, {
+    method: "GET",
+    headers: {
+      Authorization: `Basic ${auth}`,
+    },
+    cache: "no-store",
+  });
 
-    if (!res.ok) {
-      const errText = await res.text();
-      console.warn("Daraja OAuth response not OK, using simulated token fallback for local dev:", errText);
-      return "simulated_daraja_access_token_" + Date.now();
-    }
-
-    const data = await res.json();
-    return data.access_token;
-  } catch (error) {
-    console.warn("Daraja OAuth fetch error (network or sandbox down), using simulated token:", error);
-    return "simulated_daraja_access_token_" + Date.now();
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error("[Daraja OAuth Error]:", errText);
+    throw new Error(`Safaricom Daraja authentication failed (${res.status}): ${errText}`);
   }
+
+  const data = await res.json();
+  if (!data.access_token) {
+    throw new Error("Safaricom Daraja did not return an access token.");
+  }
+  return data.access_token;
 }
 
 /**
@@ -148,7 +146,7 @@ export async function initiateSTKPush(
     BusinessShortCode: config.shortcode,
     Password: password,
     Timestamp: timestamp,
-    TransactionType: "CustomerPayBillOnline", // or "CustomerBuyGoodsOnline" for Till numbers
+    TransactionType: "CustomerPayBillOnline",
     Amount: Math.round(params.amount),
     PartyA: formattedPhone,
     PartyB: config.shortcode,
@@ -158,40 +156,24 @@ export async function initiateSTKPush(
     TransactionDesc: params.transactionDesc || config.transactionDesc || "Listing Fee",
   };
 
-  try {
-    const res = await fetch(`${baseUrl}/mpesa/stkpush/v1/processrequest`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+  const res = await fetch(`${baseUrl}/mpesa/stkpush/v1/processrequest`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
 
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      console.warn("Daraja STK Push API returned non-200, activating development simulation mode:", errData);
-      return {
-        MerchantRequestID: `MR-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
-        CheckoutRequestID: `ws_CO_${Date.now()}_${Math.floor(100000 + Math.random() * 900000)}`,
-        ResponseCode: "0",
-        ResponseDescription: "Success. Request accepted for processing",
-        CustomerMessage: `Success. Prompt sent to ${formattedPhone}. Enter M-Pesa PIN to complete payment of KSh ${params.amount} to VendLex.`,
-      };
-    }
+  const data = await res.json().catch(() => ({}));
 
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.warn("Daraja STK Push fetch exception, returning structured simulated response:", error);
-    return {
-      MerchantRequestID: `MR-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      CheckoutRequestID: `ws_CO_${Date.now()}_${Math.floor(100000 + Math.random() * 900000)}`,
-      ResponseCode: "0",
-      ResponseDescription: "Success. Request accepted for processing",
-      CustomerMessage: `Success. Prompt sent to ${formattedPhone}. Enter M-Pesa PIN to complete payment of KSh ${params.amount} to VendLex.`,
-    };
+  if (!res.ok || (data.ResponseCode && data.ResponseCode !== "0")) {
+    const errorMessage = data.errorMessage || data.ResponseDescription || data.error || `Safaricom STK Push failed with status ${res.status}`;
+    console.error("[Daraja STK Push Error]:", errorMessage);
+    throw new Error(errorMessage);
   }
+
+  return data as STKPushResponse;
 }
 
 /**
@@ -216,36 +198,20 @@ export async function querySTKPushStatus(
     CheckoutRequestID: checkoutRequestId,
   };
 
-  try {
-    const res = await fetch(`${baseUrl}/mpesa/stkpushquery/v1/query`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+  const res = await fetch(`${baseUrl}/mpesa/stkpushquery/v1/query`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
 
-    if (!res.ok) {
-      return {
-        ResponseCode: "0",
-        ResponseDescription: "The service request has been accepted successfully",
-        MerchantRequestID: "MR-SIM",
-        CheckoutRequestID: checkoutRequestId,
-        ResultCode: "0",
-        ResultDesc: "The service request is processed successfully.",
-      };
-    }
+  const data = await res.json().catch(() => ({}));
 
-    return await res.json();
-  } catch (error) {
-    return {
-      ResponseCode: "0",
-      ResponseDescription: "The service request has been accepted successfully",
-      MerchantRequestID: "MR-SIM",
-      CheckoutRequestID: checkoutRequestId,
-      ResultCode: "0",
-      ResultDesc: "The service request is processed successfully.",
-    };
+  if (!res.ok) {
+    throw new Error(data.errorMessage || data.ResponseDescription || `Daraja STK Query failed with status ${res.status}`);
   }
+
+  return data as STKQueryResponse;
 }

@@ -41,6 +41,15 @@ async function runLaunchReadinessTests() {
   assert(testUser.id.startsWith("usr-"), "New user ID is assigned with usr- prefix");
   assert(testUser.businessSlug === "baraza-electronics", "Business slug correctly generated");
 
+  const testCustomer = serverDB.createUser({
+    name: "Grace Wanjiku",
+    email: `grace.${Date.now()}@gmail.com`,
+    phone: "+254 712 987 654",
+    role: "CUSTOMER",
+    password: testPass,
+  });
+  assert(testCustomer.id.startsWith("usr-"), "New customer user ID assigned with usr- prefix");
+
   // Session handling
   const session = serverDB.createSession(testUser.id, testUser.role);
   assert(session.token.length === 64, "Session token is a secure 64-character hex string");
@@ -98,10 +107,10 @@ async function runLaunchReadinessTests() {
 
   const order = serverDB.createOrder({
     orderNumber: `ORD-TEST-${Date.now()}`,
-    customerId: "usr-cust-1",
-    customerName: "Grace Wanjiku",
-    customerPhone: "+254 712 987 654",
-    customerEmail: "grace.wanjiku@gmail.com",
+    customerId: testCustomer.id,
+    customerName: testCustomer.name,
+    customerPhone: testCustomer.phone,
+    customerEmail: testCustomer.email,
     county: "Nairobi",
     town: "Kilimani",
     estate: "Yaya Center Apt 2",
@@ -192,9 +201,9 @@ async function runLaunchReadinessTests() {
 
   // 7. VERIFIED REVIEWS & RATINGS INTEGRITY
   console.log("\n7. Verified Reviews & Anti-Fraud Tests:");
-  // Grace has delivered order containing testProd -> verified review allowed
-  const hasGracePurchased = serverDB.hasUserPurchasedProduct("usr-cust-1", testProd.id);
-  assert(hasGracePurchased, "Confirmed customer is verified as having purchased the product");
+  // testCustomer has delivered order containing testProd -> verified review allowed
+  const hasCustomerPurchased = serverDB.hasUserPurchasedProduct(testCustomer.id, testProd.id);
+  assert(hasCustomerPurchased, "Confirmed customer is verified as having purchased the product");
 
   const unverifiedUserPurchased = serverDB.hasUserPurchasedProduct("unverified-random-user", testProd.id);
   assert(!unverifiedUserPurchased, "Random non-purchaser is blocked from verified purchase status");
@@ -202,8 +211,8 @@ async function runLaunchReadinessTests() {
   const reviewRes = serverDB.addReview({
     productId: testProd.id,
     orderId: order.id,
-    userId: "usr-cust-1",
-    userName: "Grace Wanjiku",
+    userId: testCustomer.id,
+    userName: testCustomer.name,
     rating: 5,
     title: "Crisp sound and prompt delivery",
     comment: "Verified delivery in Kilimani, Nairobi. Great packaging.",
@@ -215,8 +224,8 @@ async function runLaunchReadinessTests() {
   const dupReview = serverDB.addReview({
     productId: testProd.id,
     orderId: order.id,
-    userId: "usr-cust-1",
-    userName: "Grace Wanjiku",
+    userId: testCustomer.id,
+    userName: testCustomer.name,
     rating: 4,
     title: "Another review",
     comment: "Duplicate attempt",
@@ -244,9 +253,9 @@ async function runLaunchReadinessTests() {
   const dispute = serverDB.createDispute({
     orderNumber: order.orderNumber,
     orderId: order.id,
-    customerId: "usr-cust-1",
-    customerName: "Grace Wanjiku",
-    customerPhone: "+254 712 987 654",
+    customerId: testCustomer.id,
+    customerName: testCustomer.name,
+    customerPhone: testCustomer.phone,
     sellerId: testUser.businessId!,
     sellerName: testUser.businessName!,
     amount: order.totalAmount,

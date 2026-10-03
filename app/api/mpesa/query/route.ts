@@ -32,11 +32,11 @@ async function handleQuery(checkoutRequestId: string) {
     const darajaQuery = await querySTKPushStatus(checkoutRequestId);
 
     if (darajaQuery.ResultCode === "0") {
-      const receipt = storedTxn?.mpesaReceiptNumber || `QGH${Math.floor(100000 + Math.random() * 900000)}K`;
+      const receipt = storedTxn?.mpesaReceiptNumber || (darajaQuery as any).MpesaReceiptNumber || "";
       mpesaTransactionsStore.updateStatus(
         checkoutRequestId,
         "COMPLETED",
-        receipt,
+        receipt || undefined,
         darajaQuery.ResultDesc || "The service request is processed successfully."
       );
     } else if (darajaQuery.ResultCode === "1032") {
