@@ -44,10 +44,6 @@ export default function SellerLayout({
     router.push("/login");
   };
 
-  // Onboarding wizard and seller redirect are standalone flows: do not display the dashboard sidebar
-  if (pathname === "/seller" || pathname?.startsWith("/seller/onboarding")) {
-    return <>{children}</>;
-  }
 
   const navItems = [
     { href: "/seller/dashboard", label: "Dashboard", icon: LayoutDashboard },
