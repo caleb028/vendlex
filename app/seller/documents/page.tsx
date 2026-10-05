@@ -46,8 +46,8 @@ export default function SellerDocumentCenterPage() {
     try {
       const query = new URLSearchParams({
         role: "SELLER",
-        businessName: user?.businessName || "Nairobi Tech Hub",
-        name: user?.name || "Alex Mwangi",
+        businessName: user?.businessName || (user?.name ? `${user.name}'s Store` : ""),
+        name: user?.name || "Merchant",
       });
       const res = await fetch(`/api/documents?${query.toString()}`);
       const data = await res.json();

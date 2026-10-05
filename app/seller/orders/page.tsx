@@ -102,7 +102,7 @@ export default function SellerOrdersPage() {
         const mapped: SellerOrder[] = data.orders.map((o: any) => ({
           id: o.id,
           orderNumber: o.orderNumber || o.id,
-          sellerName: o.sellerName || "Nairobi Tech Hub",
+          sellerName: o.sellerName || user?.businessName || (user?.name ? `${user.name}'s Store` : "My Store"),
           customerName: o.customerName || "Customer",
           customerPhone: o.customerPhone || "+254700000000",
           customerEmail: o.customerEmail || "",

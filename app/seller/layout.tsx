@@ -44,6 +44,11 @@ export default function SellerLayout({
     router.push("/login");
   };
 
+  // Onboarding wizard and seller redirect are standalone flows: do not display the dashboard sidebar
+  if (pathname === "/seller" || pathname?.startsWith("/seller/onboarding")) {
+    return <>{children}</>;
+  }
+
   const navItems = [
     { href: "/seller/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: `/businesses/${user?.businessSlug || (user?.businessName ? user.businessName.toLowerCase().replace(/[^a-z0-9]+/g, "-") : "my-store")}`, label: "My Public Store", icon: Store, external: true },

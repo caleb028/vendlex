@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/lib/store/auth-store";
 import { PRICING_PLANS } from "@/lib/data/kenya-data";
 import { formatKSh } from "@/lib/utils";
 import { Modal } from "@/components/ui/modal";
@@ -8,9 +9,10 @@ import { Check, Sparkles, Zap, Smartphone, RefreshCw, AlertCircle, ShieldCheck }
 import confetti from "canvas-confetti";
 
 export default function SellerSubscriptionPage() {
-  const [currentTier, setCurrentTier] = useState<string>("business");
+  const { user } = useAuth();
+  const [currentTier, setCurrentTier] = useState<string>(user?.plan || "basic");
   const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState<any | null>(null);
-  const [phone, setPhone] = useState("0712345678");
+  const [phone, setPhone] = useState(user?.phone || "");
   const [isProcessing, setIsProcessing] = useState(false);
   const [stkStatus, setStkStatus] = useState<"idle" | "sent" | "success" | "error">("idle");
   const [checkoutId, setCheckoutId] = useState<string | null>(null);
@@ -73,7 +75,7 @@ export default function SellerSubscriptionPage() {
           amount: selectedPlanToUpgrade.monthlyPrice,
           accountReference: `SUB-${selectedPlanToUpgrade.name.toUpperCase()}`,
           transactionDesc: `${selectedPlanToUpgrade.name} Monthly Subscription`,
-          sellerName: "Nairobi Tech Hub",
+          sellerName: user?.businessName || (user?.name ? `${user.name}'s Store` : "VendLex Merchant"),
           purpose: "SUBSCRIPTION",
         }),
       });

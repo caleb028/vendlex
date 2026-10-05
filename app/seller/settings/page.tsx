@@ -20,18 +20,18 @@ export default function SellerSettingsPage() {
   };
 
   // Form states
-  const [storeName, setStoreName] = useState(user?.businessName || "Nairobi Tech Hub");
-  const [tagline, setTagline] = useState("Your Premier Source for Genuine Gadgets & Laptops");
+  const [storeName, setStoreName] = useState(user?.businessName || (user?.name ? `${user.name}'s Store` : "My Store"));
+  const [tagline, setTagline] = useState("Quality products & trusted Kenyan commerce");
   const [county, setCounty] = useState("Nairobi");
   const [town, setTown] = useState("CBD");
-  const [location, setLocation] = useState("Bazaar Plaza, 4th Floor, Suite 412, Moi Avenue");
-  const [phone, setPhone] = useState("+254 712 345 678");
-  const [whatsapp, setWhatsapp] = useState("+254 712 345 678");
+  const [location, setLocation] = useState("");
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [whatsapp, setWhatsapp] = useState(user?.phone || "");
 
   // M-Pesa Settlement
-  const [mpesaTill, setMpesaTill] = useState("894120");
-  const [mpesaPaybill, setMpesaPaybill] = useState("400200");
-  const [accountName, setAccountName] = useState("Nairobi Tech Hub KE");
+  const [mpesaTill, setMpesaTill] = useState("");
+  const [mpesaPaybill, setMpesaPaybill] = useState("");
+  const [accountName, setAccountName] = useState(user?.businessName ? `${user.businessName} KE` : (user?.name || "Merchant Settlement"));
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
