@@ -88,7 +88,7 @@ export interface Testimonial {
   role: string;
   businessName: string;
   county: string;
-  avatar: string;
+  avatar?: string;
   content: string;
   rating: number;
   growthMetric: string;
@@ -1391,7 +1391,6 @@ export const MOCK_TESTIMONIALS: Testimonial[] = [
     role: "Founder & Lead Tech",
     businessName: "Nairobi Tech Hub",
     county: "Nairobi",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
     content: "VendLex transformed our electronics business. Before, we relied solely on foot traffic in Nairobi CBD. Now we receive orders from Kisumu, Mombasa, and Eldoret every single morning with M-Pesa payments settled straight to our store.",
     rating: 5,
     growthMetric: "+320% Revenue in 6 Months"
@@ -1402,7 +1401,6 @@ export const MOCK_TESTIMONIALS: Testimonial[] = [
     role: "Creative Director",
     businessName: "Savanna Fashion House",
     county: "Nairobi / Mombasa",
-    avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=200&auto=format&fit=crop",
     content: "The VendLex AI Assistant is a game-changer for solo entrepreneurs. It drafts all my Instagram captions and product descriptions in seconds. The automated PDF invoice generator also makes us look exceptionally professional.",
     rating: 5,
     growthMetric: "Saved 15+ Hours/Week on Admin"
@@ -1413,7 +1411,6 @@ export const MOCK_TESTIMONIALS: Testimonial[] = [
     role: "Managing Partner",
     businessName: "Rift Solar & Power KE",
     county: "Nakuru",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
     content: "The Verified Business badge gave our solar engineering firm instant trust. Clients know we are vetted, which boosted our conversion rate on service quote requests significantly.",
     rating: 5,
     growthMetric: "85 Verified Installations Completed"

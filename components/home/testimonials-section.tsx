@@ -1,6 +1,6 @@
 import React from "react";
 import { MOCK_TESTIMONIALS } from "@/lib/data/kenya-data";
-import { Star, Quote, TrendingUp } from "lucide-react";
+import { Star, TrendingUp, User } from "lucide-react";
 
 export function TestimonialsSection() {
   return (
@@ -48,8 +48,8 @@ export function TestimonialsSection() {
 
               {/* Author */}
               <div className="flex items-center gap-3 pt-4 border-t border-border/60 dark:border-brand-dark-border/60">
-                <div className="w-11 h-11 rounded-full overflow-hidden bg-muted shrink-0 border border-brand-emerald/30 shadow-xs">
-                  <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
+                <div className="w-11 h-11 rounded-full bg-muted/60 dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border flex items-center justify-center text-muted-foreground shrink-0 shadow-xs">
+                  <User className="w-5 h-5 text-muted-foreground/80 dark:text-muted-foreground" />
                 </div>
                 <div>
                   <h4 className="text-xs sm:text-sm font-black text-foreground flex items-center gap-1">
