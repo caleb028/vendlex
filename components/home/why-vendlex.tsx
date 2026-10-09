@@ -47,7 +47,7 @@ export function WhyVendlex() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="text-center max-w-3xl mx-auto mb-12 space-y-2"
         >
@@ -71,7 +71,7 @@ export function WhyVendlex() {
                 key={index}
                 initial={{ opacity: 0, y: 28, scale: 0.98 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, amount: 0.15 }}
+                viewport={{ once: false, amount: 0.15 }}
                 transition={{
                   duration: 0.7,
                   delay: index * 0.1,

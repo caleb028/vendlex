@@ -24,7 +24,7 @@ export function ScrollReveal({
   delay = 0,
   duration = 0.75,
   threshold = 0.12,
-  once = true,
+  once = false,
   className,
   style,
   id,
@@ -81,7 +81,7 @@ export function ScrollStaggerContainer({
   className,
   staggerDelay = 0.08,
   threshold = 0.12,
-  once = true,
+  once = false,
 }: {
   children: React.ReactNode;
   className?: string;

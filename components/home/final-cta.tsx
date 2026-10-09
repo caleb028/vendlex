@@ -16,7 +16,7 @@ export function FinalCTA() {
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 24 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
+        viewport={{ once: false, amount: 0.2 }}
         transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
         className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-6"
       >

@@ -15,7 +15,7 @@ export function CountyDiscoverySection() {
         <motion.div
           initial={{ opacity: 0, y: 24, scale: 0.98 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="bg-gradient-to-br from-gray-900 via-brand-charcoal to-brand-emerald-dark rounded-3xl p-8 sm:p-12 text-white shadow-xl border border-emerald-500/30 flex flex-col lg:flex-row items-center justify-between gap-8"
         >
