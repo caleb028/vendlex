@@ -132,6 +132,23 @@ export function DownloadView() {
               : "Install VendLex directly in 1 tap with zero errors, or download the direct APK. Enjoy instant Lipa na M-Pesa STK checkout, live courier tracking, push notifications, and offline receipts."}
           </p>
 
+          {/* Mobile App Icon Display (Visible on small screens) */}
+          <div className="flex md:hidden justify-center py-2">
+            <div className="relative">
+              <div className="absolute inset-0 bg-brand-gold/30 rounded-3xl blur-xl animate-pulse" />
+              <div className="relative w-36 h-36 rounded-3xl bg-white p-2.5 shadow-2xl border-4 border-white/90 flex flex-col items-center justify-center">
+                <img
+                  src="/logo/vendlex-icon.png"
+                  alt="VendLex Official Mobile App"
+                  className="w-full h-full object-contain rounded-2xl"
+                />
+                <div className="absolute -bottom-2.5 bg-brand-gold text-brand-charcoal text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-md">
+                  Official App
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-wrap items-stretch sm:items-center gap-3 pt-2">
             <button
               onClick={handleNativeInstall}
