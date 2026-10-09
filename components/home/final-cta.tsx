@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Store, CheckCircle2 } from "lucide-react";
 
 export function FinalCTA() {
@@ -10,7 +13,13 @@ export function FinalCTA() {
       <div className="absolute top-0 right-0 w-80 h-80 bg-brand-gold/15 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-brand-emerald/20 rounded-full blur-3xl" />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 24 }}
+        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-6"
+      >
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-amber-300 text-xs sm:text-sm font-semibold">
           <Sparkles className="w-4 h-4 text-brand-gold" />
           <span>JOIN 10,000+ KENYAN COMMERCE LEADERS</span>
@@ -59,7 +68,7 @@ export function FinalCTA() {
             <span>Instant M-Pesa Integration</span>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

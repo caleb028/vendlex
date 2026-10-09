@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { MapPin, ArrowRight, Store, Wrench, Package } from "lucide-react";
 import { KENYAN_COUNTIES } from "@/lib/data/kenya-data";
 
@@ -11,7 +12,13 @@ export function CountyDiscoverySection() {
   return (
     <section className="py-14 sm:py-20 bg-white dark:bg-brand-dark-card border-t border-border/60 dark:border-brand-dark-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-br from-gray-900 via-brand-charcoal to-brand-emerald-dark rounded-3xl p-8 sm:p-12 text-white shadow-xl border border-emerald-500/30 flex flex-col lg:flex-row items-center justify-between gap-8">
+        <motion.div
+          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="bg-gradient-to-br from-gray-900 via-brand-charcoal to-brand-emerald-dark rounded-3xl p-8 sm:p-12 text-white shadow-xl border border-emerald-500/30 flex flex-col lg:flex-row items-center justify-between gap-8"
+        >
           {/* Left Text */}
           <div className="space-y-3 max-w-xl text-center lg:text-left">
             <span className="text-[11px] font-black uppercase tracking-wider text-emerald-400">
@@ -78,7 +85,7 @@ export function CountyDiscoverySection() {
               </Link>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

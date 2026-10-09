@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Zap,
   Droplets,
@@ -69,7 +70,13 @@ export function ServicesSection() {
     <section className="py-14 sm:py-20 bg-brand-off-white dark:bg-brand-dark-bg border-t border-border/60 dark:border-brand-dark-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
+        >
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-black text-brand-emerald dark:text-emerald-400 uppercase tracking-wider">
               <ShieldCheck className="w-4 h-4" />
@@ -90,47 +97,58 @@ export function ServicesSection() {
             <span>View All 10+ Trades</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
-        </div>
+        </motion.div>
 
         {/* 6-Item Popular Categories Grid with Photographic Images */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
-          {POPULAR_SERVICES.map((item) => {
+          {POPULAR_SERVICES.map((item, index) => {
             const Icon = item.icon;
             return (
-              <Link
+              <motion.div
                 key={item.name}
-                href={`/services?search=${encodeURIComponent(item.query)}`}
-                className="group bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover hover:border-brand-emerald/50 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
+                initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{
+                  duration: 0.65,
+                  delay: (index % 6) * 0.06,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
               >
-                {/* Photographic Header */}
-                <div className="relative aspect-4/3 w-full overflow-hidden bg-muted">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                <Link
+                  href={`/services?search=${encodeURIComponent(item.query)}`}
+                  className="group bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover hover:border-brand-emerald/50 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald h-full"
+                >
+                  {/* Photographic Header */}
+                  <div className="relative aspect-4/3 w-full overflow-hidden bg-muted">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
 
-                  {/* Floating Icon Pill */}
-                  <div className="absolute top-2.5 right-2.5 p-1.5 rounded-xl bg-black/60 backdrop-blur-md text-amber-400 border border-white/20 shadow-sm">
-                    <Icon className="w-3.5 h-3.5" />
+                    {/* Floating Icon Pill */}
+                    <div className="absolute top-2.5 right-2.5 p-1.5 rounded-xl bg-black/60 backdrop-blur-md text-amber-400 border border-white/20 shadow-sm">
+                      <Icon className="w-3.5 h-3.5" />
+                    </div>
+
+                    <span className="absolute bottom-2 left-2.5 text-[10px] text-white font-bold drop-shadow-xs bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-xs">
+                      {item.tag}
+                    </span>
                   </div>
 
-                  <span className="absolute bottom-2 left-2.5 text-[10px] text-white font-bold drop-shadow-xs bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-xs">
-                    {item.tag}
-                  </span>
-                </div>
-
-                {/* Body */}
-                <div className="p-3.5 text-center space-y-0.5">
-                  <span className="text-xs font-bold text-foreground group-hover:text-brand-emerald transition-colors block truncate">
-                    {item.name}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground block font-medium">
-                    {item.prosCount}
-                  </span>
-                </div>
-              </Link>
+                  {/* Body */}
+                  <div className="p-3.5 text-center space-y-0.5">
+                    <span className="text-xs font-bold text-foreground group-hover:text-brand-emerald transition-colors block truncate">
+                      {item.name}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground block font-medium">
+                      {item.prosCount}
+                    </span>
+                  </div>
+                </Link>
+              </motion.div>
             );
           })}
         </div>

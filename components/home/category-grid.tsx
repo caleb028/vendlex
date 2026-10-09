@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { CATEGORIES } from "@/lib/data/kenya-data";
 import {
   Smartphone,
@@ -37,7 +40,13 @@ export function CategoryGrid() {
     <section className="py-14 sm:py-20 bg-brand-off-white dark:bg-brand-dark-bg border-t border-border/60 dark:border-brand-dark-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8"
+        >
           <div>
             <span className="text-xs font-black text-brand-emerald dark:text-emerald-400 uppercase tracking-wider">
               Browse by Department
@@ -53,48 +62,59 @@ export function CategoryGrid() {
             <span>View All Categories</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
-        </div>
+        </motion.div>
 
         {/* Categories Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
-          {CATEGORIES.map((cat) => {
+          {CATEGORIES.map((cat, index) => {
             const Icon = ICON_MAP[cat.icon] || Sparkles;
             return (
-              <Link
+              <motion.div
                 key={cat.id}
-                href={`/marketplace?category=${cat.id}`}
-                className="group relative bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover hover:border-brand-emerald/50 hover:-translate-y-1 transition-all duration-300 flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald"
+                initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{
+                  duration: 0.6,
+                  delay: (index % 6) * 0.06,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
               >
-                {/* Category Image */}
-                <div className="relative h-28 w-full overflow-hidden bg-muted">
-                  <img
-                    src={cat.image}
-                    alt={cat.name}
-                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
-                  
-                  {/* Floating Icon with Micro-lift */}
-                  <div className="absolute top-2.5 left-2.5 w-7 h-7 rounded-lg bg-white/95 dark:bg-brand-dark-card/95 backdrop-blur-sm text-brand-emerald dark:text-emerald-400 flex items-center justify-center shadow-md group-hover:scale-110 transition-all duration-300">
-                    <Icon className="w-4 h-4" />
+                <Link
+                  href={`/marketplace?category=${cat.id}`}
+                  className="group relative bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover hover:border-brand-emerald/50 hover:-translate-y-1 transition-all duration-300 flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-emerald h-full"
+                >
+                  {/* Category Image */}
+                  <div className="relative h-28 w-full overflow-hidden bg-muted">
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                    
+                    {/* Floating Icon with Micro-lift */}
+                    <div className="absolute top-2.5 left-2.5 w-7 h-7 rounded-lg bg-white/95 dark:bg-brand-dark-card/95 backdrop-blur-sm text-brand-emerald dark:text-emerald-400 flex items-center justify-center shadow-md group-hover:scale-110 transition-all duration-300">
+                      <Icon className="w-4 h-4" />
+                    </div>
+
+                    {/* Item count badge */}
+                    <span className="absolute bottom-2 left-2.5 text-[10px] font-bold text-white bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                      {cat.productCount}+ items
+                    </span>
                   </div>
 
-                  {/* Item count badge */}
-                  <span className="absolute bottom-2 left-2.5 text-[10px] font-bold text-white bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full">
-                    {cat.productCount}+ items
-                  </span>
-                </div>
-
-                {/* Content */}
-                <div className="p-3.5 flex-1 flex flex-col justify-between">
-                  <h3 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-brand-emerald transition-colors line-clamp-1">
-                    {cat.name}
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">
-                    {cat.businessCount} Kenyan Stores
-                  </p>
-                </div>
-              </Link>
+                  {/* Content */}
+                  <div className="p-3.5 flex-1 flex flex-col justify-between">
+                    <h3 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-brand-emerald transition-colors line-clamp-1">
+                      {cat.name}
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">
+                      {cat.businessCount} Kenyan Stores
+                    </p>
+                  </div>
+                </Link>
+              </motion.div>
             );
           })}
         </div>

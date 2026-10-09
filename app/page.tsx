@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { HeroSlideshow } from "@/components/hero/hero-slideshow";
 import { CategoryGrid } from "@/components/home/category-grid";

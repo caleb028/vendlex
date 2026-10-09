@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { motion } from "framer-motion";
 import { Compass, ShoppingBag, TrendingUp, Users, Zap } from "lucide-react";
 
 export function WhyVendlex() {
@@ -41,7 +44,13 @@ export function WhyVendlex() {
     <section className="py-14 sm:py-20 bg-brand-off-white dark:bg-brand-dark-bg border-t border-border/60 dark:border-brand-dark-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 space-y-2">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-3xl mx-auto mb-12 space-y-2"
+        >
           <span className="text-xs font-black text-brand-emerald dark:text-emerald-400 uppercase tracking-wider">
             The VendLex Standard
           </span>
@@ -51,16 +60,24 @@ export function WhyVendlex() {
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
             We are more than a marketplace — VendLex is the unified technology engine powering modern African commerce across all 47 counties.
           </p>
-        </div>
+        </motion.div>
 
         {/* 4 Pillars Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {pillars.map((pillar, index) => {
             const Icon = pillar.icon;
             return (
-              <div
+              <motion.div
                 key={index}
-                className="group relative bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl p-6 sm:p-7 shadow-card hover:shadow-card-hover hover:border-brand-emerald/50 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+                initial={{ opacity: 0, y: 28, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{
+                  duration: 0.7,
+                  delay: index * 0.1,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="group relative bg-white dark:bg-brand-dark-card border border-border/80 dark:border-brand-dark-border rounded-2xl p-6 sm:p-7 shadow-card hover:shadow-card-hover hover:border-brand-emerald/50 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full"
               >
                 <div className="space-y-4">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${pillar.accent} flex items-center justify-center ${pillar.iconColor} shadow-xs group-hover:scale-108 transition-transform duration-300`}>
@@ -83,7 +100,7 @@ export function WhyVendlex() {
                   <span>Pillar 0{index + 1}</span>
                   <Zap className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

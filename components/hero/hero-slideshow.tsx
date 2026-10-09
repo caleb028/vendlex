@@ -152,18 +152,37 @@ export function HeroSlideshow() {
       </div>
 
       {/* Slide Indicators */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+      <div className="absolute bottom-16 sm:bottom-8 left-1/2 sm:left-auto sm:right-32 -translate-x-1/2 sm:translate-x-0 z-20 flex items-center gap-2">
         {HERO_SLIDES.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrentSlide(i)}
             className={`h-2 rounded-full transition-all duration-300 ${
-              i === currentSlide ? "w-9 bg-brand-emerald-light" : "w-2.5 bg-white/40 hover:bg-white/70"
+              i === currentSlide ? "w-8 bg-brand-emerald-light" : "w-2 bg-white/40 hover:bg-white/70"
             }`}
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
       </div>
+
+      {/* Scroll to Explore Animated Indicator (matching top-grade-rice-millers) */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 0.8 }}
+        className="hidden sm:flex absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex-col items-center gap-1.5 z-20 pointer-events-none"
+      >
+        <span className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-sans font-semibold">
+          Scroll to Explore
+        </span>
+        <div className="w-[1.5px] h-7 bg-white/20 relative overflow-hidden rounded-full">
+          <motion.div
+            animate={{ y: ["-100%", "100%"] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            className="w-full h-full bg-brand-emerald"
+          />
+        </div>
+      </motion.div>
     </section>
   );
 }

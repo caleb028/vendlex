@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Building2, Store, Megaphone } from "lucide-react";
 import { ServerAdvertisement } from "@/lib/server-db/types";
 import { BusinessAdCard } from "@/components/advertisements/business-ad-card";
@@ -44,7 +45,13 @@ export function SponsoredBusinessesSection() {
     <section className="py-14 sm:py-20 bg-gradient-to-b from-amber-500/[0.03] via-transparent to-transparent border-t border-border/60 dark:border-brand-dark-border/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8"
+        >
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">
               <Sparkles className="w-3.5 h-3.5" />
@@ -66,13 +73,25 @@ export function SponsoredBusinessesSection() {
             <span>Advertise Business (KES 1,020 / 30 Days)</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
-        </div>
+        </motion.div>
 
         {/* Ads Grid */}
         {ads.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ads.map((ad) => (
-              <BusinessAdCard key={ad.id} ad={ad} />
+            {ads.map((ad, index) => (
+              <motion.div
+                key={ad.id}
+                initial={{ opacity: 0, y: 28, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{
+                  duration: 0.7,
+                  delay: index * 0.08,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              >
+                <BusinessAdCard ad={ad} />
+              </motion.div>
             ))}
           </div>
         ) : (
