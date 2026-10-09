@@ -20,6 +20,57 @@ import { motion, AnimatePresence } from "framer-motion";
 
 type BrowserType = "chrome_android" | "safari_ios" | "samsung_internet" | "generic";
 
+/**
+ * Strict device detection: returns true ONLY for mobile phones and tablets.
+ * PC desktops and laptops (Windows, macOS, Linux, ChromeOS) are strictly excluded.
+ */
+function isMobileOrTablet(): boolean {
+  if (typeof window === "undefined" || typeof navigator === "undefined") return false;
+
+  const ua = navigator.userAgent || navigator.vendor || (window as any).opera || "";
+
+  // 1. Explicit Desktop / Laptop PC exclusions:
+  // Windows Desktop or Laptop PC (Windows NT)
+  const isWindows = /Windows NT/i.test(ua);
+  if (isWindows && !/Windows Phone/i.test(ua)) {
+    return false;
+  }
+
+  // macOS Desktop or Laptop PC (Macintosh)
+  // iPadOS 13+ sends Macintosh in userAgent, but has multi-touch screen (> 1 touch points)
+  const isMac = /Macintosh/i.test(ua);
+  const isIPadOS = isMac && typeof navigator.maxTouchPoints === "number" && navigator.maxTouchPoints > 1;
+  if (isMac && !isIPadOS) {
+    return false;
+  }
+
+  // Linux Desktop (Linux or X11, without Android)
+  const isLinuxDesktop = /Linux|X11/i.test(ua) && !/Android/i.test(ua);
+  if (isLinuxDesktop) {
+    return false;
+  }
+
+  // ChromeOS Desktop
+  if (/CrOS/i.test(ua) && !/Mobile|Tablet/i.test(ua)) {
+    return false;
+  }
+
+  // Navigator userAgentData mobile hint (Chrome, Edge, Samsung Internet, Opera)
+  const uaData = (navigator as any).userAgentData;
+  if (uaData && typeof uaData.mobile === "boolean") {
+    if (!uaData.mobile && !isIPadOS && !/Android|Tablet|iPad/i.test(ua)) {
+      return false;
+    }
+  }
+
+  // 2. Positive Mobile Phone and Tablet validation:
+  const isAndroid = /Android/i.test(ua);
+  const isIOS = /iPhone|iPod|iPad/i.test(ua) || isIPadOS;
+  const isOtherMobileOrTablet = /Mobile|Tablet|Silk|Kindle|BlackBerry|Opera Mini|IEMobile/i.test(ua);
+
+  return isAndroid || isIOS || isOtherMobileOrTablet;
+}
+
 export function MobileAppPrompt() {
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [isAlreadyInstalled, setIsAlreadyInstalled] = useState(false);
@@ -32,7 +83,13 @@ export function MobileAppPrompt() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // 1. Check if running in standalone mode (already actively inside installed WebAPK / PWA)
+    // 1. Strict device check: only mobile phones and tablets allowed (never PC)
+    if (!isMobileOrTablet()) {
+      setIsMobileDevice(false);
+      return;
+    }
+
+    // 2. Check if running in standalone mode (already actively inside installed WebAPK / PWA)
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as any).standalone === true ||
@@ -45,12 +102,15 @@ export function MobileAppPrompt() {
       setIsAlreadyInstalled(false);
     }
 
-    // 2. Detect platform & browser
+    // 3. Device confirmed as mobile phone or tablet
+    setIsMobileDevice(true);
+
     const ua = navigator.userAgent || navigator.vendor || (window as any).opera || "";
-    const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+    const isMac = /Macintosh/i.test(ua);
+    const isIPadOS = isMac && typeof navigator.maxTouchPoints === "number" && navigator.maxTouchPoints > 1;
+    const isIOS = /iPad|iPhone|iPod/i.test(ua) || isIPadOS;
     const isSamsung = /SamsungBrowser/i.test(ua);
     const isAndroid = /Android/i.test(ua);
-    const isMobile = isIOS || isAndroid || /mobile|blackberry|iemobile|opera mini/i.test(ua) || window.innerWidth <= 860;
 
     if (isIOS) {
       setBrowserType("safari_ios");
@@ -62,20 +122,16 @@ export function MobileAppPrompt() {
       setBrowserType("generic");
     }
 
-    if (isMobile) {
-      setIsMobileDevice(true);
-
-      const sessionDismissed = sessionStorage.getItem("vendlex_prompt_dismissed") === "true";
-      if (!sessionDismissed) {
-        const timer = setTimeout(() => {
-          setModalOpen(true);
-          setBannerVisible(true);
-        }, 1500);
-
-        return () => clearTimeout(timer);
-      } else {
+    const sessionDismissed = sessionStorage.getItem("vendlex_prompt_dismissed") === "true";
+    if (!sessionDismissed) {
+      const timer = setTimeout(() => {
+        setModalOpen(true);
         setBannerVisible(true);
-      }
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    } else {
+      setBannerVisible(true);
     }
 
     // 3. Check for early captured prompt or listen for event
