@@ -16,14 +16,14 @@ interface ScrollRevealProps {
   id?: string;
 }
 
-const CUBIC_EASE = [0.16, 1, 0.3, 1] as const;
+const CUBIC_EASE = [0.22, 1, 0.36, 1] as const;
 
 export function ScrollReveal({
   children,
   variant = "fade-up",
   delay = 0,
-  duration = 0.75,
-  threshold = 0.12,
+  duration = 0.85,
+  threshold = 0.08,
   once = false,
   className,
   style,
@@ -41,17 +41,17 @@ export function ScrollReveal({
 
   const delaySeconds = delay ? delay / 1000 : 0;
 
-  let initialVariants = { opacity: 0, y: 28, scale: 0.98, x: 0 };
+  let initialVariants = { opacity: 0, y: 16, scale: 0.992, x: 0 };
   if (variant === "fade-in") {
     initialVariants = { opacity: 0, y: 0, scale: 1, x: 0 };
   } else if (variant === "zoom-out") {
-    initialVariants = { opacity: 0, y: 0, scale: 0.95, x: 0 };
+    initialVariants = { opacity: 0, y: 0, scale: 0.975, x: 0 };
   } else if (variant === "pop-up") {
-    initialVariants = { opacity: 0, y: 24, scale: 0.96, x: 0 };
+    initialVariants = { opacity: 0, y: 14, scale: 0.985, x: 0 };
   } else if (variant === "slide-left") {
-    initialVariants = { opacity: 0, y: 0, scale: 1, x: -32 };
+    initialVariants = { opacity: 0, y: 0, scale: 1, x: -20 };
   } else if (variant === "slide-right") {
-    initialVariants = { opacity: 0, y: 0, scale: 1, x: 32 };
+    initialVariants = { opacity: 0, y: 0, scale: 1, x: 20 };
   }
 
   return (
@@ -59,14 +59,14 @@ export function ScrollReveal({
       id={id}
       initial={initialVariants}
       whileInView={{ opacity: 1, y: 0, scale: 1, x: 0 }}
-      viewport={{ once, amount: threshold }}
+      viewport={{ once, amount: threshold, margin: "-20px 0px -20px 0px" }}
       transition={{
         duration,
         delay: delaySeconds,
         ease: CUBIC_EASE,
       }}
-      className={cn("w-full", className)}
-      style={style}
+      className={cn("w-full transform-gpu", className)}
+      style={{ willChange: "opacity, transform", ...style }}
     >
       {children}
     </motion.div>
@@ -79,8 +79,8 @@ export function ScrollReveal({
 export function ScrollStaggerContainer({
   children,
   className,
-  staggerDelay = 0.08,
-  threshold = 0.12,
+  staggerDelay = 0.055,
+  threshold = 0.08,
   once = false,
 }: {
   children: React.ReactNode;
@@ -99,7 +99,7 @@ export function ScrollStaggerContainer({
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once, amount: threshold }}
+      viewport={{ once, amount: threshold, margin: "-20px 0px -20px 0px" }}
       variants={{
         hidden: {},
         visible: {
@@ -108,7 +108,7 @@ export function ScrollStaggerContainer({
           },
         },
       }}
-      className={className}
+      className={cn("transform-gpu", className)}
     >
       {children}
     </motion.div>
@@ -131,18 +131,19 @@ export function ScrollStaggerItem({
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 24, scale: 0.98 },
+        hidden: { opacity: 0, y: 16, scale: 0.992 },
         visible: {
           opacity: 1,
           y: 0,
           scale: 1,
           transition: {
-            duration: 0.65,
+            duration: 0.8,
             ease: CUBIC_EASE,
           },
         },
       }}
-      className={className}
+      className={cn("transform-gpu", className)}
+      style={{ willChange: "opacity, transform" }}
     >
       {children}
     </motion.div>

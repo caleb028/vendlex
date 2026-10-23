@@ -15,11 +15,12 @@ export function DealsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
+          viewport={{ once: false, amount: 0.08, margin: "-25px 0px -25px 0px" }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          style={{ willChange: "opacity, transform" }}
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 transform-gpu"
         >
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider">
@@ -48,14 +49,16 @@ export function DealsSection() {
           {deals.map((product, index) => (
             <motion.div
               key={product.id}
-              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              initial={{ opacity: 0, y: 18, scale: 0.992 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.15 }}
+              viewport={{ once: false, amount: 0.08, margin: "-20px 0px -20px 0px" }}
               transition={{
-                duration: 0.7,
-                delay: index * 0.08,
-                ease: [0.16, 1, 0.3, 1],
+                duration: 0.85,
+                delay: index * 0.055,
+                ease: [0.22, 1, 0.36, 1],
               }}
+              className="transform-gpu"
+              style={{ willChange: "opacity, transform" }}
             >
               <ProductCard product={product} />
             </motion.div>

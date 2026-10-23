@@ -10,7 +10,6 @@ import { CountyDiscoverySection } from "@/components/home/county-discovery-secti
 import { WhyVendlex } from "@/components/home/why-vendlex";
 import { TestimonialsSection } from "@/components/home/testimonials-section";
 import { FinalCTA } from "@/components/home/final-cta";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 export default function HomePage() {
   return (
@@ -19,44 +18,28 @@ export default function HomePage() {
       <HeroSlideshow />
 
       {/* 2. Department & Popular Categories Grid */}
-      <ScrollReveal variant="fade-up" delay={50}>
-        <CategoryGrid />
-      </ScrollReveal>
+      <CategoryGrid />
 
       {/* 4. Today's Deals & Hot Discounts */}
-      <ScrollReveal variant="fade-up" delay={60}>
-        <DealsSection />
-      </ScrollReveal>
+      <DealsSection />
 
       {/* 5. Certified Local Services & Trades */}
-      <ScrollReveal variant="fade-up" delay={60}>
-        <ServicesSection />
-      </ScrollReveal>
+      <ServicesSection />
 
       {/* 6. Sponsored Local Businesses */}
-      <ScrollReveal variant="fade-up" delay={60}>
-        <SponsoredBusinessesSection />
-      </ScrollReveal>
+      <SponsoredBusinessesSection />
 
       {/* 7. Explore Kenya Across All 47 Counties */}
-      <ScrollReveal variant="fade-up" delay={60}>
-        <CountyDiscoverySection />
-      </ScrollReveal>
+      <CountyDiscoverySection />
 
       {/* 8. Why VendLex - Trust, Protection & Tools */}
-      <ScrollReveal variant="fade-up" delay={60}>
-        <WhyVendlex />
-      </ScrollReveal>
+      <WhyVendlex />
 
       {/* 9. Verified Customer & Merchant Stories */}
-      <ScrollReveal variant="fade-up" delay={60}>
-        <TestimonialsSection />
-      </ScrollReveal>
+      <TestimonialsSection />
 
       {/* 10. Final Call-to-Action */}
-      <ScrollReveal variant="pop-up" delay={80}>
-        <FinalCTA />
-      </ScrollReveal>
+      <FinalCTA />
     </div>
   );
 }

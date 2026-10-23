@@ -530,50 +530,50 @@
 /* 4. Scroll Animation Classes */
 .scroll-hidden {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translate3d(0, 16px, 0);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 
 .scroll-hidden.scroll-revealed {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate3d(0, 0, 0);
 }
 
 .scroll-hidden-zoom {
   opacity: 0;
-  transform: scale(1.06);
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale3d(1.03, 1.03, 1);
+  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 
 .scroll-hidden-zoom.scroll-revealed {
   opacity: 1;
-  transform: scale(1);
+  transform: scale3d(1, 1, 1);
 }
 
 .scroll-hidden-left {
   opacity: 0;
-  transform: translateX(-32px);
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translate3d(-20px, 0, 0);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 
 .scroll-hidden-left.scroll-revealed {
   opacity: 1;
-  transform: translateX(0);
+  transform: translate3d(0, 0, 0);
 }
 
 .scroll-hidden-right {
   opacity: 0;
-  transform: translateX(32px);
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translate3d(20px, 0, 0);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 
 .scroll-hidden-right.scroll-revealed {
   opacity: 1;
-  transform: translateX(0);
+  transform: translate3d(0, 0, 0);
 }
 
 .animate-fade-in-up {
@@ -749,16 +749,17 @@
 @keyframes cardStaggerFadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translate3d(0, 14px, 0);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 .marketplace-card-animated {
-  animation: cardStaggerFadeInUp 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: cardStaggerFadeInUp 750ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
 }
 
 /* Respect Reduced Motion Accessibility */

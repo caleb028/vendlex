@@ -11,11 +11,12 @@ export function TestimonialsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center max-w-3xl mx-auto mb-12 space-y-2"
+          viewport={{ once: false, amount: 0.08, margin: "-25px 0px -25px 0px" }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          style={{ willChange: "opacity, transform" }}
+          className="text-center max-w-3xl mx-auto mb-12 space-y-2 transform-gpu"
         >
           <span className="text-xs font-black text-brand-emerald dark:text-emerald-400 uppercase tracking-wider">
             Verified Experiences &bull; Kenya
@@ -33,15 +34,16 @@ export function TestimonialsSection() {
           {MOCK_TESTIMONIALS.map((t, index) => (
             <motion.div
               key={t.id}
-              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              initial={{ opacity: 0, y: 18, scale: 0.992 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: false, amount: 0.15 }}
+              viewport={{ once: false, amount: 0.08, margin: "-20px 0px -20px 0px" }}
               transition={{
-                duration: 0.7,
-                delay: index * 0.1,
-                ease: [0.16, 1, 0.3, 1],
+                duration: 0.85,
+                delay: index * 0.06,
+                ease: [0.22, 1, 0.36, 1],
               }}
-              className="bg-brand-off-white dark:bg-brand-dark-bg/60 border border-border/80 dark:border-brand-dark-border rounded-2xl p-6 sm:p-7 shadow-card hover:shadow-card-hover hover:border-brand-emerald/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-6 h-full"
+              style={{ willChange: "opacity, transform" }}
+              className="bg-brand-off-white dark:bg-brand-dark-bg/60 border border-border/80 dark:border-brand-dark-border rounded-2xl p-6 sm:p-7 shadow-card hover:shadow-card-hover hover:border-brand-emerald/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-6 h-full transform-gpu"
             >
               <div className="space-y-4">
                 {/* Rating & Growth Pill */}

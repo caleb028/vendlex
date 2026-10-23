@@ -41,11 +41,12 @@ export function CategoryGrid() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8"
+          viewport={{ once: false, amount: 0.08, margin: "-25px 0px -25px 0px" }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          style={{ willChange: "opacity, transform" }}
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 transform-gpu"
         >
           <div>
             <span className="text-xs font-black text-brand-emerald dark:text-emerald-400 uppercase tracking-wider">
@@ -71,14 +72,16 @@ export function CategoryGrid() {
             return (
               <motion.div
                 key={cat.id}
-                initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                initial={{ opacity: 0, y: 18, scale: 0.992 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: false, amount: 0.15 }}
+                viewport={{ once: false, amount: 0.08, margin: "-20px 0px -20px 0px" }}
                 transition={{
-                  duration: 0.6,
-                  delay: (index % 6) * 0.06,
-                  ease: [0.16, 1, 0.3, 1],
+                  duration: 0.8,
+                  delay: (index % 6) * 0.045,
+                  ease: [0.22, 1, 0.36, 1],
                 }}
+                className="transform-gpu"
+                style={{ willChange: "opacity, transform" }}
               >
                 <Link
                   href={`/marketplace?category=${cat.id}`}

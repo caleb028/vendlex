@@ -14,11 +14,12 @@ export function FinalCTA() {
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-brand-emerald/20 rounded-full blur-3xl" />
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 24 }}
+        initial={{ opacity: 0, scale: 0.985, y: 16 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.2 }}
-        transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-6"
+        viewport={{ once: false, amount: 0.08, margin: "-25px 0px -25px 0px" }}
+        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+        style={{ willChange: "opacity, transform" }}
+        className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-6 transform-gpu"
       >
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-amber-300 text-xs sm:text-sm font-semibold">
           <Sparkles className="w-4 h-4 text-brand-gold" />
