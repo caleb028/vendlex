@@ -36,7 +36,7 @@ interface SellerOrder {
   town: string;
   address: string;
   paymentMethod: string;
-  paymentStatus: "PAID" | "ESCROW_HELD" | "PENDING";
+  paymentStatus: "PAID" | "ESCROW_HELD" | "PENDING" | "UNPAID";
   mpesaReceipt: string;
   estimatedArrival: string;
   status: "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "READY_FOR_DISPATCH" | "DISPATCHED" | "DELIVERED" | "CANCELLED";
@@ -84,6 +84,7 @@ export default function SellerOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<SellerOrder | null>(null);
   const [search, setSearch] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string>("");
 
   const trackingSteps = [
     { step: 1, title: "Order confirmed" },
@@ -104,22 +105,22 @@ export default function SellerOrdersPage() {
           orderNumber: o.orderNumber || o.id,
           sellerName: o.sellerName || user?.businessName || (user?.name ? `${user.name}'s Store` : "My Store"),
           customerName: o.customerName || "Customer",
-          customerPhone: o.customerPhone || "+254700000000",
+          customerPhone: o.customerPhone || "",
           customerEmail: o.customerEmail || "",
           items: (o.items || []).map((it: any) => ({
             title: it.title || it.productTitle || "Marketplace Item",
             qty: it.quantity || it.qty || 1,
-            price: it.price || 0,
+            price: it.unitPrice ?? it.price ?? 0,
           })),
-          subtotal: o.subtotal || o.total,
-          deliveryFee: o.deliveryFee || 0,
-          total: o.total || 0,
+          subtotal: o.subtotal ?? o.totalAmount ?? o.total ?? 0,
+          deliveryFee: o.deliveryFee ?? 0,
+          total: o.totalAmount ?? o.total ?? 0,
           county: o.county || "Nairobi",
           town: o.town || "CBD",
           address: o.address || o.estate || "Delivery Address",
-          paymentMethod: o.paymentMethod || "M-Pesa Escrow",
-          paymentStatus: o.paymentStatus || "PAID",
-          mpesaReceipt: o.mpesaReceipt || "MPESA-CONFIRMED",
+          paymentMethod: o.paymentMethod || "MPESA",
+          paymentStatus: o.paymentStatus || (o.status === "PENDING_PAYMENT" ? "UNPAID" : "PAID"),
+          mpesaReceipt: o.mpesaReceipt || "",
           estimatedArrival: o.courierTracking ? `Tracking: ${o.courierTracking}` : "Expected today via Fargo Courier",
           status: o.status,
           step: mapStatusToStep(o.status),
@@ -154,6 +155,7 @@ export default function SellerOrdersPage() {
       : undefined;
 
     setUpdatingId(orderId);
+    setActionError("");
     try {
       const res = await fetch(`/api/orders/${orderId}/status`, {
         method: "PUT",
@@ -165,27 +167,31 @@ export default function SellerOrdersPage() {
       });
 
       const data = await res.json();
-      if (data.success) {
-        setOrders((prev) =>
-          prev.map((o) => {
-            if (o.id === orderId) {
-              const newStep = (o.step + 1) as any;
-              return {
-                ...o,
-                status: nextStatus,
-                step: newStep,
-                estimatedArrival: trackingCode ? `Tracking: ${trackingCode}` : o.estimatedArrival,
-              };
-            }
-            return o;
-          })
-        );
-        if (selectedOrder && selectedOrder.id === orderId) {
-          setSelectedOrder((prev) => prev ? { ...prev, status: nextStatus, step: (prev.step + 1) as any } : null);
-        }
+      if (!res.ok || !data.success) {
+        setActionError(data.error || "Could not advance order status.");
+        return;
       }
-    } catch (err) {
+      setOrders((prev) =>
+        prev.map((o) => {
+          if (o.id === orderId) {
+            const newStep = (o.step + 1) as any;
+            return {
+              ...o,
+              status: nextStatus,
+              step: newStep,
+              paymentStatus: nextStatus === "DELIVERED" && o.paymentMethod === "COD" ? "PAID" : o.paymentStatus,
+              estimatedArrival: trackingCode ? `Tracking: ${trackingCode}` : o.estimatedArrival,
+            };
+          }
+          return o;
+        })
+      );
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder((prev) => prev ? { ...prev, status: nextStatus, step: (prev.step + 1) as any } : null);
+      }
+    } catch (err: any) {
       console.error("Failed to advance order status:", err);
+      setActionError(err?.message || "Network error updating order status.");
     } finally {
       setUpdatingId(null);
     }
@@ -230,6 +236,11 @@ export default function SellerOrdersPage() {
       </div>
 
       {/* Pipeline Tabs */}
+      {actionError && (
+        <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-xs font-bold text-red-600 dark:text-red-400">
+          {actionError}
+        </div>
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={() => setActiveStepFilter("ALL")}
@@ -299,7 +310,9 @@ export default function SellerOrdersPage() {
                 <div>
                   <span className="text-muted-foreground font-semibold">Seller / Store:</span>
                   <div className="font-bold text-foreground mt-0.5">{order.sellerName}</div>
-                  <span className="text-[11px] text-muted-foreground">Receipt: {order.mpesaReceipt}</span>
+                  <span className="text-[11px] text-muted-foreground">
+                    Receipt: {order.mpesaReceipt || (order.paymentMethod === "COD" ? "Pay on Delivery" : "Awaiting Payment")}
+                  </span>
                 </div>
 
                 <div>
@@ -397,7 +410,15 @@ export default function SellerOrdersPage() {
                     </a>
                   </div>
 
-                  {order.step < 5 && (
+                  {order.status === "CANCELLED" ? (
+                    <span className="text-xs font-bold text-red-600 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 px-3 py-1.5 rounded-xl">
+                      Order Cancelled
+                    </span>
+                  ) : order.status === "PENDING_PAYMENT" && order.paymentMethod !== "COD" ? (
+                    <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-3 py-1.5 rounded-xl">
+                      Awaiting Customer M-Pesa Payment
+                    </span>
+                  ) : order.step < 5 ? (
                     <button
                       onClick={() => advanceStep(order.id)}
                       disabled={updatingId === order.id}
@@ -412,7 +433,7 @@ export default function SellerOrdersPage() {
                         <span>Advance to &quot;{trackingSteps[order.step].title}&quot; &rarr;</span>
                       )}
                     </button>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>

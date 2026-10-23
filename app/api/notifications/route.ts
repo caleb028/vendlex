@@ -7,11 +7,13 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   try {
     const { user, isAuthenticated } = getServerSession(req);
-    const userId = user?.id || req.nextUrl.searchParams.get("userId");
-
-    if (!userId) {
+    if (!isAuthenticated || !user) {
       return NextResponse.json({ success: true, notifications: [] });
     }
+
+    const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+    const requestedUserId = req.nextUrl.searchParams.get("userId");
+    const userId = isAdmin && requestedUserId ? requestedUserId : user.id;
 
     const notifs = serverDB.getUserNotifications(userId);
     return NextResponse.json({ success: true, notifications: notifs });
@@ -22,9 +24,19 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const { user, isAuthenticated } = getServerSession(req);
+    if (!isAuthenticated || !user) {
+      return NextResponse.json({ success: false, error: "Authentication required." }, { status: 401 });
+    }
+
     const body = await req.json();
     const id = body.id;
     if (id) {
+      const userNotifs = serverDB.getUserNotifications(user.id);
+      const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+      if (!isAdmin && !userNotifs.some((n) => n.id === id)) {
+        return NextResponse.json({ success: false, error: "Forbidden." }, { status: 403 });
+      }
       serverDB.markNotificationAsRead(id);
       return NextResponse.json({ success: true, message: "Marked as read." });
     }

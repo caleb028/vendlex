@@ -13,22 +13,21 @@ export async function GET(
     const { user } = getServerSession(req);
     const { searchParams } = new URL(req.url);
 
-    const role = (user?.role || searchParams.get("role") || "CUSTOMER") as any;
-    const userId = user?.id || searchParams.get("userId") || undefined;
-    const name = user?.name || searchParams.get("name") || undefined;
-    const phone = user?.phone || searchParams.get("phone") || undefined;
-    const email = user?.email || searchParams.get("email") || undefined;
-    const businessName = user?.businessName || searchParams.get("businessName") || undefined;
     const inline = searchParams.get("inline") === "true";
+    const code = searchParams.get("code") || undefined;
 
-    const pdfRes = await DocumentService.generatePDF(id, {
-      role,
-      userId,
-      name,
-      phone,
-      email,
-      businessName,
-    });
+    const authCtx = user
+      ? {
+          role: user.role,
+          userId: user.id,
+          name: user.name,
+          phone: user.phone,
+          email: user.email,
+          businessName: user.businessName,
+        }
+      : undefined;
+
+    const pdfRes = await DocumentService.generatePDF(id, authCtx, code);
 
     if (!pdfRes.success || !pdfRes.pdfResult) {
       return NextResponse.json(

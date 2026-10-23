@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useMemo, Suspense } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { MOCK_PRODUCTS, CATEGORIES, KENYAN_COUNTIES, KENYAN_TOWNS } from "@/lib/data/kenya-data";
+import { MOCK_PRODUCTS, CATEGORIES, KENYAN_COUNTIES, KENYAN_TOWNS, Product } from "@/lib/data/kenya-data";
 import { ProductCard } from "@/components/marketplace/product-card";
 import { formatKSh } from "@/lib/utils";
 import {
@@ -40,6 +40,18 @@ function MarketplaceContent() {
 
   // Drawer state
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [catalogProducts, setCatalogProducts] = useState<Product[]>(MOCK_PRODUCTS);
+
+  useEffect(() => {
+    fetch("/api/products?limit=250")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.products) && data.products.length > 0) {
+          setCatalogProducts(data.products);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Available towns based on selected county
   const availableTowns = useMemo(() => {
@@ -65,7 +77,7 @@ function MarketplaceContent() {
 
   // Filter products
   const filteredProducts = useMemo(() => {
-    return MOCK_PRODUCTS.filter((product) => {
+    return catalogProducts.filter((product) => {
       // Search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -123,6 +135,7 @@ function MarketplaceContent() {
       return 0;
     });
   }, [
+    catalogProducts,
     searchQuery,
     selectedCategory,
     selectedCounty,

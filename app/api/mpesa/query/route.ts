@@ -1,11 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { querySTKPushStatus } from "@/lib/mpesa/daraja";
 import { mpesaTransactionsStore } from "@/lib/mpesa/transaction-store";
+import type { MpesaTransaction } from "@/lib/mpesa/transaction-store";
+import { getServerSession } from "@/lib/auth/session";
+import { serverDB } from "@/lib/server-db";
+import { maskPhoneNumber } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-async function handleQuery(checkoutRequestId: string) {
+/** Strip PII / raw gateway payloads for non-admin callers. */
+function publicTxn(txn: MpesaTransaction | undefined | null, isAdmin: boolean) {
+  if (!txn) return null;
+  if (isAdmin) return txn;
+  const { rawCallback, ...rest } = txn;
+  void rawCallback;
+  return { ...rest, phoneNumber: maskPhoneNumber(rest.phoneNumber) };
+}
+
+async function handleQuery(req: NextRequest, checkoutRequestId: string) {
+  const { user, isAuthenticated } = getServerSession(req);
+  const isAdmin = Boolean(user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN"));
+
   if (!checkoutRequestId) {
     return NextResponse.json(
       { error: "checkoutRequestId is required." },
@@ -13,8 +29,35 @@ async function handleQuery(checkoutRequestId: string) {
     );
   }
 
+  // The persisted order bound to this STK request is the source of truth for product payments
+  // (the in-memory ledger can be empty on serverless instances).
+  const linkedOrder = serverDB.getOrders().find((o) => o.checkoutRequestId === checkoutRequestId);
+  if (linkedOrder) {
+    if (!isAuthenticated || !user) {
+      return NextResponse.json({ error: "Please sign in to check order payment status." }, { status: 401 });
+    }
+    if (linkedOrder.customerId !== user.id && !isAdmin) {
+      return NextResponse.json({ error: "Not authorised to view this payment." }, { status: 403 });
+    }
+    if (linkedOrder.paymentStatus === "PAID") {
+      return NextResponse.json({
+        success: true,
+        status: "COMPLETED",
+        mpesaReceiptNumber: linkedOrder.mpesaReceipt,
+        resultDesc: "Payment confirmed.",
+      });
+    }
+  }
+
   // Check internal store first
   let storedTxn = mpesaTransactionsStore.getByCheckoutId(checkoutRequestId);
+  if (!linkedOrder && storedTxn && !isAdmin && storedTxn.purpose === "PRODUCT_PURCHASE") {
+    // Product payments must be tied to an order the caller owns
+    return NextResponse.json({ error: "Not authorised to view this payment." }, { status: 403 });
+  }
+  if (!linkedOrder && (!isAuthenticated || !user) && storedTxn && storedTxn.purpose !== "ADVERTISEMENT") {
+    return NextResponse.json({ error: "Please sign in to check payment status." }, { status: 401 });
+  }
 
   // If already finished, return immediately
   if (storedTxn && (storedTxn.status === "COMPLETED" || storedTxn.status === "CANCELLED" || storedTxn.status === "FAILED")) {
@@ -22,7 +65,7 @@ async function handleQuery(checkoutRequestId: string) {
       success: true,
       status: storedTxn.status,
       mpesaReceiptNumber: storedTxn.mpesaReceiptNumber,
-      transaction: storedTxn,
+      transaction: publicTxn(storedTxn, isAdmin),
       resultDesc: storedTxn.resultDesc || "Transaction processed.",
     });
   }
@@ -61,8 +104,8 @@ async function handleQuery(checkoutRequestId: string) {
       success: true,
       status: storedTxn?.status || (darajaQuery.ResultCode === "0" ? "COMPLETED" : "PENDING"),
       mpesaReceiptNumber: storedTxn?.mpesaReceiptNumber,
-      transaction: storedTxn || null,
-      darajaQuery,
+      transaction: publicTxn(storedTxn, isAdmin),
+      ...(isAdmin ? { darajaQuery } : {}),
       resultDesc: darajaQuery.ResultDesc,
     });
   } catch (darajaErr: any) {
@@ -70,7 +113,7 @@ async function handleQuery(checkoutRequestId: string) {
       success: true,
       status: storedTxn?.status || "PENDING",
       mpesaReceiptNumber: storedTxn?.mpesaReceiptNumber,
-      transaction: storedTxn || null,
+      transaction: publicTxn(storedTxn, isAdmin),
     });
   }
 }
@@ -78,11 +121,11 @@ async function handleQuery(checkoutRequestId: string) {
 export async function GET(req: NextRequest) {
   try {
     const checkoutRequestId = req.nextUrl.searchParams.get("checkoutRequestId") || "";
-    return await handleQuery(checkoutRequestId);
+    return await handleQuery(req, checkoutRequestId);
   } catch (error: any) {
     console.error("STK Query GET API Route error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to query M-Pesa transaction status." },
+      { error: "Failed to query M-Pesa transaction status." },
       { status: 500 }
     );
   }
@@ -92,11 +135,11 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
     const checkoutRequestId = body.checkoutRequestId || req.nextUrl.searchParams.get("checkoutRequestId") || "";
-    return await handleQuery(checkoutRequestId);
+    return await handleQuery(req, checkoutRequestId);
   } catch (error: any) {
     console.error("STK Query POST API Route error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to query M-Pesa transaction status." },
+      { error: "Failed to query M-Pesa transaction status." },
       { status: 500 }
     );
   }

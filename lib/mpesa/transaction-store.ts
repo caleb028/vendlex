@@ -12,7 +12,7 @@ export interface MpesaTransaction {
   amount: number;
   accountReference: string;
   transactionDesc: string;
-  purpose: "SUBSCRIPTION" | "LISTING_FEE" | "PRODUCT_PURCHASE" | "FEATURED_BANNER";
+  purpose: "SUBSCRIPTION" | "LISTING_FEE" | "PRODUCT_PURCHASE" | "FEATURED_BANNER" | "ADVERTISEMENT" | "GENERAL" | "DIAGNOSTIC";
   sellerId?: string;
   sellerName?: string;
   status: "PENDING" | "COMPLETED" | "FAILED" | "CANCELLED";

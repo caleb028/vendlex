@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, use } from "react";
+import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
-import { MOCK_PRODUCTS, MOCK_BUSINESSES, KENYAN_COUNTIES } from "@/lib/data/kenya-data";
+import { MOCK_PRODUCTS, MOCK_BUSINESSES, KENYAN_COUNTIES, Product } from "@/lib/data/kenya-data";
 import { formatKSh } from "@/lib/utils";
 import { useCart } from "@/lib/store/cart-store";
 import { useWishlist } from "@/lib/store/wishlist-store";
@@ -37,7 +37,31 @@ export default function ProductDetailPage({
   const resolvedParams = use(params);
   const router = useRouter();
 
-  const product = MOCK_PRODUCTS.find((p) => p.slug === resolvedParams.slug);
+  const initialProduct = MOCK_PRODUCTS.find(
+    (p) => p.slug === resolvedParams.slug || p.id === resolvedParams.slug
+  );
+  const [liveProduct, setLiveProduct] = useState<Product | null>(initialProduct || null);
+  const [loadingProduct, setLoadingProduct] = useState(!initialProduct);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/products/${encodeURIComponent(resolvedParams.slug)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (active && data.success && data.product) {
+          setLiveProduct(data.product);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (active) setLoadingProduct(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [resolvedParams.slug]);
+
+  const product = liveProduct;
 
   const [selectedImg, setSelectedImg] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -48,6 +72,15 @@ export default function ProductDetailPage({
 
   const { addToCart, setIsCartOpen } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
+
+  if (loadingProduct && !product) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center space-y-3">
+        <div className="w-8 h-8 rounded-full border-2 border-brand-emerald border-t-transparent animate-spin mx-auto" />
+        <p className="text-xs text-muted-foreground">Loading product details...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (

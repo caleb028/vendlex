@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, use } from "react";
+import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { MOCK_BUSINESSES, MOCK_PRODUCTS, MOCK_SERVICES } from "@/lib/data/kenya-data";
+import { MOCK_BUSINESSES, MOCK_PRODUCTS, MOCK_SERVICES, Product } from "@/lib/data/kenya-data";
 import { VerifiedBadge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/marketplace/product-card";
 import { ServiceCard } from "@/components/services/service-card";
@@ -31,7 +31,63 @@ export default function BusinessProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = use(params);
-  const business = MOCK_BUSINESSES.find((b) => b.slug === resolvedParams.slug);
+  const staticBusiness = MOCK_BUSINESSES.find((b) => b.slug === resolvedParams.slug || b.id === resolvedParams.slug);
+
+  const [liveProducts, setLiveProducts] = useState<Product[]>(
+    MOCK_PRODUCTS.filter((p) => p.businessSlug === resolvedParams.slug || p.businessId === resolvedParams.slug)
+  );
+  const [loadingStore, setLoadingStore] = useState(!staticBusiness);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/products?sellerId=${encodeURIComponent(resolvedParams.slug)}&limit=100`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (active && data.success && Array.isArray(data.products)) {
+          setLiveProducts(data.products);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (active) setLoadingStore(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [resolvedParams.slug]);
+
+  const firstProduct = liveProducts[0];
+  const business = staticBusiness || (firstProduct ? {
+    id: firstProduct.businessId,
+    slug: firstProduct.businessSlug,
+    name: firstProduct.businessName,
+    tagline: `Verified Kenyan Merchant in ${firstProduct.town}, ${firstProduct.county}`,
+    description: `Official digital storefront for ${firstProduct.businessName} on VendLex Kenya, serving customers across ${firstProduct.county} and all 47 counties.`,
+    category: firstProduct.category,
+    county: firstProduct.county,
+    town: firstProduct.town,
+    physicalLocation: `${firstProduct.town}, ${firstProduct.county}`,
+    logo: firstProduct.images[0] || "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=400&auto=format&fit=crop",
+    coverImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1200&auto=format&fit=crop",
+    rating: firstProduct.rating || 5.0,
+    reviewCount: firstProduct.reviewCount || 1,
+    followerCount: 120,
+    isVerified: firstProduct.businessVerified,
+    badges: ["Verified Merchant", "Escrow Protected"],
+    phone: "+254 798 159 503",
+    whatsapp: "+254 798 159 503",
+    email: "karibu@vendlex.vercel.app",
+    website: undefined as string | undefined,
+    joinedDate: "2026",
+    openingHours: {
+      weekdays: "8:00 AM - 6:00 PM",
+      saturday: "9:00 AM - 5:00 PM",
+      sunday: "Closed",
+    },
+    operatingHours: "Mon - Sat: 8:00 AM - 6:00 PM",
+    deliveryOptions: ["Same-Day County Dispatch", "Nationwide Courier (24-48h)", "Store Pickup"],
+    paymentMethods: ["Lipa na M-Pesa", "Cash on Delivery"],
+  } : undefined);
 
   const [activeTab, setActiveTab] = useState<"products" | "services" | "about" | "reviews" | "info">("products");
   const [isFollowing, setIsFollowing] = useState(false);
@@ -41,6 +97,15 @@ export default function BusinessProfilePage({
   const [userRating, setUserRating] = useState(5);
   const [userComment, setUserComment] = useState("");
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+  if (loadingStore && !business) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center space-y-3">
+        <div className="w-8 h-8 rounded-full border-2 border-brand-emerald border-t-transparent animate-spin mx-auto" />
+        <p className="text-xs text-muted-foreground">Loading storefront...</p>
+      </div>
+    );
+  }
 
   if (!business) {
     return (
@@ -54,7 +119,9 @@ export default function BusinessProfilePage({
     );
   }
 
-  const products = MOCK_PRODUCTS.filter((p) => p.businessId === business.id || p.businessSlug === business.slug);
+  const products = liveProducts.length > 0
+    ? liveProducts
+    : MOCK_PRODUCTS.filter((p) => p.businessId === business.id || p.businessSlug === business.slug);
   const services = MOCK_SERVICES.filter((s) => s.providerId === business.id || s.providerSlug === business.slug);
 
   const handleFollow = () => {

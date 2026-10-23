@@ -34,7 +34,7 @@ export default function SellerLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -43,6 +43,82 @@ export default function SellerLayout({
     await logout();
     router.push("/login");
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-brand-emerald border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  const isMerchantRole =
+    user &&
+    (user.role === "SELLER" ||
+      user.role === "BUSINESS_OWNER" ||
+      user.role === "SERVICE_PROVIDER" ||
+      user.role === "ADMIN" ||
+      user.role === "SUPER_ADMIN");
+
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white dark:bg-brand-dark-card border border-border rounded-3xl p-8 text-center space-y-4 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-brand-emerald-soft text-brand-emerald flex items-center justify-center mx-auto">
+            <Lock className="w-6 h-6" />
+          </div>
+          <h2 className="text-xl font-black text-foreground">Seller Portal Sign-In Required</h2>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Please sign in with your verified merchant account to manage your inventory, orders, and payouts.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
+            <Link
+              href={`/login?redirect=${encodeURIComponent(pathname || "/seller/dashboard")}`}
+              className="flex-1 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/seller/onboarding"
+              className="flex-1 bg-muted hover:bg-muted/80 text-foreground font-bold py-2.5 px-4 rounded-xl text-xs transition-colors"
+            >
+              Open a Store
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isMerchantRole) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white dark:bg-brand-dark-card border border-border rounded-3xl p-8 text-center space-y-4 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center mx-auto">
+            <Store className="w-6 h-6" />
+          </div>
+          <h2 className="text-xl font-black text-foreground">Activate Your Merchant Account</h2>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Your account is currently registered as a shopper. Complete the 2-minute merchant onboarding to unlock your seller dashboard and list products.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
+            <Link
+              href="/seller/onboarding"
+              className="flex-1 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-colors"
+            >
+              Start Selling Now
+            </Link>
+            <Link
+              href="/customer/dashboard"
+              className="flex-1 bg-muted hover:bg-muted/80 text-foreground font-bold py-2.5 px-4 rounded-xl text-xs transition-colors"
+            >
+              Buyer Dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
 
   const navItems = [

@@ -12,7 +12,7 @@ export interface DocumentAuthContext {
   name?: string;
   phone?: string;
   email?: string;
-  role: "CUSTOMER" | "SELLER" | "BUSINESS_OWNER" | "ADMIN";
+  role: "CUSTOMER" | "SELLER" | "BUSINESS_OWNER" | "SERVICE_PROVIDER" | "ADMIN" | "SUPER_ADMIN";
   businessName?: string;
 }
 
@@ -24,32 +24,25 @@ export class DocumentService {
     auth?: DocumentAuthContext,
     filter?: { type?: string; status?: string; search?: string }
   ): VendLexDocument[] {
+    if (!auth) {
+      return [];
+    }
+
     let docs = DocumentStore.getAll();
 
     const normalizePhone = (p?: string) => (p ? p.replace(/[\s+-]/g, "").slice(-9) : "");
 
     // 1. Role-based isolation
-    if (!auth || auth.role === "CUSTOMER") {
-      if (auth && (auth.userId || auth.phone || auth.email || auth.name)) {
-        const normAuthPhone = normalizePhone(auth.phone);
-        const userName = auth.name?.toLowerCase().trim() || "";
-        const userId = auth.userId || "";
-        const userEmail = auth.email?.toLowerCase().trim() || "";
-
-        docs = docs.filter((d) => {
-          if (userId && d.ownerId === userId) return true;
-          if (userEmail && d.ownerEmail && d.ownerEmail.toLowerCase().trim() === userEmail) return true;
-          const normDocPhone = normalizePhone(d.ownerPhone);
-          if (normAuthPhone && normDocPhone && normDocPhone === normAuthPhone) return true;
-          if (userName && d.ownerName.toLowerCase().includes(userName)) return true;
-          if (userName && userName.includes(d.ownerName.toLowerCase())) return true;
-          return false;
-        });
-      }
-    } else if (auth.role === "SELLER" || auth.role === "BUSINESS_OWNER") {
+    if (auth.role === "ADMIN" || auth.role === "SUPER_ADMIN") {
+      // Admin sees all documents
+    } else if (auth.role === "SELLER" || auth.role === "BUSINESS_OWNER" || auth.role === "SERVICE_PROVIDER") {
       const biz = (auth.businessName || "").toLowerCase().trim();
       const userName = (auth.name || "").toLowerCase().trim();
       const userId = auth.userId || "";
+
+      if (!userId && !biz && !userName) {
+        return [];
+      }
 
       docs = docs.filter((d) => {
         if (userId && (d.sellerId === userId || d.ownerId === userId)) return true;
@@ -57,8 +50,26 @@ export class DocumentService {
         if (userName && (d.sellerName.toLowerCase().includes(userName) || userName.includes(d.sellerName.toLowerCase()))) return true;
         return false;
       });
+    } else {
+      // CUSTOMER
+      if (!auth.userId && !auth.phone && !auth.email && !auth.name) {
+        return [];
+      }
+      const normAuthPhone = normalizePhone(auth.phone);
+      const userName = auth.name?.toLowerCase().trim() || "";
+      const userId = auth.userId || "";
+      const userEmail = auth.email?.toLowerCase().trim() || "";
+
+      docs = docs.filter((d) => {
+        if (userId && d.ownerId === userId) return true;
+        if (userEmail && d.ownerEmail && d.ownerEmail.toLowerCase().trim() === userEmail) return true;
+        const normDocPhone = normalizePhone(d.ownerPhone);
+        if (normAuthPhone && normDocPhone && normDocPhone === normAuthPhone) return true;
+        if (userName && d.ownerName.toLowerCase().includes(userName)) return true;
+        if (userName && userName.includes(d.ownerName.toLowerCase())) return true;
+        return false;
+      });
     }
-    // ADMIN sees all
 
     // 2. Filter by Type
     if (filter?.type && filter.type !== "ALL") {
@@ -95,7 +106,8 @@ export class DocumentService {
    */
   static getDocument(
     idOrPublicId: string,
-    auth?: DocumentAuthContext
+    auth?: DocumentAuthContext,
+    verificationCode?: string
   ): { success: boolean; document?: VendLexDocument; error?: string } {
     const doc =
       DocumentStore.findByPublicId(idOrPublicId) ||
@@ -121,8 +133,13 @@ export class DocumentService {
       return { success: true, document: doc };
     }
 
+    // 1b. Holder of the cryptographic verification code (e.g. from /verify/[documentId])
+    if (verificationCode && doc.verificationCode && verificationCode.trim() === doc.verificationCode) {
+      return { success: true, document: doc };
+    }
+
     // 2. Admin has complete compliance audit access
-    if (auth?.role === "ADMIN") {
+    if (auth?.role === "ADMIN" || auth?.role === "SUPER_ADMIN") {
       return { success: true, document: doc };
     }
 
@@ -162,9 +179,10 @@ export class DocumentService {
    */
   static async generatePDF(
     idOrPublicId: string,
-    auth?: DocumentAuthContext
+    auth?: DocumentAuthContext,
+    verificationCode?: string
   ): Promise<{ success: boolean; pdfResult?: PDFGenerationResult; filename?: string; error?: string }> {
-    const fetchRes = this.getDocument(idOrPublicId, auth);
+    const fetchRes = this.getDocument(idOrPublicId, auth, verificationCode);
     if (!fetchRes.success || !fetchRes.document) {
       return { success: false, error: fetchRes.error };
     }
@@ -254,7 +272,7 @@ export class DocumentService {
     reason: string,
     adminAuth: DocumentAuthContext
   ): { success: boolean; error?: string } {
-    if (adminAuth.role !== "ADMIN") {
+    if (adminAuth.role !== "ADMIN" && adminAuth.role !== "SUPER_ADMIN") {
       return { success: false, error: "Unauthorized: Only administrators can revoke official documents." };
     }
     return DocumentStore.revoke(publicDocumentId, reason, adminAuth.name || "ADMIN");
@@ -268,8 +286,17 @@ export class DocumentService {
     newData: Partial<VendLexDocument>,
     auth: DocumentAuthContext
   ): { success: boolean; newDoc?: VendLexDocument; error?: string } {
-    if (auth.role !== "ADMIN" && auth.role !== "SELLER") {
+    if (
+      auth.role !== "ADMIN" &&
+      auth.role !== "SUPER_ADMIN" &&
+      auth.role !== "SELLER" &&
+      auth.role !== "BUSINESS_OWNER"
+    ) {
       return { success: false, error: "Unauthorized: Only sellers or administrators can supersede documents." };
+    }
+    const accessCheck = this.getDocument(oldPublicId, auth);
+    if (!accessCheck.success) {
+      return { success: false, error: accessCheck.error };
     }
     return DocumentStore.supersede(oldPublicId, newData, auth.name || "AUTHORIZED_USER");
   }

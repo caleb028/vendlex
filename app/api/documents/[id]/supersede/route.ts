@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DocumentService } from "@/lib/documents/service";
+import { requireRole } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -8,13 +9,21 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = requireRole(req, ["SELLER", "BUSINESS_OWNER", "ADMIN", "SUPER_ADMIN"]);
+    if (auth instanceof NextResponse) return auth;
+    const { user } = auth;
+
     const { id } = await context.params;
     const body = await req.json();
-    const { newData = {}, performedBy = "Seller Admin", role = "SELLER" } = body;
+    const { newData = {} } = body;
 
     const res = DocumentService.supersedeDocument(id, newData, {
-      role,
-      name: performedBy,
+      role: user.role,
+      userId: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      businessName: user.businessName,
     });
 
     if (!res.success || !res.newDoc) {

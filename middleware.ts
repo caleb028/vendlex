@@ -4,19 +4,15 @@ import { checkRateLimit } from "@/lib/security";
 
 const SESSION_COOKIE = "vendlex_session";
 
-// Routes that require authentication (redirects to login if no cookie)
-const AUTH_REQUIRED_PREFIXES = [
-  "/seller",
-  "/admin",
-  "/account",
-  "/checkout",
-];
-
-// Routes restricted to specific roles
-const ROLE_RESTRICTIONS: Record<string, string[]> = {
-  "/admin": ["ADMIN", "SUPER_ADMIN"],
-  "/seller": ["SELLER", "BUSINESS_OWNER", "ADMIN", "SUPER_ADMIN"],
-};
+// Routes that require authentication (redirects to login if no cookie).
+// Note: /admin, /checkout, /seller, and /seller/onboarding render their own dedicated in-place
+// auth/registration gateways and are therefore excluded from forced login redirects.
+function pathRequiresSessionCookie(pathname: string): boolean {
+  if (pathname.startsWith("/account")) return true;
+  if (pathname.startsWith("/customer/dashboard") || pathname.startsWith("/customer/disputes")) return true;
+  if (pathname.startsWith("/seller/") && !pathname.startsWith("/seller/onboarding")) return true;
+  return false;
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -44,7 +40,7 @@ export function middleware(request: NextRequest) {
   }
 
   // 2. Authentication enforcement for protected routes
-  const needsAuth = AUTH_REQUIRED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  const needsAuth = pathRequiresSessionCookie(pathname);
   if (needsAuth) {
     const sessionCookie = request.cookies.get(SESSION_COOKIE)?.value;
     if (!sessionCookie) {
@@ -72,6 +68,7 @@ export const config = {
     "/admin/:path*",
     "/seller/:path*",
     "/account/:path*",
+    "/customer/:path*",
     "/checkout/:path*",
   ],
 };

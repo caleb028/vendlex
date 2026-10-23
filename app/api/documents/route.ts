@@ -6,21 +6,28 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const { user } = getServerSession(req);
+    const { user, isAuthenticated } = getServerSession(req);
+    if (!isAuthenticated || !user) {
+      return NextResponse.json(
+        { success: false, error: "Authentication required to list documents.", count: 0, documents: [] },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type") || "ALL";
     const status = searchParams.get("status") || "ALL";
     const search = searchParams.get("search") || "";
 
-    const role = (user?.role || searchParams.get("role") || "CUSTOMER") as any;
-    const userId = user?.id || searchParams.get("userId") || undefined;
-    const name = user?.name || searchParams.get("name") || undefined;
-    const phone = user?.phone || searchParams.get("phone") || undefined;
-    const email = user?.email || searchParams.get("email") || undefined;
-    const businessName = user?.businessName || searchParams.get("businessName") || undefined;
-
     const docs = DocumentService.listDocuments(
-      { role, userId, name, phone, email, businessName },
+      {
+        role: user.role,
+        userId: user.id,
+        name: user.name,
+        phone: user.phone,
+        email: user.email,
+        businessName: user.businessName,
+      },
       { type, status, search }
     );
 

@@ -16,12 +16,18 @@ export async function GET(req: NextRequest) {
     const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!, 10) : 10;
     const offset = searchParams.get("offset") ? parseInt(searchParams.get("offset")!, 10) : 0;
 
+    const { user } = getServerSession(req);
+    const isAdmin = user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN");
+    const canViewAllForAdvertiser = Boolean(
+      advertiserId && (isAdmin || (user && user.id === advertiserId))
+    );
+
     const result = serverDB.getAdvertisements({
       category,
       county,
       town,
-      advertiserId,
-      status: advertiserId ? undefined : "ACTIVE", // Only active ads for public feed unless querying own ads
+      advertiserId: canViewAllForAdvertiser ? advertiserId : undefined,
+      status: canViewAllForAdvertiser ? undefined : "ACTIVE", // Only active ads for public feed unless querying own ads
       limit,
       offset,
     });

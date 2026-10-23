@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DocumentService } from "@/lib/documents/service";
+import { requireRole } from "@/lib/auth/session";
+import { sanitizeInput } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
@@ -8,20 +10,25 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = requireRole(req, ["ADMIN", "SUPER_ADMIN"]);
+    if (auth instanceof NextResponse) return auth;
+    const { user } = auth;
+
     const { id } = await context.params;
     const body = await req.json();
-    const { reason, adminName = "Compliance Admin", role = "ADMIN" } = body;
+    const reason = sanitizeInput(body.reason || "", 300);
 
-    if (!reason || !reason.trim()) {
+    if (!reason) {
       return NextResponse.json(
         { success: false, error: "A revocation reason is required." },
         { status: 400 }
       );
     }
 
-    const res = DocumentService.revokeDocument(id, reason.trim(), {
-      role,
-      name: adminName,
+    const res = DocumentService.revokeDocument(id, reason, {
+      role: user.role,
+      userId: user.id,
+      name: user.name,
     });
 
     if (!res.success) {

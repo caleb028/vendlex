@@ -71,10 +71,16 @@ export async function PUT(
 
     if (body.title) updates.title = sanitizeInput(body.title, 120);
     if (body.description) updates.description = sanitizeInput(body.description, 1000);
-    if (typeof body.price === "number" && body.price > 0) updates.price = body.price;
-    if (typeof body.stockCount === "number") {
-      updates.stockCount = Math.max(0, body.stockCount);
-      updates.inStock = updates.stockCount > 0;
+    if (body.price !== undefined) {
+      const parsedPrice = Number(body.price);
+      if (!Number.isNaN(parsedPrice) && parsedPrice > 0) updates.price = parsedPrice;
+    }
+    if (body.stockCount !== undefined) {
+      const parsedStock = parseInt(String(body.stockCount), 10);
+      if (!Number.isNaN(parsedStock)) {
+        updates.stockCount = Math.max(0, parsedStock);
+        updates.inStock = updates.stockCount > 0;
+      }
     }
     if (body.category) updates.category = sanitizeInput(body.category, 60);
     if (Array.isArray(body.images) && body.images.length > 0) updates.images = body.images;

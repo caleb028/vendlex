@@ -102,7 +102,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/delivery" className="hover:text-white transition-colors">
+                <Link href="/customer/dashboard" className="hover:text-white transition-colors">
                   Delivery Tracking
                 </Link>
               </li>
@@ -229,17 +229,17 @@ export function Footer() {
             </h4>
             <ul className="space-y-2 text-xs text-gray-400">
               <li>
-                <Link href="/terms" className="hover:text-white transition-colors">
+                <Link href="/help?section=terms" className="hover:text-white transition-colors">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-white transition-colors">
+                <Link href="/help?section=privacy" className="hover:text-white transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="hover:text-white transition-colors">
+                <Link href="/help?section=returns" className="hover:text-white transition-colors">
                   Returns &amp; Escrow Policy
                 </Link>
               </li>

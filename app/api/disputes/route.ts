@@ -1,29 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { serverDB } from "@/lib/server-db";
-import { getServerSession } from "@/lib/auth/session";
+import { getServerSession, requireAuth } from "@/lib/auth/session";
 import { sanitizeInput } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const { user, isAuthenticated } = getServerSession(req);
+    const auth = requireAuth(req);
+    if (auth instanceof NextResponse) return auth;
+    const { user } = auth;
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status") || undefined;
     const sellerIdParam = searchParams.get("sellerId") || undefined;
 
-    let disputes = serverDB.getDisputes({ status });
-
-    if (isAuthenticated && user) {
-      if (user.role === "SELLER" || user.role === "BUSINESS_OWNER") {
-        const sId = user.businessId || user.businessSlug || user.id;
-        disputes = serverDB.getDisputes({ sellerId: sId, status });
-      } else if (user.role === "CUSTOMER") {
-        disputes = serverDB.getDisputes({ customerId: user.id, status });
-      }
-      // ADMIN sees all
-    } else if (sellerIdParam) {
+    let disputes;
+    if (user.role === "ADMIN" || user.role === "SUPER_ADMIN") {
       disputes = serverDB.getDisputes({ sellerId: sellerIdParam, status });
+    } else if (user.role === "SELLER" || user.role === "BUSINESS_OWNER") {
+      const sId = user.businessId || user.businessSlug || user.id;
+      disputes = serverDB.getDisputes({ sellerId: sId, status });
+    } else {
+      disputes = serverDB.getDisputes({ customerId: user.id, status });
     }
 
     return NextResponse.json({ success: true, disputes });
@@ -35,7 +33,15 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { user } = getServerSession(req);
+    const auth = requireAuth(req);
+    if (auth instanceof NextResponse) {
+      return NextResponse.json(
+        { success: false, error: "Please sign in to open an order dispute." },
+        { status: 401 }
+      );
+    }
+    const { user } = auth;
+    const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
     const body = await req.json();
 
     const orderNumber = sanitizeInput(body.orderNumber || "", 50);
@@ -53,6 +59,12 @@ export async function POST(req: NextRequest) {
 
     // Try to find matching order in database
     const order = serverDB.getOrderByNumber(orderNumber) || (body.orderId ? serverDB.getOrderById(body.orderId) : undefined);
+    if (order && order.customerId !== user.id && !isAdmin) {
+      return NextResponse.json(
+        { success: false, error: "Forbidden: You can only open a dispute for your own orders." },
+        { status: 403 }
+      );
+    }
 
     const customerId = user?.id || order?.customerId || `usr-cust-${Date.now()}`;
     const customerName = user?.name || order?.customerName || body.customerName || "Customer";

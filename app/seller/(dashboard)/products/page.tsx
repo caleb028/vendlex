@@ -295,7 +295,7 @@ export default function SellerProductsPage() {
               {/* Actions */}
               <div className="pt-2 border-t border-border flex items-center justify-between gap-2">
                 <Link
-                  href={`/marketplace/${product.slug || product.id}`}
+                  href={`/products/${product.slug || product.id}`}
                   target="_blank"
                   className="p-2 rounded-xl bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                   title="View on Live Storefront"

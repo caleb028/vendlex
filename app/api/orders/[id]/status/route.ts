@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { serverDB } from "@/lib/server-db";
+import type { ServerOrder } from "@/lib/server-db/types";
 import { requireAuth } from "@/lib/auth/session";
 import { sanitizeInput } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
+
+const VALID_ORDER_STATUSES: ReadonlyArray<ServerOrder["status"]> = [
+  "PENDING_PAYMENT",
+  "PAID",
+  "PROCESSING",
+  "READY_FOR_DISPATCH",
+  "DISPATCHED",
+  "DELIVERED",
+  "CANCELLED",
+];
 
 export async function PUT(
   req: NextRequest,
@@ -21,14 +32,15 @@ export async function PUT(
       return NextResponse.json({ success: false, error: "Order not found." }, { status: 404 });
     }
 
-    // Check permission: only owning seller or admin can update order status
-    const isSellerOwner =
-      order.sellerId === user.businessId ||
-      order.sellerId === user.businessSlug ||
-      (user.businessName && order.sellerName.toLowerCase() === user.businessName.toLowerCase());
     const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+    const isSellerOwner =
+      !isAdmin &&
+      (order.sellerId === user.businessId ||
+        order.sellerId === user.businessSlug ||
+        (!!user.businessName && order.sellerName.toLowerCase() === user.businessName.toLowerCase()));
+    const isBuyer = order.customerId === user.id;
 
-    if (!isSellerOwner && !isAdmin) {
+    if (!isSellerOwner && !isAdmin && !isBuyer) {
       return NextResponse.json(
         { success: false, error: "Forbidden: You are not authorized to update this order." },
         { status: 403 }
@@ -36,15 +48,41 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const newStatus = body.status;
+    const rawStatus = body.status;
+    if (typeof rawStatus !== "string" || !VALID_ORDER_STATUSES.includes(rawStatus as ServerOrder["status"])) {
+      return NextResponse.json({ success: false, error: "Invalid order status." }, { status: 400 });
+    }
+    const newStatus = rawStatus as ServerOrder["status"];
+
+    // A buyer may only cancel their own order, and only while it is still unpaid.
+    if (isBuyer && !isAdmin && !isSellerOwner) {
+      if (newStatus !== "CANCELLED" || order.status !== "PENDING_PAYMENT") {
+        return NextResponse.json(
+          { success: false, error: "You can only cancel an order that has not been paid yet." },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Online payments (M-Pesa / card) are confirmed only by the payment callback or an admin.
+    // Merchants may mark PAID themselves solely for Cash-on-Delivery orders.
+    if (newStatus === "PAID" && !isAdmin && order.paymentMethod !== "COD") {
+      return NextResponse.json(
+        { success: false, error: "Online payments are confirmed automatically once M-Pesa/card payment succeeds." },
+        { status: 403 }
+      );
+    }
+
     const courierTracking = body.courierTracking ? sanitizeInput(body.courierTracking, 50) : undefined;
-    const mpesaReceipt = body.mpesaReceipt ? sanitizeInput(body.mpesaReceipt, 50) : undefined;
+    // Receipts are only ever recorded from the verified payment callback or by an admin.
+    const mpesaReceipt = isAdmin && body.mpesaReceipt ? sanitizeInput(body.mpesaReceipt, 50) : undefined;
 
     const res = serverDB.updateOrderStatus(id, newStatus, {
-      courierTracking,
+      courierTracking: isBuyer && !isAdmin && !isSellerOwner ? undefined : courierTracking,
       mpesaReceipt,
       paymentStatus: newStatus === "PAID" ? "PAID" : undefined,
     });
+
 
     if (!res.success || !res.order) {
       return NextResponse.json({ success: false, error: res.error || "Failed to update order status." }, { status: 400 });

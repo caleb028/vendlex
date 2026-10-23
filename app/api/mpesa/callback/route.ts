@@ -9,8 +9,14 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Optional Webhook Secret Verification (if configured)
+    // 1. Webhook Secret Verification. In live (production) mode the secret is mandatory so a
+    //    forged callback can never mark an order as paid.
     const webhookSecret = process.env.MPESA_CALLBACK_SECRET;
+    const isLiveMode = process.env.MPESA_ENVIRONMENT === "production";
+    if (isLiveMode && !webhookSecret) {
+      console.error("[SECURITY ALERT] MPESA_CALLBACK_SECRET is not set in live mode; callback rejected.");
+      return NextResponse.json({ ResultCode: 1, ResultDesc: "Callback not configured" }, { status: 503 });
+    }
     if (webhookSecret) {
       const authHeader = req.headers.get("x-callback-secret") || req.nextUrl.searchParams.get("secret");
       if (!authHeader || !timingSafeCompare(authHeader, webhookSecret)) {
@@ -86,17 +92,60 @@ export async function POST(req: NextRequest) {
 
     // Reconcile with matching Order in Server Database
     if (isSuccess) {
-      // Find order by matching checkoutRequestId or accountReference
-      const allOrders = serverDB.getOrders();
-      const matchingOrder = allOrders.find(
-        (o) =>
-          o.checkoutRequestId === CheckoutRequestID ||
-          (existingTxn?.accountReference && o.orderNumber === existingTxn.accountReference) ||
-          o.status === "PENDING_PAYMENT"
-      );
+      const adminIds = () =>
+        serverDB
+          .getUsers()
+          .filter((u) => u.role === "ADMIN" || u.role === "SUPER_ADMIN")
+          .map((u) => u.id);
+      const alertAdmins = (title: string, message: string) => {
+        for (const adminId of adminIds()) {
+          serverDB.addNotification({ userId: adminId, title, message, type: "PAYMENT", link: "/admin" });
+        }
+      };
+
+      // Match STRICTLY on this exact STK request (never "any pending order").
+      const accountRef = existingTxn?.accountReference;
+      const candidate = serverDB
+        .getOrders()
+        .find(
+          (o) =>
+            o.checkoutRequestId === CheckoutRequestID ||
+            (!o.checkoutRequestId && !!accountRef && o.orderNumber === accountRef)
+        );
+
+      let matchingOrder: typeof candidate;
+
+      if (!candidate) {
+        console.warn(`[M-PESA DARAJA] Payment ${safeReceipt} (${CheckoutRequestID}) matched no order.`);
+      } else if (candidate.paymentStatus === "PAID" || (candidate.status !== "PENDING_PAYMENT" && candidate.status !== "CANCELLED")) {
+        console.log(`[M-PESA DARAJA] Order ${candidate.orderNumber} already settled; ignoring duplicate payment.`);
+      } else if (candidate.status === "CANCELLED") {
+        // Money arrived for an order that had already expired/been cancelled: flag for refund.
+        const msg = `Payment ${safeReceipt} of KSh ${amountPaid ?? "?"} arrived for cancelled order ${candidate.orderNumber}. A refund is required.`;
+        alertAdmins("Refund required: late M-Pesa payment", msg);
+        serverDB.addNotification({
+          userId: candidate.customerId,
+          title: "Payment received for an expired order",
+          message: `We received KSh ${amountPaid ?? ""} (Receipt ${safeReceipt}) after order ${candidate.orderNumber} expired. Support will refund you shortly.`,
+          type: "PAYMENT",
+          link: "/help",
+        });
+      } else if (typeof amountPaid === "number" && Math.round(amountPaid) < Math.round(candidate.totalAmount)) {
+        const msg = `Underpayment for ${candidate.orderNumber}: paid KSh ${amountPaid}, expected KSh ${candidate.totalAmount} (Receipt ${safeReceipt}). Order left unpaid.`;
+        console.warn(`[M-PESA DARAJA] ${msg}`);
+        alertAdmins("M-Pesa underpayment flagged", msg);
+      } else {
+        const res = serverDB.updateOrderStatus(candidate.id, "PAID", {
+          mpesaReceipt: safeReceipt,
+          paymentStatus: "PAID",
+        });
+        if (res.success) {
+          matchingOrder = candidate;
+        }
+      }
 
       if (matchingOrder) {
-        // Automatically issue verified VendLex document receipt
+        // Automatically issue verified VendLex document receipt (only after payment is recorded)
         let docId: string | undefined;
         try {
           const doc = DocumentService.issueOrderReceipt({
@@ -115,16 +164,10 @@ export async function POST(req: NextRequest) {
             items: matchingOrder.items,
           });
           docId = doc.publicDocumentId;
+          serverDB.updateOrderStatus(matchingOrder.id, "PAID", { documentId: docId });
         } catch (docErr) {
           console.error("Failed to generate document for order:", docErr);
         }
-
-        // Update order status to PAID
-        serverDB.updateOrderStatus(matchingOrder.id, "PAID", {
-          mpesaReceipt: safeReceipt,
-          paymentStatus: "PAID",
-          documentId: docId,
-        });
 
         // Notify Buyer
         serverDB.addNotification({
@@ -135,9 +178,10 @@ export async function POST(req: NextRequest) {
           link: docId ? `/verify/${docId}` : "/account/documents",
         });
 
-        // Notify Seller
+        // Notify Seller (sellerId on an order is the business id, so resolve the owning user)
+        const sellerUser = serverDB.findUserByBusiness(matchingOrder.sellerId);
         serverDB.addNotification({
-          userId: matchingOrder.sellerId,
+          userId: sellerUser?.id || matchingOrder.sellerId,
           title: "New Paid Order Received",
           message: `Order ${matchingOrder.orderNumber} has been paid via M-Pesa (${safeReceipt}). Please prepare for dispatch.`,
           type: "ORDER",

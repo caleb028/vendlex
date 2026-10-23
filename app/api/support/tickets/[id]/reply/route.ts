@@ -39,6 +39,12 @@ export async function POST(
     }
 
     const isAdmin = user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN");
+    if (ticket.userId && !isAdmin && user?.id !== ticket.userId) {
+      return NextResponse.json(
+        { success: false, error: "Forbidden: You can only reply to your own support tickets." },
+        { status: 403 }
+      );
+    }
     const senderRole = isAdmin
       ? "ADMIN"
       : user?.role === "SELLER"

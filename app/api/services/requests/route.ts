@@ -7,21 +7,20 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    const { user, isAuthenticated } = getServerSession(req);
+    const auth = requireAuth(req);
+    if (auth instanceof NextResponse) return auth;
+    const { user } = auth;
     const { searchParams } = new URL(req.url);
     const providerId = searchParams.get("providerId");
 
-    let requests = serverDB.getServiceRequests();
-
-    if (isAuthenticated && user) {
-      if (user.role === "SERVICE_PROVIDER" || user.role === "SELLER" || user.role === "BUSINESS_OWNER") {
-        const pId = user.businessId || user.businessSlug || user.id;
-        requests = serverDB.getServiceRequests({ providerId: pId });
-      } else if (user.role === "CUSTOMER") {
-        requests = serverDB.getServiceRequests({ customerId: user.id });
-      }
-    } else if (providerId) {
-      requests = serverDB.getServiceRequests({ providerId });
+    let requests;
+    if (user.role === "ADMIN" || user.role === "SUPER_ADMIN") {
+      requests = providerId ? serverDB.getServiceRequests({ providerId }) : serverDB.getServiceRequests();
+    } else if (user.role === "SERVICE_PROVIDER" || user.role === "SELLER" || user.role === "BUSINESS_OWNER") {
+      const pId = user.businessId || user.businessSlug || user.id;
+      requests = serverDB.getServiceRequests({ providerId: pId });
+    } else {
+      requests = serverDB.getServiceRequests({ customerId: user.id });
     }
 
     return NextResponse.json({ success: true, serviceRequests: requests });

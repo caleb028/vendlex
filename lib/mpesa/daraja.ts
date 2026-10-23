@@ -151,7 +151,11 @@ export async function initiateSTKPush(
     PartyA: formattedPhone,
     PartyB: config.shortcode,
     PhoneNumber: formattedPhone,
-    CallBackURL: config.callbackUrl,
+    CallBackURL: (() => {
+      const secret = process.env.MPESA_CALLBACK_SECRET;
+      if (!secret || config.callbackUrl.includes("secret=")) return config.callbackUrl;
+      return `${config.callbackUrl}${config.callbackUrl.includes("?") ? "&" : "?"}secret=${encodeURIComponent(secret)}`;
+    })(),
     AccountReference: params.accountReference || config.accountReference || "VENDLEX",
     TransactionDesc: params.transactionDesc || config.transactionDesc || "Listing Fee",
   };

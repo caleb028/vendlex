@@ -63,6 +63,7 @@ export default function CustomerDashboardPage() {
   const [redeemedToast, setRedeemedToast] = useState("");
 
   const [orders, setOrders] = useState<CustomerOrder[]>([]);
+  const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -87,12 +88,15 @@ export default function CustomerDashboardPage() {
               year: "numeric",
             }),
             seller: o.sellerName || "Verified Merchant",
-            product: o.items?.[0]?.title || o.items?.[0]?.productTitle || "Marketplace Product",
-            price: o.total || 0,
-            status: o.status || "PAID",
+            product:
+              o.items?.length > 1
+                ? `${o.items[0]?.title || o.items[0]?.productTitle || "Marketplace Product"} +${o.items.length - 1} more`
+                : o.items?.[0]?.title || o.items?.[0]?.productTitle || "Marketplace Product",
+            price: o.totalAmount ?? o.total ?? 0,
+            status: o.status || "PENDING_PAYMENT",
             delivery: o.courierTracking ? `Tracking: ${o.courierTracking}` : `${o.town || "CBD"}, ${o.county || "Nairobi"}`,
-            receipt: o.mpesaReceipt || "MPESA-CONFIRMED",
-            documentId: o.documentId || "VLX-REC-2026-000182",
+            receipt: o.mpesaReceipt || (o.paymentMethod === "COD" ? "Pay on Delivery" : "Pending Payment"),
+            documentId: o.documentId || undefined,
           }));
           setOrders(mapped);
         }
@@ -278,31 +282,69 @@ export default function CustomerDashboardPage() {
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
-                        <Link
-                          href="/delivery"
-                          className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm"
+                        <button
+                          type="button"
+                          onClick={() => setTrackingOrderId(trackingOrderId === ord.id ? null : ord.id)}
+                          className="bg-brand-emerald hover:bg-brand-emerald-dark text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm transition-colors"
                         >
                           <Truck className="w-3.5 h-3.5" />
-                          <span>Track</span>
-                        </Link>
-                        <a
-                          href={`/api/documents/${ord.documentId || "VLX-REC-2026-000182"}/download`}
-                          className="bg-muted hover:bg-muted/80 text-foreground border border-border font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
-                          title="Download Official PDF Receipt"
-                        >
-                          <FileText className="w-3.5 h-3.5 text-brand-emerald" />
-                          <span>Receipt</span>
-                        </a>
-                        <Link
-                          href={`/verify/${ord.documentId || "VLX-REC-2026-000182"}`}
-                          target="_blank"
-                          className="p-2 bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-xl border border-border"
-                          title="Verify on VendLex Portal"
-                        >
-                          <ShieldCheck className="w-3.5 h-3.5 text-brand-emerald" />
-                        </Link>
+                          <span>{trackingOrderId === ord.id ? "Hide Tracking" : "Track"}</span>
+                        </button>
+                        {ord.documentId && (
+                          <>
+                            <a
+                              href={`/api/documents/${ord.documentId}/download`}
+                              className="bg-muted hover:bg-muted/80 text-foreground border border-border font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
+                              title="Download Official PDF Receipt"
+                            >
+                              <FileText className="w-3.5 h-3.5 text-brand-emerald" />
+                              <span>Receipt</span>
+                            </a>
+                            <Link
+                              href={`/verify/${ord.documentId}`}
+                              target="_blank"
+                              className="p-2 bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-xl border border-border"
+                              title="Verify on VendLex Portal"
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5 text-brand-emerald" />
+                            </Link>
+                          </>
+                        )}
                       </div>
                     </div>
+
+                    {trackingOrderId === ord.id && (
+                      <div className="pt-3 border-t border-border/80 bg-muted/20 rounded-2xl p-4 space-y-2 text-xs">
+                        <div className="flex items-center justify-between font-bold text-foreground">
+                          <span>Live Escrow &amp; Courier Status</span>
+                          <span className="text-brand-emerald">{ord.status}</span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-2 pt-1 text-[10px] font-bold text-center">
+                          {(["PAID", "PROCESSING", "SHIPPED", "DELIVERED"] as const).map((step, idx) => {
+                            const orderRank: Record<string, number> = {
+                              PENDING_PAYMENT: 0,
+                              PAID: 1,
+                              PROCESSING: 2,
+                              SHIPPED: 3,
+                              DELIVERED: 4,
+                            };
+                            const reached = (orderRank[ord.status] ?? 0) >= idx + 1;
+                            return (
+                              <div
+                                key={step}
+                                className={`py-1.5 px-2 rounded-lg border ${
+                                  reached
+                                    ? "bg-emerald-50 dark:bg-emerald-950/50 border-brand-emerald text-brand-emerald"
+                                    : "bg-background border-border text-muted-foreground"
+                                }`}
+                              >
+                                {step}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

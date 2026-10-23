@@ -717,6 +717,7 @@ export default function AdminDashboardPage() {
           amount: Number(testAmount),
           accountReference: "ADMIN_DIAGNOSTIC",
           transactionDesc: "VendLex Live STK Diagnostic Probe",
+          purpose: "DIAGNOSTIC",
         }),
       });
       const data = await res.json();

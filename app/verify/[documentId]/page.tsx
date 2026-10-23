@@ -247,7 +247,7 @@ export default function DocumentVerificationPage({
                   {/* Actions */}
                   <div className="flex flex-col sm:flex-row gap-3 pt-3">
                     <a
-                      href={`/api/documents/${result.document.publicDocumentId}/download`}
+                      href={`/api/documents/${result.document.publicDocumentId}/download?code=${encodeURIComponent(result.document.verificationCode)}`}
                       className="flex-1 bg-brand-emerald hover:bg-brand-emerald-dark text-white font-black py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
                     >
                       <Download className="w-4 h-4" />

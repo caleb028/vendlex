@@ -304,25 +304,23 @@ export default function AdvertisePage() {
             setPaymentStatus("success");
             setIsProcessingPayment(false);
             setCurrentStep("CONFIRMATION");
-          } else if (queryData.status === "FAILED" || (queryData.ResultCode && queryData.ResultCode !== "0")) {
+          } else if (queryData.status === "FAILED" || queryData.status === "CANCELLED" || (queryData.ResultCode && queryData.ResultCode !== "0")) {
             clearInterval(pollInterval);
             setPaymentStatus("failed");
             setIsProcessingPayment(false);
-            setPaymentError(queryData.error || queryData.ResultDesc || "M-Pesa payment was not completed.");
+            setPaymentError(queryData.error || queryData.resultDesc || queryData.ResultDesc || "M-Pesa payment was not completed.");
           } else if (attempts >= maxAttempts) {
-            // In case of Daraja sandbox delay or slow webhook, mark as submitted for review with pending payment check
             clearInterval(pollInterval);
-            setPaymentStatus("success");
+            setPaymentStatus("failed");
             setIsProcessingPayment(false);
-            setMpesaReceipt(`PENDING-${Date.now().toString().slice(-6)}`);
-            setCurrentStep("CONFIRMATION");
+            setPaymentError("Payment confirmation timed out. Please complete the M-Pesa PIN prompt on your phone and try again.");
           }
         } catch {
           if (attempts >= maxAttempts) {
             clearInterval(pollInterval);
             setIsProcessingPayment(false);
-            setPaymentStatus("success");
-            setCurrentStep("CONFIRMATION");
+            setPaymentStatus("failed");
+            setPaymentError("Could not verify M-Pesa payment status. Please check your phone and try again.");
           }
         }
       }, 2000);

@@ -241,11 +241,11 @@ function OnboardingContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          phone: paymentPhone,
+          phoneNumber: paymentPhone,
           amount: activePlanObj.monthlyPrice,
-          orderId: `VLX-PLAN-${selectedPlan.toUpperCase()}-${Date.now().toString().slice(-4)}`,
           accountReference: `VENDLEX-${bizName.replace(/\s+/g, "").slice(0, 10).toUpperCase()}`,
-          description: `VendLex ${activePlanObj.name} Store Activation`,
+          transactionDesc: `VendLex ${activePlanObj.name} Store Activation`,
+          purpose: "SUBSCRIPTION",
         }),
       });
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { mpesaTransactionsStore } from "@/lib/mpesa/transaction-store";
-import { maskPhoneNumber } from "@/lib/security";
+import { timingSafeCompare } from "@/lib/security";
 import { getServerSession } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
@@ -9,33 +9,38 @@ export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   const apiKey = req.headers.get("x-api-key");
-  const adminSecret = process.env.ADMIN_API_SECRET || "vendlex_admin_secret_key";
+  // No default secret: API-key access is only enabled when ADMIN_API_SECRET is configured.
+  const adminSecret = process.env.ADMIN_API_SECRET;
 
   const { user, isAuthenticated } = getServerSession(req);
   const isSessionAdmin = isAuthenticated && user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN");
 
+  const hasValidSecret =
+    !!adminSecret &&
+    ((!!authHeader && timingSafeCompare(authHeader, `Bearer ${adminSecret}`)) ||
+      (!!apiKey && timingSafeCompare(apiKey, adminSecret)));
+
   // Check if caller has verified admin credentials
-  const isAdmin = isSessionAdmin || authHeader === `Bearer ${adminSecret}` || apiKey === adminSecret;
+  const isAdmin = !!isSessionAdmin || hasValidSecret;
+
+  // Only admins may list the ledger at all; everyone else gets an empty, masked summary.
+  if (!isAdmin) {
+    return NextResponse.json({ error: "Admin access required." }, { status: 403 });
+  }
 
   const rawTransactions = mpesaTransactionsStore.getAll();
   const totalVolume = mpesaTransactionsStore.getTotalVolume();
 
-  // If not authenticated admin, mask sensitive PII (Data Protection compliance)
-  const transactions = rawTransactions.map((txn) => {
-    if (isAdmin) return txn;
-    return {
-      ...txn,
-      phoneNumber: maskPhoneNumber(txn.phoneNumber),
-      // Mask receipt number partially if unauthenticated
-      mpesaReceiptNumber: txn.mpesaReceiptNumber ? `${txn.mpesaReceiptNumber.slice(0, 4)}****` : undefined,
-    };
-  });
+  const transactions = rawTransactions.map((txn) => ({
+    ...txn,
+    phoneNumber: txn.phoneNumber,
+  }));
 
   return NextResponse.json({
     success: true,
     totalVolume,
     transactionCount: transactions.length,
-    isMasked: !isAdmin,
+    isMasked: false,
     transactions,
   });
 }

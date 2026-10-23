@@ -24,9 +24,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, ticket });
     }
 
-    // Role-based filtering: Admin sees all, User sees own
+    // Role-based filtering: Admin sees all, authenticated user sees own, unauthenticated sees none
     const isAdmin = user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN");
-    const userIdFilter = isAdmin ? undefined : user?.id;
+    if (!isAdmin && !user?.id) {
+      return NextResponse.json({
+        success: true,
+        count: 0,
+        tickets: [],
+      });
+    }
+    const userIdFilter = isAdmin ? undefined : user!.id;
 
     const tickets = serverDB.getSupportTickets({
       status,

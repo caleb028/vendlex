@@ -1,43 +1,64 @@
 import { NextRequest, NextResponse } from "next/server";
 import { serverDB } from "@/lib/server-db";
-import { getServerSession } from "@/lib/auth/session";
+import { requireAuth } from "@/lib/auth/session";
 import { sanitizeInput, isValidKenyanPhone } from "@/lib/security";
 import { calculateCountyDeliveryFee } from "@/lib/delivery";
 
 export const dynamic = "force-dynamic";
 
-// In-memory idempotency cache to prevent double-charging or duplicate orders
+// In-memory idempotency cache (scoped per user, expiring) to prevent duplicate orders on double-submit
+const IDEMPOTENCY_TTL_MS = 10 * 60 * 1000;
 const idempotencyStore = new Map<string, { timestamp: number; order: any }>();
+
+function pruneIdempotencyStore() {
+  const cutoff = Date.now() - IDEMPOTENCY_TTL_MS;
+  for (const [key, entry] of idempotencyStore.entries()) {
+    if (entry.timestamp < cutoff) idempotencyStore.delete(key);
+  }
+}
 
 export async function GET(req: NextRequest) {
   try {
-    const { user, isAuthenticated } = getServerSession(req);
-    const { searchParams } = new URL(req.url);
-    const sellerId = searchParams.get("sellerId");
+    // Orders contain customer PII (phone, address). Never expose them without a session.
+    const auth = requireAuth(req);
+    if (auth instanceof NextResponse) return auth;
+    const { user } = auth;
 
-    let orders = serverDB.getOrders();
+    // Release stock held by abandoned online-payment orders
+    serverDB.expireStaleUnpaidOrders();
 
-    if (isAuthenticated && user) {
-      if (user.role === "SELLER" || user.role === "BUSINESS_OWNER") {
-        const sId = user.businessId || user.businessSlug || user.id;
-        orders = serverDB.getSellerOrders(sId);
-      } else if (user.role === "CUSTOMER") {
-        orders = serverDB.getCustomerOrders(user.id);
-      }
-      // ADMIN sees all orders
-    } else if (sellerId) {
-      orders = serverDB.getSellerOrders(sellerId);
+    let orders;
+    if (user.role === "ADMIN" || user.role === "SUPER_ADMIN") {
+      orders = serverDB.getOrders();
+    } else if (user.role === "SELLER" || user.role === "BUSINESS_OWNER") {
+      const sId = user.businessId || user.businessSlug;
+      orders = sId ? serverDB.getSellerOrders(sId) : [];
+    } else {
+      // CUSTOMER and any other role: strictly their own orders (default deny)
+      orders = serverDB.getCustomerOrders(user.id);
     }
 
     return NextResponse.json({ success: true, orders });
   } catch (err: any) {
+    console.error("[Order List Error]:", err);
     return NextResponse.json({ success: false, error: "Failed to fetch orders." }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const idempotencyKey = req.headers.get("x-idempotency-key") || "";
+    const auth = requireAuth(req);
+    if (auth instanceof NextResponse) {
+      return NextResponse.json(
+        { success: false, error: "Please sign in or create an account to place your order." },
+        { status: 401 }
+      );
+    }
+    const { user } = auth;
+
+    pruneIdempotencyStore();
+    const rawKey = req.headers.get("x-idempotency-key") || "";
+    const idempotencyKey = rawKey ? `${user.id}:${rawKey}` : "";
     if (idempotencyKey && idempotencyStore.has(idempotencyKey)) {
       const existing = idempotencyStore.get(idempotencyKey)!;
       return NextResponse.json({
@@ -45,14 +66,6 @@ export async function POST(req: NextRequest) {
         order: existing.order,
         isDuplicatePrevented: true,
       });
-    }
-
-    const { user, isAuthenticated } = getServerSession(req);
-    if (!isAuthenticated || !user) {
-      return NextResponse.json(
-        { success: false, error: "Please sign in or create an account to place your order." },
-        { status: 401 }
-      );
     }
 
     const body = await req.json();
@@ -64,7 +77,13 @@ export async function POST(req: NextRequest) {
     const town = sanitizeInput(body.town || "Central", 50);
     const estate = sanitizeInput(body.estate || "Estate", 100);
     const deliveryNotes = body.deliveryNotes ? sanitizeInput(body.deliveryNotes, 200) : undefined;
-    const paymentMethod = body.paymentMethod === "CARD" ? "CARD" : body.paymentMethod === "COD" ? "COD" : "MPESA";
+    if (body.paymentMethod === "CARD") {
+      return NextResponse.json(
+        { success: false, error: "Card payments are not available yet. Please pay via M-Pesa or Pay on Delivery." },
+        { status: 400 }
+      );
+    }
+    const paymentMethod = body.paymentMethod === "COD" ? "COD" : "MPESA";
     const promoCode = (body.promoCode || "").trim().toUpperCase();
 
     if (!isValidKenyanPhone(customerPhone)) {
@@ -78,32 +97,48 @@ export async function POST(req: NextRequest) {
     if (rawItems.length === 0) {
       return NextResponse.json({ success: false, error: "Cannot create an order with an empty cart." }, { status: 400 });
     }
+    if (rawItems.length > 100) {
+      return NextResponse.json({ success: false, error: "Too many line items in a single order." }, { status: 400 });
+    }
 
-    // Authoritative server-side price & stock verification
+    // 1. Normalise & merge line items (same product listed twice must be stock-checked as one line)
+    const requested = new Map<string, number>();
+    for (const item of rawItems) {
+      const productId = typeof item?.productId === "string" ? item.productId : "";
+      if (!productId) {
+        return NextResponse.json({ success: false, error: "Cart contains an invalid item." }, { status: 400 });
+      }
+      const parsedQty = Math.floor(Number(item.quantity));
+      const qty = Number.isFinite(parsedQty) ? Math.max(1, Math.min(parsedQty, 50)) : 1;
+      requested.set(productId, (requested.get(productId) || 0) + qty);
+    }
+
+    // 2. Validate EVERY line against authoritative server price & stock BEFORE touching inventory
     const orderItems: any[] = [];
     let subtotal = 0;
     let primarySellerId = "biz-1";
     let primarySellerName = "VendLex Marketplace";
+    const reservations: Array<{ productId: string; qty: number }> = [];
 
-    for (const item of rawItems) {
-      const product = serverDB.getProductById(item.productId);
+    for (const [productId, qty] of requested.entries()) {
+      const product = serverDB.getProductById(productId);
       if (!product) {
-        return NextResponse.json({ success: false, error: `Product ID ${item.productId} is invalid or expired.` }, { status: 400 });
+        return NextResponse.json({ success: false, error: `Product ID ${productId} is invalid or expired.` }, { status: 400 });
       }
-
-      const qty = Math.max(1, Math.min(item.quantity || 1, 50));
-      if (product.stockCount < qty) {
+      if (!(product.stockCount >= qty)) {
         return NextResponse.json({
           success: false,
-          error: `Insufficient stock for "${product.title}". Only ${product.stockCount} remaining.`,
+          error: `Insufficient stock for "${product.title}". Only ${Math.max(0, product.stockCount || 0)} remaining.`,
         }, { status: 400 });
       }
 
       const itemTotal = product.price * qty;
       subtotal += itemTotal;
 
-      primarySellerId = product.businessId;
-      primarySellerName = product.businessName;
+      if (orderItems.length === 0) {
+        primarySellerId = product.businessId;
+        primarySellerName = product.businessName;
+      }
 
       orderItems.push({
         productId: product.id,
@@ -116,9 +151,23 @@ export async function POST(req: NextRequest) {
         sellerName: product.businessName,
         image: product.images[0] || "",
       });
+      reservations.push({ productId: product.id, qty });
+    }
 
-      // Decrement inventory in live database
-      serverDB.decrementStock(product.id, qty);
+    // 3. All lines are valid: reserve stock (rolls back on any unexpected failure)
+    const reserved: Array<{ productId: string; qty: number }> = [];
+    for (const r of reservations) {
+      if (!serverDB.decrementStock(r.productId, r.qty)) {
+        for (const done of reserved) {
+          const p = serverDB.getProductById(done.productId);
+          if (p) serverDB.updateProduct(done.productId, { stockCount: p.stockCount + done.qty });
+        }
+        return NextResponse.json(
+          { success: false, error: "An item just went out of stock. Please review your cart and try again." },
+          { status: 409 }
+        );
+      }
+      reserved.push(r);
     }
 
     const deliveryFee = calculateCountyDeliveryFee(county);
@@ -128,11 +177,15 @@ export async function POST(req: NextRequest) {
     }
     const totalAmount = Math.max(0, subtotal + deliveryFee - discountAmount);
 
-    const orderNumber = `ORD-${Math.floor(10000 + Math.random() * 90000)}`;
+    // Unique, human-friendly order number
+    let orderNumber = "";
+    do {
+      orderNumber = `ORD-${Math.floor(10000 + Math.random() * 90000)}`;
+    } while (serverDB.getOrderByNumber(orderNumber));
 
     const newOrder = serverDB.createOrder({
       orderNumber,
-      customerId: user?.id || `guest-${Date.now()}`,
+      customerId: user.id,
       customerName,
       customerPhone,
       customerEmail,
@@ -159,19 +212,29 @@ export async function POST(req: NextRequest) {
     }
 
     // In-app notification for buyer
-    if (user?.id) {
+    serverDB.addNotification({
+      userId: user.id,
+      title: `Order ${newOrder.orderNumber} Created`,
+      message: `Your order for ${orderItems.length} item(s) has been placed. Amount: KSh ${newOrder.totalAmount.toLocaleString()}.`,
+      type: "ORDER",
+      link: `/customer/dashboard`,
+    });
+
+    // In-app notification for the merchant (notifications are addressed to user ids, not business ids)
+    const sellerUser = serverDB.findUserByBusiness(primarySellerId);
+    if (sellerUser) {
       serverDB.addNotification({
-        userId: user.id,
-        title: `Order ${newOrder.orderNumber} Created`,
-        message: `Your order for ${orderItems.length} item(s) has been placed. Amount: KSh ${newOrder.totalAmount.toLocaleString()}.`,
+        userId: sellerUser.id,
+        title: `New Order ${newOrder.orderNumber}`,
+        message: `${customerName} ordered ${orderItems.length} item(s) worth KSh ${newOrder.totalAmount.toLocaleString()}${paymentMethod === "COD" ? " (Pay on Delivery)" : " — awaiting payment"}.`,
         type: "ORDER",
-        link: `/customer/dashboard`,
+        link: `/seller/orders`,
       });
     }
 
     serverDB.logAction({
-      userId: user?.id,
-      userRole: user?.role,
+      userId: user.id,
+      userRole: user.role,
       action: "ORDER_CREATED",
       resource: "ORDER",
       resourceId: newOrder.id,

@@ -43,9 +43,10 @@ export async function POST(req: NextRequest) {
     let sessionToken: string | null = null;
 
     if (user) {
-      // Upgrade existing user account to SELLER
+      // Upgrade existing user account to SELLER (preserve ADMIN/SUPER_ADMIN privileges)
+      const nextRole = user.role === "ADMIN" || user.role === "SUPER_ADMIN" ? user.role : "SELLER";
       const updatedUser = serverDB.updateUser(user.id, {
-        role: "SELLER",
+        role: nextRole,
         businessId: user.businessId || businessId,
         businessName: bizName,
         businessSlug: user.businessSlug || businessSlug,
@@ -54,30 +55,34 @@ export async function POST(req: NextRequest) {
       });
       if (updatedUser) user = updatedUser;
     } else {
-      // Find or create user
-      let existingUser = ownerEmail ? serverDB.findUserByEmail(ownerEmail) : undefined;
-      if (!existingUser && ownerPhone) {
-        existingUser = serverDB.findUserByPhone(ownerPhone);
-      }
+      // Unauthenticated caller: never hijack an existing account by email/phone
+      const existingUser =
+        (ownerEmail ? serverDB.findUserByEmail(ownerEmail) : undefined) ||
+        (ownerPhone ? serverDB.findUserByPhone(ownerPhone) : undefined);
 
       if (existingUser) {
-        const updated = serverDB.updateUser(existingUser.id, {
-          role: "SELLER",
-          businessId: existingUser.businessId || businessId,
-          businessName: bizName,
-          businessSlug: existingUser.businessSlug || businessSlug,
-        });
-        user = updated || existingUser;
-      } else {
-        user = serverDB.createUser({
-          name: ownerName,
-          email: ownerEmail || `merchant_${Date.now()}@vendlex.vercel.app`,
-          phone: ownerPhone || "+254700000000",
-          role: "SELLER",
-          password: "password123", // default fallback password
-          businessName: bizName,
-        });
+        return NextResponse.json(
+          {
+            success: false,
+            error: "An account with this email or phone number already exists. Please sign in first to activate your seller store.",
+          },
+          { status: 409 }
+        );
       }
+
+      const fallbackPassword =
+        typeof body.password === "string" && body.password.length >= 8
+          ? body.password
+          : `Vlx!${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+
+      user = serverDB.createUser({
+        name: ownerName,
+        email: ownerEmail || `merchant_${Date.now()}@vendlex.vercel.app`,
+        phone: ownerPhone || "+254700000000",
+        role: "SELLER",
+        password: fallbackPassword,
+        businessName: bizName,
+      });
 
       const userAgent = req.headers.get("user-agent") || undefined;
       const session = serverDB.createSession(user.id, user.role, {

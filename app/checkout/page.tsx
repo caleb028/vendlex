@@ -77,6 +77,12 @@ export default function CheckoutPage() {
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [confirmedOrderNumber, setConfirmedOrderNumber] = useState("");
   const [confirmedReceipt, setConfirmedReceipt] = useState("");
+  const [pendingOrder, setPendingOrder] = useState<{
+    id: string;
+    orderNumber: string;
+    total: number;
+    signature: string;
+  } | null>(null);
 
   // Form validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -177,6 +183,39 @@ export default function CheckoutPage() {
       setIsProcessingOrder(true);
       setCheckoutError("");
 
+      // Signature of what the buyer is about to pay for. If the buyer closes the M-Pesa prompt and
+      // retries with nothing changed we re-use the same unpaid order instead of creating a duplicate.
+      const orderSignature = JSON.stringify({
+        items: items
+          .map((i) => [i.product.id, i.quantity])
+          .sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
+        customerName,
+        customerPhone,
+        customerEmail,
+        deliveryCounty,
+        town,
+        estate,
+        deliveryNotes,
+        paymentMethod,
+      });
+
+      if (pendingOrder && pendingOrder.signature === orderSignature && paymentMethod === "MPESA") {
+        setConfirmedOrderNumber(pendingOrder.orderNumber);
+        setIsProcessingOrder(false);
+        setMpesaModalOpen(true);
+        return;
+      }
+
+      if (pendingOrder) {
+        // Details changed: release the stale unpaid order (returns its reserved stock).
+        fetch(`/api/orders/${pendingOrder.id}/status`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "CANCELLED" }),
+        }).catch(() => {});
+        setPendingOrder(null);
+      }
+
       try {
         const res = await fetch("/api/orders", {
           method: "POST",
@@ -203,11 +242,19 @@ export default function CheckoutPage() {
         }
 
         setConfirmedOrderNumber(data.order.orderNumber);
+        // The server's total is authoritative (the client figure is display-only).
+        setPendingOrder({
+          id: data.order.id,
+          orderNumber: data.order.orderNumber,
+          total: Number(data.order.totalAmount) || total,
+          signature: orderSignature,
+        });
 
         if (paymentMethod === "MPESA") {
           setMpesaModalOpen(true);
         } else {
-          completeOrder("CARD-AUTH-982", data.order.orderNumber);
+          // Pay on Delivery: the order is placed but nothing has been paid, so no receipt.
+          completeOrder("", data.order.orderNumber, Number(data.order.totalAmount) || total);
         }
       } catch (err: any) {
         setIsProcessingOrder(false);
@@ -221,8 +268,8 @@ export default function CheckoutPage() {
 
   const { addOrder } = usePlatform();
 
-  const completeOrder = (receipt: string, orderNo?: string) => {
-    const finalOrderNumber = orderNo || confirmedOrderNumber || `ORD-${Math.floor(10000 + Math.random() * 90000)}`;
+  const completeOrder = (receipt: string, orderNo?: string, amountOverride?: number) => {
+    const finalOrderNumber = orderNo || confirmedOrderNumber || pendingOrder?.orderNumber || "";
     setConfirmedOrderNumber(finalOrderNumber);
     setConfirmedReceipt(receipt);
     setOrderConfirmed(true);
@@ -235,7 +282,7 @@ export default function CheckoutPage() {
       county: deliveryCounty,
       productTitle: items.map((i) => i.product.title).join(", ") || "VendLex Marketplace Order",
       storeName: items[0]?.product.businessName || "VendLex Merchant",
-      amount: total,
+      amount: amountOverride ?? pendingOrder?.total ?? total,
       mpesaReceipt: receipt,
     });
 
@@ -306,10 +353,13 @@ export default function CheckoutPage() {
                 <CheckCircle2 className="w-10 h-10" />
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-foreground">
-                Asante! Order Confirmed.
+                {confirmedReceipt ? "Asante! Payment Confirmed." : "Asante! Order Placed."}
               </h1>
               <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
-                Your order <strong className="text-foreground">#{confirmedOrderNumber}</strong> has been received and verified. The merchant has begun packing your items.
+                Your order <strong className="text-foreground">#{confirmedOrderNumber}</strong>{" "}
+                {confirmedReceipt
+                  ? "has been paid and sent to the merchant for packing."
+                  : "has been received. The merchant will prepare it and you pay when it is delivered."}
               </p>
             </div>
 
@@ -322,7 +372,7 @@ export default function CheckoutPage() {
               <div className="flex justify-between border-b border-border pb-2">
                 <span className="text-muted-foreground">Payment Method:</span>
                 <span className="font-bold text-foreground">
-                  {paymentMethod === "MPESA" ? "M-Pesa STK Push (Paid)" : paymentMethod === "CARD" ? "Card Payment (Paid)" : "Cash on Delivery"}
+                  {paymentMethod === "MPESA" ? "M-Pesa STK Push (Paid)" : "Pay on Delivery (Unpaid)"}
                 </span>
               </div>
               {confirmedReceipt && (
@@ -336,8 +386,8 @@ export default function CheckoutPage() {
                 <span className="font-semibold text-foreground">{customerName} • {town}, {deliveryCounty}</span>
               </div>
               <div className="flex justify-between pt-1 font-bold text-sm">
-                <span>Total Amount Paid:</span>
-                <span className="text-brand-emerald text-base font-black">{formatKSh(total)}</span>
+                <span>{confirmedReceipt ? "Total Amount Paid:" : "Total Due on Delivery:"}</span>
+                <span className="text-brand-emerald text-base font-black">{formatKSh(pendingOrder?.total ?? total)}</span>
               </div>
             </div>
 
@@ -829,25 +879,24 @@ export default function CheckoutPage() {
                       </span>
                     </label>
 
-                    {/* Debit/Credit Card */}
-                    <label
-                      onClick={() => setPaymentMethod("CARD")}
-                      className={`flex items-start justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
-                        paymentMethod === "CARD"
-                          ? "border-brand-emerald bg-brand-emerald-soft/30 dark:bg-brand-dark-bg"
-                          : "border-border hover:bg-muted/30"
-                      }`}
+                    {/* Debit/Credit Card - gateway not integrated yet, so it is not selectable */}
+                    <div
+                      aria-disabled="true"
+                      className="flex items-start justify-between p-4 rounded-2xl border border-border opacity-60 cursor-not-allowed"
                     >
                       <div className="flex items-start gap-3">
                         <CreditCard className="w-6 h-6 text-blue-600 shrink-0 mt-1" />
                         <div>
                           <div className="font-bold text-xs text-foreground">Debit / Credit Card (Visa, Mastercard)</div>
                           <p className="text-[11px] text-muted-foreground mt-0.5">
-                            3D Secure Kenyan bank card checkout.
+                            Card checkout is coming soon. Please use M-Pesa or Pay on Delivery.
                           </p>
                         </div>
                       </div>
-                    </label>
+                      <span className="text-[10px] bg-muted text-muted-foreground font-bold px-2 py-0.5 rounded-full">
+                        Coming soon
+                      </span>
+                    </div>
 
                     {/* Cash on Delivery */}
                     <label
@@ -861,9 +910,9 @@ export default function CheckoutPage() {
                       <div className="flex items-start gap-3">
                         <Smartphone className="w-6 h-6 text-amber-500 shrink-0 mt-1" />
                         <div>
-                          <div className="font-bold text-xs text-foreground">Pay on Delivery via M-Pesa</div>
+                          <div className="font-bold text-xs text-foreground">Pay on Delivery (Cash or M-Pesa)</div>
                           <p className="text-[11px] text-muted-foreground mt-0.5">
-                            Inspect goods upon rider arrival before sending M-Pesa to store Till.
+                            Inspect goods upon rider arrival, then pay the rider or send M-Pesa to the store Till.
                           </p>
                         </div>
                       </div>
@@ -904,7 +953,9 @@ export default function CheckoutPage() {
                     {isProcessingOrder
                       ? "Processing Order..."
                       : currentStep === 4
-                      ? `Pay ${formatKSh(total)} with ${paymentMethod === "MPESA" ? "M-Pesa" : "Card"}`
+                      ? paymentMethod === "MPESA"
+                        ? `Pay ${formatKSh(total)} with M-Pesa`
+                        : `Place Order (Pay ${formatKSh(total)} on Delivery)`
                       : "Continue to Next Step"}
                   </span>
                   <ArrowRight className="w-4 h-4" />
@@ -975,8 +1026,8 @@ export default function CheckoutPage() {
         isOpen={mpesaModalOpen}
         onClose={() => setMpesaModalOpen(false)}
         phone={customerPhone}
-        amount={total}
-        orderNumber={confirmedOrderNumber || `VLX-${Math.floor(10000 + Math.random() * 90000)}`}
+        amount={pendingOrder?.total ?? total}
+        orderNumber={pendingOrder?.orderNumber || confirmedOrderNumber}
         onSuccess={(receipt) => {
           setMpesaModalOpen(false);
           completeOrder(receipt);

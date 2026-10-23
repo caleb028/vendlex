@@ -533,6 +533,7 @@ class ServerDatabaseManager {
       mpesaReceipt?: string;
       paymentStatus?: ServerOrder["paymentStatus"];
       documentId?: string;
+      checkoutRequestId?: string;
     }
   ): { success: boolean; order?: ServerOrder; error?: string } {
     const order = this.getOrderById(orderId);
@@ -549,11 +550,30 @@ class ServerDatabaseManager {
       CANCELLED: [],
     };
 
-    if (order.status !== newStatus && !validTransitions[order.status].includes(newStatus)) {
+    // Cash-on-Delivery orders have no online payment step: the merchant may start processing
+    // straight away, and the cash is collected (and the order becomes PAID) on delivery.
+    const isCodFastTrack =
+      order.paymentMethod === "COD" &&
+      order.status === "PENDING_PAYMENT" &&
+      newStatus === "PROCESSING";
+
+    if (order.status !== newStatus && !validTransitions[order.status].includes(newStatus) && !isCodFastTrack) {
       return {
         success: false,
         error: `Invalid transition from ${order.status} to ${newStatus}`,
       };
+    }
+
+    // Return reserved stock to the catalogue when an order is cancelled. Stock is reserved
+    // at order creation, so without this every cancelled/abandoned order would leak inventory.
+    if (newStatus === "CANCELLED" && order.status !== "CANCELLED") {
+      for (const item of order.items) {
+        const prod = this.getProductById(item.productId);
+        if (prod) {
+          prod.stockCount += item.quantity;
+          prod.inStock = prod.stockCount > 0;
+        }
+      }
     }
 
     order.status = newStatus;
@@ -561,10 +581,55 @@ class ServerDatabaseManager {
     if (metadata?.mpesaReceipt) order.mpesaReceipt = metadata.mpesaReceipt;
     if (metadata?.paymentStatus) order.paymentStatus = metadata.paymentStatus;
     if (metadata?.documentId) order.documentId = metadata.documentId;
+    if (metadata?.checkoutRequestId) order.checkoutRequestId = metadata.checkoutRequestId;
+    if (newStatus === "DELIVERED" && order.paymentMethod === "COD") order.paymentStatus = "PAID";
     order.updatedAt = new Date().toISOString();
 
     this.persist();
     return { success: true, order };
+  }
+
+  /**
+   * Link an in-flight M-Pesa STK request to its order so the Daraja callback can be
+   * reconciled against exactly the right order (never "whichever order is pending").
+   */
+  public setOrderCheckoutRequest(orderId: string, checkoutRequestId: string): void {
+    const order = this.getOrderById(orderId);
+    if (!order) return;
+    order.checkoutRequestId = checkoutRequestId;
+    order.updatedAt = new Date().toISOString();
+    this.persist();
+  }
+
+  /**
+   * Cancel online-payment orders (M-Pesa / card) that were never paid within maxAgeMs and
+   * release their reserved stock. COD orders are excluded: they are legitimately unpaid
+   * until delivery. Called lazily from order endpoints, so no background job is required.
+   */
+  public expireStaleUnpaidOrders(maxAgeMs: number = 30 * 60 * 1000): number {
+    const cutoff = Date.now() - maxAgeMs;
+    let expired = 0;
+    for (const order of this.db.orders) {
+      if (
+        order.status === "PENDING_PAYMENT" &&
+        order.paymentMethod !== "COD" &&
+        new Date(order.createdAt).getTime() < cutoff
+      ) {
+        const res = this.updateOrderStatus(order.id, "CANCELLED");
+        if (res.success) expired += 1;
+      }
+    }
+    return expired;
+  }
+
+  /**
+   * Resolve the platform user that owns a business (orders/ads reference businessId or slug,
+   * but notifications are addressed to a user id).
+   */
+  public findUserByBusiness(businessIdOrSlug: string): ServerUser | undefined {
+    return this.db.users.find(
+      (u) => u.businessId === businessIdOrSlug || u.businessSlug === businessIdOrSlug
+    );
   }
 
   // ==========================================================================

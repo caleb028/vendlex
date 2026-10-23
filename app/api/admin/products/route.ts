@@ -141,16 +141,22 @@ export async function PUT(req: NextRequest) {
 
     const updates: Record<string, any> = {};
     if (body.title !== undefined) updates.title = sanitizeInput(body.title, 120);
-    if (body.price !== undefined) updates.price = Number(body.price);
-    if (body.stock !== undefined) {
-      updates.stock = Number(body.stock);
-      updates.inStock = updates.stock > 0;
+    if (body.price !== undefined) {
+      const p = Number(body.price);
+      if (!Number.isNaN(p) && p > 0) updates.price = p;
+    }
+    if (body.stock !== undefined || body.stockCount !== undefined) {
+      const s = Number(body.stockCount ?? body.stock);
+      if (!Number.isNaN(s)) {
+        updates.stockCount = Math.max(0, Math.floor(s));
+        updates.inStock = updates.stockCount > 0;
+      }
     }
     if (body.category !== undefined) updates.category = sanitizeInput(body.category, 60);
     if (body.county !== undefined) updates.county = sanitizeInput(body.county, 40);
     if (body.town !== undefined) updates.town = sanitizeInput(body.town, 40);
     if (body.badge !== undefined) updates.badge = body.badge ? sanitizeInput(body.badge, 30) : undefined;
-    if (body.image !== undefined) updates.image = body.image;
+    if (body.image !== undefined && body.image) updates.images = [body.image];
     if (body.description !== undefined) updates.description = sanitizeInput(body.description, 500);
 
     const updated = serverDB.updateProduct(id, updates);

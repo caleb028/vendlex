@@ -14,14 +14,19 @@ export async function GET(req: NextRequest) {
     const county = searchParams.get("county") || "";
     const town = searchParams.get("town") || "";
     const sellerId = searchParams.get("sellerId") || "";
-    const minPrice = searchParams.get("minPrice") ? parseFloat(searchParams.get("minPrice")!) : undefined;
-    const maxPrice = searchParams.get("maxPrice") ? parseFloat(searchParams.get("maxPrice")!) : undefined;
-    const minRating = searchParams.get("minRating") ? parseFloat(searchParams.get("minRating")!) : undefined;
+    const rawMinPrice = searchParams.get("minPrice") ? parseFloat(searchParams.get("minPrice")!) : undefined;
+    const rawMaxPrice = searchParams.get("maxPrice") ? parseFloat(searchParams.get("maxPrice")!) : undefined;
+    const rawMinRating = searchParams.get("minRating") ? parseFloat(searchParams.get("minRating")!) : undefined;
+    const minPrice = typeof rawMinPrice === "number" && !Number.isNaN(rawMinPrice) ? rawMinPrice : undefined;
+    const maxPrice = typeof rawMaxPrice === "number" && !Number.isNaN(rawMaxPrice) ? rawMaxPrice : undefined;
+    const minRating = typeof rawMinRating === "number" && !Number.isNaN(rawMinRating) ? rawMinRating : undefined;
     const verifiedOnly = searchParams.get("verifiedOnly") === "true";
     const inStockOnly = searchParams.get("inStockOnly") === "true";
     const dealOnly = searchParams.get("dealOnly") === "true";
-    const limit = parseInt(searchParams.get("limit") || "50", 10);
-    const offset = parseInt(searchParams.get("offset") || "0", 10);
+    const parsedLimit = parseInt(searchParams.get("limit") || "50", 10);
+    const parsedOffset = parseInt(searchParams.get("offset") || "0", 10);
+    const limit = Number.isNaN(parsedLimit) || parsedLimit <= 0 ? 50 : Math.min(parsedLimit, 500);
+    const offset = Number.isNaN(parsedOffset) || parsedOffset < 0 ? 0 : parsedOffset;
 
     let products = serverDB.getProducts();
 
@@ -110,8 +115,10 @@ export async function POST(req: NextRequest) {
     const category = sanitizeInput(body.category || "General Merchandise", 60);
     const description = sanitizeInput(body.description || "", 1000);
     const price = parseFloat(body.price);
-    const originalPrice = body.originalPrice ? parseFloat(body.originalPrice) : undefined;
-    const stockCount = parseInt(body.stockCount || "1", 10);
+    const rawOriginal = body.originalPrice ? parseFloat(body.originalPrice) : undefined;
+    const originalPrice = typeof rawOriginal === "number" && !Number.isNaN(rawOriginal) && rawOriginal > 0 ? rawOriginal : undefined;
+    const parsedStock = parseInt(String(body.stockCount ?? "1"), 10);
+    const stockCount = Number.isNaN(parsedStock) ? 1 : Math.max(0, parsedStock);
     const county = sanitizeInput(body.county || "Nairobi", 40);
     const town = sanitizeInput(body.town || "Central", 40);
     const sku = sanitizeInput(body.sku || `SKU-${Math.floor(1000 + Math.random() * 9000)}`, 30);
